@@ -1,0 +1,237 @@
+diff --git a/librecomp/src/files.cpp b/librecomp/src/files.cpp
+index af6f18d..87a62a7 100644
+--- a/librecomp/src/files.cpp
++++ b/librecomp/src/files.cpp
+@@ -1,5 +1,9 @@
+ #include "files.hpp"
+ 
++#ifdef _WIN32
++#include <windows.h>
++#endif
++
+ constexpr std::u8string_view backup_suffix = u8".bak";
+ constexpr std::u8string_view temp_suffix = u8".temp";
+ 
+@@ -42,10 +46,14 @@ bool recomp::finalize_output_file_with_backup(const std::filesystem::path& filep
+             return false;
+         }
+     }
+-    std::filesystem::copy_file(temp_path, filepath, std::filesystem::copy_options::overwrite_existing, ec);
+-    if (ec) {
+-        return false;
+-    }
+-    std::filesystem::remove(temp_path, ec);
+-    return true;
++#ifdef _WIN32
++    return MoveFileExW(temp_path.c_str(), filepath.c_str(),
++                       MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
++#else
++    // POSIX rename replaces the destination atomically. A crash can therefore
++    // leave either the previous primary or the complete new primary, never a
++    // partially copied save.
++    std::filesystem::rename(temp_path, filepath, ec);
++    return !ec;
++#endif
+ }
+diff --git a/librecomp/src/pi.cpp b/librecomp/src/pi.cpp
+index 16c3214..4d0dd54 100644
+--- a/librecomp/src/pi.cpp
++++ b/librecomp/src/pi.cpp
+@@ -362,6 +362,8 @@ struct {
+     // Used to tell the consumer thread that the saving thread is ready for a file swap.
+     moodycamel::LightweightSemaphore swap_file_ready_sempahore;
+     std::mutex save_buffer_mutex;
++    std::mutex save_io_mutex;
++    std::atomic_bool save_dirty{false};
+ } save_context;
+ 
+ const std::u8string save_folder = u8"saves";
+@@ -380,14 +382,26 @@ void set_save_file_path(const std::u8string& subfolder, const std::u8string& nam
+     save_context.save_file_path = dir / (name + u8".bin");
+ }
+ 
+-void update_save_file() {
++bool update_save_file(bool force = false) {
++    std::lock_guard io_lock{ save_context.save_io_mutex };
++    std::vector<char> snapshot;
++    {
++        std::lock_guard buffer_lock{ save_context.save_buffer_mutex };
++        if (!force && !save_context.save_dirty.exchange(false)) {
++            return true;
++        }
++        snapshot = save_context.save_buffer;
++        save_context.save_dirty.store(false);
++    }
++
+     bool saving_failed = false;
+     {
+         std::ofstream save_file = recomp::open_output_file_with_backup(ultramodern::get_save_file_path(), std::ios_base::binary);
+ 
+         if (save_file.good()) {
+-            std::lock_guard lock{ save_context.save_buffer_mutex };
+-            save_file.write(save_context.save_buffer.data(), save_context.save_buffer.size());
++            save_file.write(snapshot.data(), snapshot.size());
++            save_file.flush();
++            saving_failed = !save_file.good();
+         }
+         else {
+             saving_failed = true;
+@@ -397,8 +411,10 @@ void update_save_file() {
+         saving_failed = !recomp::finalize_output_file_with_backup(ultramodern::get_save_file_path());
+     }
+     if (saving_failed) {
++        save_context.save_dirty.store(true);
+         ultramodern::error_handling::message_box("Failed to write to the save file. Check your file permissions and whether the save folder has been moved to Dropbox or similar, as this can cause issues.");
+     }
++    return !saving_failed;
+ }
+ 
+ extern std::atomic_bool exited;
+@@ -423,13 +439,18 @@ void saving_thread_func(RDRAM_ARG1) {
+ 
+         // Only touch the file when at least one write landed this round.
+         if (dirty) {
+-            update_save_file();
++            update_save_file(false);
+         }
+ 
+         if (save_context.swap_file_pending_sempahore.tryWait()) {
++            update_save_file(false);
+             save_context.swap_file_ready_sempahore.signal();
+         }
+     }
++
++    // `quit()` can race with a newly signaled write. Always give the final
++    // dirty snapshot one synchronous opportunity to reach disk before join.
++    update_save_file(false);
+ }
+ 
+ void save_write_ptr(const void* in, uint32_t offset, uint32_t count) {
+@@ -438,6 +459,7 @@ void save_write_ptr(const void* in, uint32_t offset, uint32_t count) {
+     {
+         std::lock_guard lock{ save_context.save_buffer_mutex };
+         std::memcpy(save_context.save_buffer.data() + offset, in, count);
++        save_context.save_dirty.store(true);
+     }
+ 
+     save_context.write_sempahore.signal();
+@@ -451,6 +473,7 @@ void save_write(RDRAM_ARG PTR(void) rdram_address, uint32_t offset, uint32_t cou
+         for (uint32_t pos = 0; pos < count; ++pos) {
+             save_context.save_buffer[offset + pos] = MEM_B(pos, rdram_address);
+         }
++        save_context.save_dirty.store(true);
+     }
+ 
+     save_context.write_sempahore.signal();
+@@ -472,6 +495,7 @@ void save_clear(uint32_t start, uint32_t size, char value) {
+         std::lock_guard lock{ save_context.save_buffer_mutex };
+         auto first = save_context.save_buffer.begin() + start;
+         std::fill(first, first + size, value);
++        save_context.save_dirty.store(true);
+     }
+ 
+     save_context.write_sempahore.signal();
+@@ -494,6 +518,38 @@ size_t get_save_size(recomp::SaveType save_type) {
+     return 0;
+ }
+ 
++bool read_exact_save(const std::filesystem::path& path, std::vector<char>& destination) {
++    std::error_code ec;
++    if (!std::filesystem::exists(path, ec) || ec ||
++        std::filesystem::file_size(path, ec) != destination.size() || ec) {
++        return false;
++    }
++
++    std::ifstream input{path, std::ios_base::binary};
++    if (!input.good()) {
++        return false;
++    }
++    input.read(destination.data(), destination.size());
++    return static_cast<size_t>(input.gcount()) == destination.size();
++}
++
++void quarantine_invalid_save(const std::filesystem::path& path) {
++    std::error_code ec;
++    if (!std::filesystem::exists(path, ec) || ec) {
++        return;
++    }
++
++    std::filesystem::path corrupt_path{path};
++    corrupt_path += u8".corrupt";
++    std::filesystem::remove(corrupt_path, ec);
++    ec.clear();
++    std::filesystem::rename(path, corrupt_path, ec);
++    if (ec) {
++        std::fprintf(stderr, "[save] could not quarantine an invalid save file\n");
++        std::fflush(stderr);
++    }
++}
++
+ void read_save_file() {
+     std::filesystem::path save_file_path = ultramodern::get_save_file_path();
+ 
+@@ -502,12 +558,36 @@ void read_save_file() {
+ 
+     const char blank_value =
+         recomp::get_save_type() == recomp::SaveType::Flashram ? static_cast<char>(0xFF) : 0;
+-    std::fill(save_context.save_buffer.begin(), save_context.save_buffer.end(), blank_value);
++    std::vector<char> loaded(save_context.save_buffer.size(), blank_value);
++    if (read_exact_save(save_file_path, loaded)) {
++        std::lock_guard lock{ save_context.save_buffer_mutex };
++        save_context.save_buffer = std::move(loaded);
++        save_context.save_dirty.store(false);
++        return;
++    }
++
++    std::filesystem::path backup_path{save_file_path};
++    backup_path += u8".bak";
++    if (read_exact_save(backup_path, loaded)) {
++        quarantine_invalid_save(save_file_path);
++        {
++            std::lock_guard lock{ save_context.save_buffer_mutex };
++            save_context.save_buffer = loaded;
++            save_context.save_dirty.store(false);
++        }
++        const bool restored = update_save_file(true);
++        std::fprintf(stderr, "[save] recovered a valid backup%s\n",
++                     restored ? " and restored the primary" : "");
++        std::fflush(stderr);
++        return;
++    }
+ 
+-    // Read the save file if it exists.
+-    std::ifstream save_file = recomp::open_input_file_with_backup(save_file_path, std::ios_base::binary);
+-    if (save_file.good()) {
+-        save_file.read(save_context.save_buffer.data(), save_context.save_buffer.size());
++    quarantine_invalid_save(save_file_path);
++    quarantine_invalid_save(backup_path);
++    {
++        std::lock_guard lock{ save_context.save_buffer_mutex };
++        std::fill(save_context.save_buffer.begin(), save_context.save_buffer.end(), blank_value);
++        save_context.save_dirty.store(false);
+     }
+ }
+ 
+@@ -531,6 +611,10 @@ void ultramodern::change_save_file(const std::u8string& subfolder, const std::u8
+     read_save_file();
+ }
+ 
++bool ultramodern::flush_save_file() {
++    return update_save_file(true);
++}
++
+ void ultramodern::join_saving_thread() {
+     if (save_context.saving_thread.joinable()) {
+         save_context.saving_thread.join();
+diff --git a/ultramodern/include/ultramodern/ultramodern.hpp b/ultramodern/include/ultramodern/ultramodern.hpp
+index 6e5cf1f..f7e743c 100644
+--- a/ultramodern/include/ultramodern/ultramodern.hpp
++++ b/ultramodern/include/ultramodern/ultramodern.hpp
+@@ -123,6 +123,7 @@ void init_thread_cleanup();
+ // Saving
+ void change_save_file(const std::u8string& subfolder, const std::u8string& name);
+ std::filesystem::path get_save_file_path();
++bool flush_save_file();
+ 
+ // Thread queues.
+ constexpr PTR(PTR(OSThread)) running_queue = (PTR(PTR(OSThread)))-1;

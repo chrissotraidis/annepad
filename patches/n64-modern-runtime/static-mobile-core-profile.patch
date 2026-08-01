@@ -1,0 +1,427 @@
+diff --git a/N64Recomp b/N64Recomp
+--- a/N64Recomp
++++ b/N64Recomp
+@@ -1 +1 @@
+-Subproject commit 94838144bb970ca6b415636924339e90bafa9ebd
++Subproject commit 94838144bb970ca6b415636924339e90bafa9ebd-dirty
+diff --git a/librecomp/CMakeLists.txt b/librecomp/CMakeLists.txt
+index f3348eb..a08303e 100644
+--- a/librecomp/CMakeLists.txt
++++ b/librecomp/CMakeLists.txt
+@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 20)
+ set(CMAKE_CXX_STANDARD_REQUIRED True)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ 
++option(N64MODERN_NO_DYNAMIC_CODE "Compile out runtime code generation and dynamic-library loading" OFF)
++
+ # Define the library
+ add_library(librecomp STATIC
+     "${CMAKE_CURRENT_SOURCE_DIR}/src/ai.cpp"
+@@ -95,5 +97,11 @@ endif()
+ add_subdirectory(${PROJECT_SOURCE_DIR}/../thirdparty/miniz ${CMAKE_CURRENT_BINARY_DIR}/miniz)
+ add_subdirectory(${PROJECT_SOURCE_DIR}/../N64Recomp ${CMAKE_CURRENT_BINARY_DIR}/N64Recomp EXCLUDE_FROM_ALL)
+ 
+-target_link_libraries(librecomp PRIVATE ultramodern N64Recomp LiveRecomp)
++target_link_libraries(librecomp PRIVATE ultramodern N64Recomp)
++if (N64MODERN_NO_DYNAMIC_CODE)
++    target_compile_definitions(librecomp PUBLIC N64MODERN_NO_DYNAMIC_CODE=1)
++    message(STATUS "librecomp: runtime code generation and dynamic loading compiled out")
++else()
++    target_link_libraries(librecomp PRIVATE LiveRecomp)
++endif()
+ target_link_libraries(librecomp PUBLIC miniz)
+diff --git a/librecomp/include/librecomp/mods.hpp b/librecomp/include/librecomp/mods.hpp
+index 6632910..8aeaee3 100644
+--- a/librecomp/include/librecomp/mods.hpp
++++ b/librecomp/include/librecomp/mods.hpp
+@@ -434,7 +434,9 @@ namespace recomp {
+             // to add hooks to any functions that weren't already replaced by a mod.
+             std::vector<bool> processed_hook_slots;
+             // Generated shim functions to use for implementing shim exports.
++#if !defined(N64MODERN_NO_DYNAMIC_CODE)
+             std::vector<std::unique_ptr<N64Recomp::ShimFunction>> shim_functions;
++#endif
+             ConfigSchema empty_schema;
+             std::vector<char> empty_bytes;
+             size_t num_events = 0;
+@@ -594,7 +596,9 @@ namespace recomp {
+             GenericFunction get_function_handle(size_t func_index) final;
+         private:
+             uint32_t base_event_index;
++#if !defined(N64MODERN_NO_DYNAMIC_CODE)
+             std::unique_ptr<N64Recomp::LiveGeneratorOutput> recompiler_output;
++#endif
+             void set_bad();
+             bool is_good = false;
+             std::unique_ptr<int32_t[]> section_addresses;
+diff --git a/librecomp/src/mods.cpp b/librecomp/src/mods.cpp
+index fab0212..04ef304 100644
+--- a/librecomp/src/mods.cpp
++++ b/librecomp/src/mods.cpp
+@@ -8,7 +8,9 @@
+ #include "librecomp/overlays.hpp"
+ #include "librecomp/game.hpp"
+ #include "recompiler/context.h"
++#if !defined(N64MODERN_NO_DYNAMIC_CODE)
+ #include "recompiler/live_recompiler.h"
++#endif
+ 
+ static bool read_json(std::ifstream input_file, nlohmann::json &json_out) {
+     // Nothing to do if the stream isn't usable.
+@@ -95,7 +97,25 @@ struct overloaded : Ts... { using Ts::operator()...; };
+ template<class... Ts>
+ overloaded(Ts...) -> overloaded<Ts...>;
+ 
+-#if defined(_WIN32)
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++class recomp::mods::DynamicLibrary {
++public:
++    static constexpr std::string_view PlatformExtension = "";
++    DynamicLibrary() = default;
++    explicit DynamicLibrary(const std::filesystem::path&) {}
++    void unload() {}
++    bool good() const { return false; }
++    template <typename T>
++    bool get_dll_symbol(T& out, const char*) const {
++        out = nullptr;
++        return false;
++    }
++    uint32_t get_api_version() const { return static_cast<uint32_t>(-1); }
++};
++
++void unprotect(void*, uint64_t* old_flags) { *old_flags = 0; }
++void protect(void*, uint64_t) {}
++#elif defined(_WIN32)
+ #   define WIN32_LEAN_AND_MEAN
+ #   include "Windows.h"
+ 
+@@ -488,6 +508,15 @@ recomp::mods::LiveRecompilerCodeHandle::LiveRecompilerCodeHandle(
+     const N64Recomp::Context& context, const ModCodeHandleInputs& inputs,
+     std::unordered_map<size_t, size_t>&& entry_func_hooks, std::unordered_map<size_t, size_t>&& return_func_hooks, std::vector<size_t>&& original_section_indices, bool regenerated)
+ {
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    (void)context;
++    (void)entry_func_hooks;
++    (void)return_func_hooks;
++    (void)original_section_indices;
++    (void)regenerated;
++    base_event_index = inputs.base_event_index;
++    is_good = false;
++#else
+     if (!regenerated) {
+        section_addresses = std::make_unique<int32_t[]>(context.sections.size());
+     }
+@@ -529,17 +558,28 @@ recomp::mods::LiveRecompilerCodeHandle::LiveRecompilerCodeHandle(
+     // Emit the generated code and record whether the whole process succeeded.
+     recompiler_output = std::make_unique<N64Recomp::LiveGeneratorOutput>(generator.finish());
+     is_good = !recompile_failed && recompiler_output->good;
++#endif
+ }
+ 
+ void recomp::mods::LiveRecompilerCodeHandle::set_imported_function(size_t import_index, GenericFunction func) {
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    (void)import_index;
++    (void)func;
++#else
+     std::visit(overloaded {
+         [this, import_index](recomp_func_t* native_func) {
+             recompiler_output->populate_import_symbol_jumps(import_index, native_func);
+         }
+     }, func);
++#endif
+ }
+ 
+ recomp::mods::CodeModLoadError recomp::mods::LiveRecompilerCodeHandle::populate_reference_symbols(const N64Recomp::Context& context, std::string& error_param) {
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    (void)context;
++    error_param = "runtime code generation is disabled";
++    return CodeModLoadError::FailedToRecompile;
++#else
+     // Resolve a real function pointer for every reference-symbol jump emitted by
+     // the live recompiler and patch it back into the generated output.
+     size_t jump_count = recompiler_output->num_reference_symbol_jumps();
+@@ -559,10 +599,16 @@ recomp::mods::CodeModLoadError recomp::mods::LiveRecompilerCodeHandle::populate_
+         recompiler_output->set_reference_symbol_jump(jump_index, resolved_func);
+     }
+     return CodeModLoadError::Good;
++#endif
+ }
+ 
+ recomp::mods::GenericFunction recomp::mods::LiveRecompilerCodeHandle::get_function_handle(size_t func_index) {
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    (void)func_index;
++    return GenericFunction{static_cast<recomp_func_t*>(nullptr)};
++#else
+     return GenericFunction{ recompiler_output->functions[func_index] };
++#endif
+ }
+ 
+ void patch_func(recomp_func_t* target_func, recomp::mods::GenericFunction replacement_func) {
+@@ -1994,6 +2040,12 @@ std::vector<recomp::mods::ModLoadErrorDetails> build_regen_list(
+ std::unique_ptr<recomp::mods::LiveRecompilerCodeHandle> apply_regenlist(RegeneratedList& regenlist, std::span<const uint8_t> rom) {
+     using namespace recomp::mods;
+ 
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    (void)regenlist;
++    (void)rom;
++    return {};
++#else
++
+     std::unique_ptr<LiveRecompilerCodeHandle> regenerated_code_handle{};
+ 
+     // Build a recompiler context from the regenerated list, marking all reference
+@@ -2040,6 +2092,7 @@ std::unique_ptr<recomp::mods::LiveRecompilerCodeHandle> apply_regenlist(Regenera
+     }
+ 
+     return regenerated_code_handle;
++#endif
+ }
+ 
+ std::vector<recomp::mods::ModLoadErrorDetails> recomp::mods::ModContext::regenerate_with_hooks(
+@@ -2296,6 +2349,13 @@ recomp::mods::CodeModLoadError recomp::mods::ModContext::init_mod_code(uint8_t*
+ }
+ 
+ recomp::mods::CodeModLoadError recomp::mods::ModContext::load_mod_code(uint8_t* rdram, recomp::mods::ModHandle& mod, uint32_t base_event_index, std::string& error_param) {
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    (void)rdram;
++    (void)mod;
++    (void)base_event_index;
++    error_param = "runtime code mods are disabled for this target";
++    return CodeModLoadError::FailedToRecompile;
++#else
+     // Per-function hook maps for this mod: mod function index -> hook slot index.
+     std::unordered_map<size_t, size_t> entry_func_hooks{};
+     std::unordered_map<size_t, size_t> return_func_hooks{};
+@@ -2415,9 +2475,17 @@ recomp::mods::CodeModLoadError recomp::mods::ModContext::load_mod_code(uint8_t*
+     }
+ 
+     return CodeModLoadError::Good;
++#endif
+ }
+ 
+ recomp::mods::CodeModLoadError recomp::mods::ModContext::resolve_code_dependencies(recomp::mods::ModHandle& mod, size_t mod_index, const std::unordered_map<recomp_func_t*, overlays::BasePatchedFunction>& base_patched_funcs, std::string& error_param) {
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    (void)mod;
++    (void)mod_index;
++    (void)base_patched_funcs;
++    error_param = "runtime code mods are disabled for this target";
++    return CodeModLoadError::FailedToRecompile;
++#else
+     // Resolve reference symbols first.
+     std::string reference_syms_error_param{};
+     CodeModLoadError reference_syms_error = mod.code_handle->populate_reference_symbols(*mod.recompiler_context, reference_syms_error_param);
+@@ -2616,6 +2684,7 @@ recomp::mods::CodeModLoadError recomp::mods::ModContext::resolve_code_dependenci
+     }
+ 
+     return CodeModLoadError::Good;
++#endif
+ }
+ 
+ void recomp::mods::ModContext::unload_mods() {
+@@ -2626,7 +2695,9 @@ void recomp::mods::ModContext::unload_mods() {
+     loaded_mods_by_id.clear();
+     hook_slots.clear();
+     processed_hook_slots.clear();
++#if !defined(N64MODERN_NO_DYNAMIC_CODE)
+     shim_functions.clear();
++#endif
+     recomp::mods::reset_events();
+     recomp::mods::reset_hooks();
+     num_events = recomp::overlays::num_base_events();
+diff --git a/librecomp/src/overlays.cpp b/librecomp/src/overlays.cpp
+index 08fe7be..b0bf9f9 100644
+--- a/librecomp/src/overlays.cpp
++++ b/librecomp/src/overlays.cpp
+@@ -54,7 +54,16 @@
+ 
+ #include "recomp.h"
+ #include "recompiler/context.h"
++#if __has_include("recompiler/tcc_recompiler.h")
++#define N64MODERN_HAS_TCC_RECOMPILER 1
+ #include "recompiler/tcc_recompiler.h"
++#else
++#define N64MODERN_HAS_TCC_RECOMPILER 0
++#endif
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++#undef N64MODERN_HAS_TCC_RECOMPILER
++#define N64MODERN_HAS_TCC_RECOMPILER 0
++#endif
+ #include "overlays.hpp"
+ #include "sections.h"
+ #include "json/json.hpp"
+@@ -2469,9 +2478,11 @@ extern "C" void recomp_capture_interp_target(uint32_t addr);
+ // func_map and the generated code bakes in its string/jumptable/section-addr
+ // pointers. Freeing any of these would UAF. Guarded by func_map_mutex.
+ struct JitEntry {
++#if N64MODERN_HAS_TCC_RECOMPILER
+     // The TccRecompOutput owns the TCCState that backs the executable code, so
+     // it must outlive every call to the compiled function.
+     std::unique_ptr<N64Recomp::TccRecompOutput> tcc_output;
++#endif
+ };
+ static std::vector<JitEntry> g_jit_entries;
+ 
+@@ -2515,12 +2526,16 @@ static std::unordered_map<uint32_t, std::vector<FragmentCandidate>> g_frag_cands
+ // kill switch for debugging only. Validated default-on: self-test proves the
+ // native path; PMS + Stadium 1 + Stadium 2 run with 0 divergences / 0 regress.
+ static bool frag_jit_enabled() {
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    return false;
++#else
+     static const bool enabled = []{
+         const char* v = std::getenv("PSR_FRAG_JIT");
+         return !(v && (v[0] == '0' || v[0] == 'n' || v[0] == 'N' ||
+                        v[0] == 'f' || v[0] == 'F'));
+     }();
+     return enabled;
++#endif
+ }
+ 
+ // fnv1a_64 over the live code bytes at [addr, addr+len), read in the recompiler's
+@@ -3533,6 +3548,7 @@ static const std::string& tcc_toolchain_dir() {
+ static recomp_func_t* codegen_function(N64Recomp::Context& ctx, uint32_t vram,
+                                        JitEntry& entry_out, size_t* out_code_size,
+                                        std::string& err) {
++#if N64MODERN_HAS_TCC_RECOMPILER
+     using namespace N64Recomp;
+     // Bind every host runtime helper the CGenerator output can call. All are
+     // CODE symbols (tcc_add_symbol resolves them); the lone DATA symbol,
+@@ -3570,6 +3586,14 @@ static recomp_func_t* codegen_function(N64Recomp::Context& ctx, uint32_t vram,
+     if (out_code_size) *out_code_size = tcc_out.code_size;
+     entry_out.tcc_output = std::make_unique<TccRecompOutput>(std::move(tcc_out));
+     return fn;
++#else
++    (void)ctx;
++    (void)vram;
++    (void)entry_out;
++    if (out_code_size) *out_code_size = 0;
++    err = "optional TCC live-recompiler backend is unavailable";
++    return nullptr;
++#endif
+ }
+ 
+ static recomp_func_t* jit_compile_inner(uint32_t vram, uint8_t* rdram,
+@@ -3826,6 +3850,9 @@ static recomp_func_t* jit_compile_function(uint32_t vram, uint8_t* rdram,
+ // to the same graceful abort as before. JIT work runs on a 256 MiB-reserved
+ // worker thread guarded by SEH + a 2 s watchdog. PSR_JIT_TIER=0 restores opt-out.
+ static bool jit_tier_enabled() {
++#if defined(N64MODERN_NO_DYNAMIC_CODE)
++    return false;
++#else
+     static const bool enabled = [](){
+         const char* v = std::getenv("PSR_JIT_TIER");
+         // Default ON; only an explicit 0/false/no disables it.
+@@ -3834,9 +3861,54 @@ static bool jit_tier_enabled() {
+                  v[0] == 'n' || v[0] == 'N');
+     }();
+     return enabled;
++#endif
+ }
+ 
+ static void unhandled_lookup_trampoline(uint8_t* rdram, recomp_context* ctx) {
++    // Stadium's high-level audio voice dispatcher returns to 0x8003ADB0.
++    // A stale voice can index past the fixed handler table and produce a
++    // sample-like target. Returning zero is the dispatcher's native failure
++    // contract: its next branch silences that voice at voice+0x38.
++    if ((uint32_t)ctx->r31 == 0x8003ADB0u) {
++        static std::atomic<uint32_t> voice_repair_count{0};
++        const uint32_t n =
++            voice_repair_count.fetch_add(1, std::memory_order_relaxed);
++        if (n < 8u) {
++            std::fprintf(stderr,
++                "[audio-uaf] rejected stale secondary handler=0x%08X; "
++                "caller will silence voice\n",
++                (uint32_t)g_self_heal_addr);
++            std::fflush(stderr);
++        }
++        ctx->r2 = 0;
++        return;
++    }
++
++    // Pokemon Stadium's static _decodeChunk body returns to 0x8004FB58 after
++    // invoking N_PVoice.dc_dma. Every voice is initialized with __amDMA, but a
++    // voice racing a pool transition can survive just long enough for dc_dma
++    // and dc_dmaState to be overwritten by newly-loaded sample bytes. Recover
++    // only that exact indirect-call site: restore the real callback/state for
++    // the current call, without mutating the stale descriptor or skipping the
++    // game's decoder/DMA path.
++    if ((uint32_t)ctx->r31 == 0x8004FB58u &&
++        (uint32_t)g_self_heal_addr != 0x8003C8DCu) {
++        static std::atomic<uint32_t> repair_count{0};
++        const uint32_t n = repair_count.fetch_add(1, std::memory_order_relaxed);
++        if (n < 8u) {
++            std::fprintf(stderr,
++                "[audio-uaf] repaired stale dc_dma=0x%08X state=0x%08X "
++                "rom=0x%08X len=0x%X\n",
++                (uint32_t)g_self_heal_addr, (uint32_t)ctx->r6,
++                (uint32_t)ctx->r4, (uint32_t)ctx->r5);
++            std::fflush(stderr);
++        }
++        ctx->r6 = (gpr)(int32_t)0x800FCAB8u; // Stadium dmaState
++        recomp_func_t* dma = get_function((int32_t)0x8003C8DCu); // __amDMA
++        dma(rdram, ctx);
++        return;
++    }
++
+     // ── Interior-return self-heal (tier 2 before the loud abort) ─────────
+     // The dominant miss class is a return address interior to a resident
+     // fragment function (the tailcall-bubble dispatcher re-enters via
+diff --git a/librecomp/src/recomp.cpp b/librecomp/src/recomp.cpp
+index 342dff4..fbcca9e 100644
+--- a/librecomp/src/recomp.cpp
++++ b/librecomp/src/recomp.cpp
+@@ -38,7 +38,9 @@
+ #include "ultramodern/error_handling.hpp"
+ #include "librecomp/addresses.hpp"
+ #include "librecomp/mods.hpp"
++#if !defined(N64MODERN_NO_DYNAMIC_CODE)
+ #include "recompiler/live_recompiler.h"
++#endif
+ 
+ #ifdef _WIN32
+ #    define WIN32_LEAN_AND_MEAN
+@@ -98,7 +100,9 @@ bool recomp::register_game(const recomp::GameEntry& entry) {
+ }
+ 
+ void recomp::mods::initialize_mods() {
++#if !defined(N64MODERN_NO_DYNAMIC_CODE)
+     N64Recomp::live_recompiler_init();
++#endif
+     std::filesystem::create_directories(config_path / mods_directory);
+     std::filesystem::create_directories(config_path / mod_config_directory);
+     mod_context->set_mods_config_path(config_path / "mods.json");
+diff --git a/librecomp/src/audio_uaf_protect.cpp b/librecomp/src/audio_uaf_protect.cpp
+index 3757469..337db65 100644
+--- a/librecomp/src/audio_uaf_protect.cpp
++++ b/librecomp/src/audio_uaf_protect.cpp
+@@ -565,6 +565,19 @@ extern "C" int librecomp_audio_uaf_silence_secondary_in_range(
+     int silenced = 0;
+     for (uint32_t i = 0; i < count; i++) {
+         uint32_t voice_p = array_p + (uint32_t)i * (uint32_t)L.voice_size;
++
++        // The field we clear is commonly the voice's command-stream pointer.
++        // Catch it directly before following the optional sample-data chain:
++        // either resource can independently outlive the pool being released.
++        uint32_t silence_field_v =
++            load_be32(rdram, voice_p + (uint32_t)L.silence_field_offset);
++        if (silence_field_v >= start_vaddr && silence_field_v < end_vaddr) {
++            store_be32(rdram, voice_p + (uint32_t)L.silence_field_offset,
++                       L.silence_value);
++            silenced++;
++            continue;
++        }
++
+         uint32_t cur_v = 0x80000000u | (voice_p & 0x1FFFFFFFu);
+ 
+         bool ok = true;
+@@ -587,8 +600,8 @@ extern "C" int librecomp_audio_uaf_silence_secondary_in_range(
+ 
+     if (silenced > 0) {
+         std::fprintf(stderr,
+-            "[audio-uaf-2nd] silenced %d secondary voice(s) whose chained "
+-            "pointer fell in [0x%08X, 0x%08X)\n",
++            "[audio-uaf-2nd] silenced %d secondary voice(s) whose command "
++            "or chained pointer fell in [0x%08X, 0x%08X)\n",
+             silenced, start_vaddr, end_vaddr);
+         std::fflush(stderr);
+     }

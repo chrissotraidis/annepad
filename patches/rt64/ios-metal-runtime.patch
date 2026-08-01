@@ -1,0 +1,367 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3881276..72cdebc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -5,7 +5,9 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+ 
+ if (APPLE)
+     enable_language(OBJC OBJCXX)
+-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
++    if (NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
++        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
++    endif()
+ endif()
+ 
+ option(RT64_STATIC "Build RT64 as a static library" OFF)
+@@ -16,6 +18,11 @@ if (${RT64_BUILD_EXAMPLES})
+ endif()
+ 
+ option(RT64_SDL_WINDOW_VULKAN "Build RT64 to expect an SDL Window outside of Windows" OFF)
++option(RT64_BUILD_TOOLS "Build RT64 host-side tools" ON)
++
++set(DXC_PATH "" CACHE FILEPATH "Host DXC executable used for shader compilation")
++set(SPIRV_CROSS_MSL_PATH "" CACHE FILEPATH "Host spirv_cross_msl executable")
++set(FILE_TO_C_PATH "" CACHE FILEPATH "Host file_to_c executable")
+ 
+ if (NOT ${RT64_STATIC})
+     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+@@ -39,7 +46,17 @@ function(preprocess INFILE OUTFILE OPTIONS)
+     endif()
+ endfunction()
+ 
+-if (WIN32)
++if (DXC_PATH)
++    if(APPLE)
++        get_filename_component(DXC_ARCH_BIN_DIR "${DXC_PATH}" DIRECTORY)
++        get_filename_component(DXC_BIN_DIR "${DXC_ARCH_BIN_DIR}" DIRECTORY)
++        get_filename_component(DXC_ROOT_DIR "${DXC_BIN_DIR}" DIRECTORY)
++        get_filename_component(DXC_ARCH "${DXC_ARCH_BIN_DIR}" NAME)
++        set(DXC "DYLD_LIBRARY_PATH=${DXC_ROOT_DIR}/lib/${DXC_ARCH}" "${DXC_PATH}")
++    else()
++        set(DXC "${DXC_PATH}")
++    endif()
++elseif (WIN32)
+     set (DXC "${PROJECT_SOURCE_DIR}/src/contrib/dxc/bin/x64/dxc.exe")
+     add_compile_definitions(NOMINMAX)
+ 
+@@ -70,7 +87,12 @@ set(ZSTD_LEGACY_SUPPORT OFF)
+ set(ZSTD_BUILD_STATIC ON)
+ set(ZSTD_BUILD_SHARED OFF)
+ 
+-add_subdirectory(src/tools/file_to_c)
++if(FILE_TO_C_PATH)
++    add_executable(file_to_c IMPORTED GLOBAL)
++    set_target_properties(file_to_c PROPERTIES IMPORTED_LOCATION "${FILE_TO_C_PATH}")
++else()
++    add_subdirectory(src/tools/file_to_c)
++endif()
+ add_subdirectory(src/contrib/re-spirv)
+ add_subdirectory(src/contrib/nativefiledialog-extended)
+ add_subdirectory(src/contrib/zstd/build/cmake)
+@@ -109,7 +131,7 @@ set (DXC_RT_OPTS "${DXC_COMMON_OPTS}" "-D" "RT_SHADER" "-T" "lib_6_3" "-fspv-tar
+ 
+ function(build_shader_spirv_impl TARGETOBJ FILENAME TARGET_NAME OUTNAME)
+     add_custom_command(OUTPUT ${OUTNAME}.spv
+-        COMMAND ${DXC} ${DXC_SPV_OPTS} ${ARGN} ${FILENAME} /Fo ${OUTNAME}.spv
++        COMMAND ${DXC} ${DXC_SPV_OPTS} ${RT64_SIMULATOR_DXC_EXTRA_OPTS} ${ARGN} ${FILENAME} /Fo ${OUTNAME}.spv
+         DEPENDS ${FILENAME})
+     add_custom_command(OUTPUT ${OUTNAME}.spirv.c
+         COMMAND file_to_c ${OUTNAME}.spv ${TARGET_NAME}BlobSPIRV ${OUTNAME}.spirv.c ${OUTNAME}.spirv.h
+@@ -129,18 +151,44 @@ function(build_shader_dxil_impl TARGETOBJ FILENAME TARGET_NAME OUTNAME)
+     target_sources(${TARGETOBJ} PRIVATE ${OUTNAME}.dxil.c)
+ endfunction()
+ 
++if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
++    if(CMAKE_OSX_SYSROOT MATCHES "iphonesimulator")
++        set(RT64_APPLE_METAL_SDK "iphonesimulator")
++        set(RT64_APPLE_METAL_MIN_FLAG "-mios-simulator-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
++        set(RT64_SIMULATOR_DXC_EXTRA_OPTS "-D" "RT64_DISABLE_NATIVE_SAMPLERS")
++    else()
++        set(RT64_APPLE_METAL_SDK "iphoneos")
++        set(RT64_APPLE_METAL_MIN_FLAG "-mios-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
++        set(RT64_SIMULATOR_DXC_EXTRA_OPTS "")
++    endif()
++else()
++    set(RT64_APPLE_METAL_SDK "macosx")
++    set(RT64_APPLE_METAL_MIN_FLAG "")
++    set(RT64_SIMULATOR_DXC_EXTRA_OPTS "")
++endif()
++
++set(RT64_METAL_COMPILER_COMMAND
++    "xcrun;-sdk;${RT64_APPLE_METAL_SDK};metal"
++    CACHE STRING "Command used to compile Metal shader sources")
++set(RT64_METALLIB_COMMAND
++    "xcrun;-sdk;${RT64_APPLE_METAL_SDK};metallib"
++    CACHE STRING "Command used to link Metal shader libraries")
++set(RT64_METAL_COMPILER_FLAGS
++    "${RT64_APPLE_METAL_MIN_FLAG}"
++    CACHE STRING "Additional flags passed to the Metal shader compiler")
++
+ function(build_shader_msl_impl TARGETOBJ FILENAME TARGET_NAME OUTNAME)
+     add_custom_command(OUTPUT ${OUTNAME}.spv
+-            COMMAND ${DXC} ${DXC_SPV_OPTS} ${ARGN} ${FILENAME} /Fo ${OUTNAME}.spv
++            COMMAND ${DXC} ${DXC_SPV_OPTS} ${RT64_SIMULATOR_DXC_EXTRA_OPTS} ${ARGN} ${FILENAME} /Fo ${OUTNAME}.spv
+             DEPENDS ${FILENAME})
+     add_custom_command(OUTPUT ${OUTNAME}.metal
+             COMMAND spirv_cross_msl ${OUTNAME}.spv ${OUTNAME}.metal
+             DEPENDS ${OUTNAME}.spv spirv_cross_msl)
+     add_custom_command(OUTPUT ${OUTNAME}.ir
+-            COMMAND xcrun -sdk macosx metal -o ${OUTNAME}.ir -c ${OUTNAME}.metal $<$<CONFIG:Debug>:-frecord-sources>
++            COMMAND ${RT64_METAL_COMPILER_COMMAND} ${RT64_METAL_COMPILER_FLAGS} -o ${OUTNAME}.ir -c ${OUTNAME}.metal $<$<CONFIG:Debug>:-frecord-sources>
+             DEPENDS ${OUTNAME}.metal)
+     add_custom_command(OUTPUT ${OUTNAME}.metallib
+-            COMMAND xcrun -sdk macosx metallib ${OUTNAME}.ir -o ${OUTNAME}.metallib
++            COMMAND ${RT64_METALLIB_COMMAND} ${OUTNAME}.ir -o ${OUTNAME}.metallib
+             DEPENDS ${OUTNAME}.ir)
+     add_custom_command(OUTPUT ${OUTNAME}.metal.c
+             COMMAND file_to_c ${OUTNAME}.metallib ${TARGET_NAME}BlobMSL ${OUTNAME}.metal.c ${OUTNAME}.metal.h
+@@ -283,6 +331,10 @@ if (WIN32)
+     set(SDL2_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src/contrib/mupen64plus-win32-deps/SDL2-2.26.3/include")
+     set(SDL2_LIBRARIES "SDL2" "SDL2main")
+     link_directories("${PROJECT_SOURCE_DIR}/src/contrib/mupen64plus-win32-deps/SDL2-2.26.3/lib/x64")
++elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
++    if(NOT SDL2_INCLUDE_DIRS)
++        message(FATAL_ERROR "SDL2_INCLUDE_DIRS must point to SDL2 headers when cross-compiling RT64 for iOS")
++    endif()
+ else()
+     find_package(SDL2 REQUIRED)
+ endif()
+@@ -452,19 +504,30 @@ target_link_libraries(rt64 nfd)
+ target_link_libraries(rt64 libzstd_static)
+ 
+ # Add tools.
+-add_subdirectory(src/tools/texture_hasher)
+-add_subdirectory(src/tools/texture_packer)
++if(RT64_BUILD_TOOLS)
++    add_subdirectory(src/tools/texture_hasher)
++    add_subdirectory(src/tools/texture_packer)
++endif()
+ 
+ # Add any Apple-specific source files and libraries
+ if (APPLE)
+-    add_subdirectory(src/tools/spirv_cross_msl)
++    if(SPIRV_CROSS_MSL_PATH)
++        add_executable(spirv_cross_msl IMPORTED GLOBAL)
++        set_target_properties(spirv_cross_msl PROPERTIES IMPORTED_LOCATION "${SPIRV_CROSS_MSL_PATH}")
++    else()
++        add_subdirectory(src/tools/spirv_cross_msl)
++    endif()
+ 
+     target_sources(rt64 PRIVATE
+         "${PROJECT_SOURCE_DIR}/src/metal/rt64_metal.cpp"
+         "${PROJECT_SOURCE_DIR}/src/apple/rt64_apple.mm"
+     )
+     target_include_directories(rt64 PRIVATE "${PROJECT_SOURCE_DIR}/src/contrib/metal-cpp")
+-    target_link_libraries(rt64 "-framework Metal -framework QuartzCore -framework CoreGraphics")
++    if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
++        target_link_libraries(rt64 "-framework Metal -framework QuartzCore -framework CoreGraphics -framework Foundation -framework UIKit")
++    else()
++        target_link_libraries(rt64 "-framework Metal -framework QuartzCore -framework CoreGraphics")
++    endif()
+ endif()
+ 
+ # Add any Windows-specific source files and libraries
+diff --git a/src/apple/rt64_apple.h b/src/apple/rt64_apple.h
+index 6fd8860..d2ae282 100644
+--- a/src/apple/rt64_apple.h
++++ b/src/apple/rt64_apple.h
+@@ -13,6 +13,7 @@ struct CocoaWindowAttributes {
+ };
+ 
+ const char* GetHomeDirectory();
++const char* GetApplicationSupportDirectory();
+ 
+ class CocoaWindow {
+ private:
+diff --git a/src/apple/rt64_apple.mm b/src/apple/rt64_apple.mm
+index 9ef49c6..ed63891 100644
+--- a/src/apple/rt64_apple.mm
++++ b/src/apple/rt64_apple.mm
+@@ -1,12 +1,92 @@
+ #include "rt64_apple.h"
+ 
+-#import <AppKit/AppKit.h>
++#import <TargetConditionals.h>
+ #import <Foundation/Foundation.h>
++#if TARGET_OS_IPHONE
++#import <UIKit/UIKit.h>
++#else
++#import <AppKit/AppKit.h>
++#endif
+ 
+ const char* GetHomeDirectory() {
+     return strdup([NSHomeDirectory() UTF8String]);
+ }
+ 
++const char* GetApplicationSupportDirectory() {
++    NSArray<NSURL *> *urls = [[NSFileManager defaultManager]
++        URLsForDirectory:NSApplicationSupportDirectory
++        inDomains:NSUserDomainMask];
++    NSURL *url = [urls firstObject];
++    return url == nil ? nullptr : strdup([[url path] UTF8String]);
++}
++
++#if TARGET_OS_IPHONE
++
++CocoaWindow::CocoaWindow(void* window)
++    : windowHandle(window), cachedRefreshRate(60) {
++    cachedAttributes = {0, 0, 0, 0};
++    updateWindowAttributesInternal(true);
++    updateRefreshRateInternal(true);
++}
++
++CocoaWindow::~CocoaWindow() {}
++
++void CocoaWindow::updateWindowAttributesInternal(bool forceSync) {
++    auto updateBlock = ^{
++        UIWindow *uiWindow = (__bridge UIWindow *)windowHandle;
++        UIScreen *screen = uiWindow.screen ?: [UIScreen mainScreen];
++        CGRect bounds = uiWindow.bounds;
++        CGFloat scale = screen.nativeScale > 0.0 ? screen.nativeScale : screen.scale;
++
++        std::lock_guard<std::mutex> lock(attributesMutex);
++        cachedAttributes.x = 0;
++        cachedAttributes.y = 0;
++        cachedAttributes.width = static_cast<int>(bounds.size.width * scale);
++        cachedAttributes.height = static_cast<int>(bounds.size.height * scale);
++    };
++
++    if ([NSThread isMainThread]) {
++        updateBlock();
++    } else if (forceSync) {
++        dispatch_sync(dispatch_get_main_queue(), updateBlock);
++    } else {
++        dispatch_async(dispatch_get_main_queue(), updateBlock);
++    }
++}
++
++void CocoaWindow::updateRefreshRateInternal(bool forceSync) {
++    auto updateBlock = ^{
++        UIWindow *uiWindow = (__bridge UIWindow *)windowHandle;
++        UIScreen *screen = uiWindow.screen ?: [UIScreen mainScreen];
++        cachedRefreshRate.store(static_cast<int>(screen.maximumFramesPerSecond));
++    };
++
++    if ([NSThread isMainThread]) {
++        updateBlock();
++    } else if (forceSync) {
++        dispatch_sync(dispatch_get_main_queue(), updateBlock);
++    } else {
++        dispatch_async(dispatch_get_main_queue(), updateBlock);
++    }
++}
++
++void CocoaWindow::getWindowAttributes(CocoaWindowAttributes* attributes) const {
++    const_cast<CocoaWindow*>(this)->updateWindowAttributesInternal(true);
++    std::lock_guard<std::mutex> lock(attributesMutex);
++    *attributes = cachedAttributes;
++}
++
++int CocoaWindow::getRefreshRate() const {
++    const_cast<CocoaWindow*>(this)->updateRefreshRateInternal(true);
++    return cachedRefreshRate.load();
++}
++
++void CocoaWindow::toggleFullscreen() {
++    // iOS applications already own a fullscreen scene.
++}
++
++#else
++
+ // MARK: - CocoaWindow
+ 
+ CocoaWindow::CocoaWindow(void* window)
+@@ -124,3 +204,5 @@ void CocoaWindow::toggleFullscreen() {
+         });
+     }
+ }
++
++#endif
+diff --git a/src/common/rt64_user_paths.cpp b/src/common/rt64_user_paths.cpp
+index f38d8eb..342f35b 100644
+--- a/src/common/rt64_user_paths.cpp
++++ b/src/common/rt64_user_paths.cpp
+@@ -10,6 +10,7 @@
+ #elif defined(_WIN32)
+ #   include <Shlobj.h>
+ #elif defined(__APPLE__)
++#   include <TargetConditionals.h>
+ #   include "apple/rt64_apple.h"
+ #endif
+ 
+@@ -32,6 +33,11 @@ namespace RT64 {
+         }
+ 
+         CoTaskMemFree(knownPath);
++#   elif defined(__APPLE__) && TARGET_OS_IPHONE
++        const char *applicationSupportDir = GetApplicationSupportDirectory();
++        if (applicationSupportDir != nullptr) {
++            resultPath = std::filesystem::path{ applicationSupportDir } / appId;
++        }
+ #   elif defined(__linux__) || defined(__APPLE__)
+         const char *homeDir = getenv("HOME");
+         if (homeDir == nullptr) {
+diff --git a/src/metal/rt64_metal.cpp b/src/metal/rt64_metal.cpp
+index 0d88e46..b131425 100644
+--- a/src/metal/rt64_metal.cpp
++++ b/src/metal/rt64_metal.cpp
+@@ -3130,8 +3130,15 @@ namespace RT64 {
+     }
+ 
+     bool MetalInterface::isValid() const {
++#if RT64_IOS && TARGET_OS_SIMULATOR
++        // Simulator exposes a host-backed Metal device whose GPU-family report
++        // does not match physical Apple GPU families. The backend already
++        // disables unsupported native-sampler paths for this target.
++        return device != nullptr;
++#else
+         // check if Metal is available and we support bindless textures: GPUFamilyMac2 or GPUFamilyApple6
+         return MTL::CopyAllDevices()->count() > 0 && (device->supportsFamily(MTL::GPUFamilyMac2) || device->supportsFamily(MTL::GPUFamilyApple6));
++#endif
+     }
+ 
+     void MetalInterface::createResolvePipelineState() {
+diff --git a/src/render/rt64_shader_library.cpp b/src/render/rt64_shader_library.cpp
+index d1c5273..c046333 100644
+--- a/src/render/rt64_shader_library.cpp
++++ b/src/render/rt64_shader_library.cpp
+@@ -852,8 +852,9 @@ namespace RT64 {
+             postProcess.pipeline = device->createGraphicsPipeline(pipelineDesc);
+         }
+         
+-        // Raytracing debug.
+-        {
++        // Raytracing debug. Avoid creating its oversized descriptor layout on
++        // backends that do not expose raytracing, including iOS Simulator.
++        if (deviceCapabilities.raytracing) {
+             FramebufferRendererDescriptorCommonSet descriptorCommonSet(samplerLibrary, deviceCapabilities.raytracing);
+             FramebufferRendererDescriptorTextureSet descriptorTextureSet;
+             FramebufferRendererDescriptorFramebufferSet descriptorFramebufferSet;
+diff --git a/src/shaders/TextureSampler.hlsli b/src/shaders/TextureSampler.hlsli
+index 7305736..7f3f28c 100644
+--- a/src/shaders/TextureSampler.hlsli
++++ b/src/shaders/TextureSampler.hlsli
+@@ -147,7 +147,11 @@ float4 sampleTextureLevel(const RDPTile rdpTile, const GPUTile gpuTile, bool fil
+     int2 texelBaseInt = floor(uvCoord);
+     bool filtering = or(filterBilerp, linearFiltering);
+     float4 samples[4];
++#ifdef RT64_DISABLE_NATIVE_SAMPLERS
++    const uint nativeSampler = NATIVE_SAMPLER_NONE;
++#else
+     const uint nativeSampler = rdpTile.nativeSampler;
++#endif
+     bool gpuTileUsesTMEM = canDecodeTMEM && gpuTileFlagRawTMEM(gpuTile.flags);
+     if ((nativeSampler == NATIVE_SAMPLER_NONE) || gpuTileUsesTMEM) {
+ #if USE_FOR_LOOPS
+@@ -261,7 +265,11 @@ float4 sampleTexture(OtherMode otherMode, RenderFlags renderFlags, float2 inputU
+     const uint tlut = otherMode.textLUT();
+     const bool canDecodeTMEM = renderFlagCanDecodeTMEM(renderFlags);
+     const bool usesHDR = renderFlagUsesHDR(renderFlags);
++#ifdef RT64_DISABLE_NATIVE_SAMPLERS
++    const uint nativeSampler = NATIVE_SAMPLER_NONE;
++#else
+     const uint nativeSampler = rdpTile.nativeSampler;
++#endif
+     const bool flagHasMipmaps = gpuTileFlagHasMipmaps(gpuTile.flags);
+     uint numRDPSamples = 0;
+     uint RDPMipLevels[2];

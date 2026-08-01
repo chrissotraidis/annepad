@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-07-31",
+  "notes": [
+    "The Pokemon Stadium game, disassembly, launcher, and N64Recomp commits are exact upstream pins.",
+    "N64ModernRuntime and RT64 are inferred reconstruction candidates because v0.4.6 does not publish their commits.",
+    "Source checkouts are local build inputs; redistribution remains subject to docs/LEGAL-AND-ASSET-BOUNDARIES.md."
+  ],
+  "sources": {
+    "pokemonStadiumRecomp": {
+      "url": "https://github.com/mstan/PokemonStadiumRecomp.git",
+      "commit": "de27b7b8481630d41fc7fb913dbd02572d421efd",
+      "provenance": "v0.4.6 release commit"
+    },
+    "pokemonStadiumDisasm": {
+      "url": "https://github.com/pret/pokestadium.git",
+      "commit": "756f7e332ee3837ead17197276cebc071108e8c6",
+      "provenance": "PokemonStadiumRecomp gitlink",
+      "redistribution": "blocked-pending-license-clarification"
+    },
+    "n64splat": {
+      "url": "https://github.com/ethteck/splat.git",
+      "commit": "433edd205953812ebd29f96602daa1a729947514",
+      "provenance": "pokemonStadiumDisasm gitlink"
+    },
+    "recompUi": {
+      "url": "https://github.com/mstan/recomp-ui.git",
+      "commit": "4ed61d0dd826bb81f17d3b23e412b974114bf83f",
+      "provenance": "PokemonStadiumRecomp gitlink",
+      "redistribution": "blocked-pending-license-clarification"
+    },
+    "n64RecompGenerator": {
+      "url": "https://github.com/mstan/N64Recomp.git",
+      "commit": "2b949c5c3f1c41dd76023e7626a6302a4a262a8a",
+      "provenance": "PokemonStadiumRecomp n64recomp.pin; host AOT generator"
+    },
+    "n64RecompRuntime": {
+      "url": "https://github.com/mstan/N64Recomp.git",
+      "commit": "94838144bb970ca6b415636924339e90bafa9ebd",
+      "provenance": "N64ModernRuntime gitlink; runtime and LiveRecomp build interface"
+    },
+    "n64ModernRuntime": {
+      "url": "https://github.com/mstan/N64ModernRuntime.git",
+      "commit": "d4bf8828514c567df42ff049e1e90505bdcdb734",
+      "provenance": "inferred pre-v0.4.6 fork head"
+    },
+    "rt64": {
+      "url": "https://github.com/mstan/rt64.git",
+      "commit": "821a8676963a1b486ca693ebaf8dd606f6c31c64",
+      "provenance": "inferred pre-v0.4.6 fork head"
+    },
+    "bearbirdpadReference": {
+      "url": "https://github.com/chrissotraidis/bearbirdpad.git",
+      "commit": "0451d3fae492bb9c474e90596cba7efce820b349",
+      "provenance": "research reference only"
+    },
+    "harkinianpadReference": {
+      "url": "https://github.com/chrissotraidis/harkinianpad.git",
+      "commit": "4db21e4be0f0be52948438de5d8c755d191897ae",
+      "provenance": "local research reference only"
+    }
+  },
+  "rom": {
+    "title": "Pokemon Stadium (US) 1.0",
+    "normalizedByteOrder": "z64-big-endian",
+    "size": 33554432,
+    "md5": "ed1378bc12115f71209a77844965ba50",
+    "redistribution": "forbidden"
+  },
+  "iosBuildDependencies": {
+    "sdl2": {
+      "version": "2.32.10",
+      "url": "https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-2.32.10.tar.gz",
+      "sha256": "5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165"
+    }
+  }
+}

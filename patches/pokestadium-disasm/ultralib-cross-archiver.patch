@@ -1,0 +1,13 @@
+diff --git a/lib/ultralib/Makefile b/lib/ultralib/Makefile
+index c324b20..e18c77e 100644
+--- a/lib/ultralib/Makefile
++++ b/lib/ultralib/Makefile
+@@ -26,7 +26,7 @@ ifeq ($(VERBOSE),0)
+ endif
+ 
+ CPP := cpp -P
+-AR := ar
++AR := $(CROSS)ar
+ 
+ VERSION_D := 1
+ VERSION_E := 2

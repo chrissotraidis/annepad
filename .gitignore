@@ -1,0 +1,44 @@
+.DS_Store
+
+# User-supplied game material and saves must never enter source control.
+*.n64
+*.v64
+*.z64
+*.rom
+*.sav
+*.sra
+*.eep
+*.fla
+*.gb
+*.gbc
+
+# Local reference material is intentionally untracked. Keep only its policy file.
+/ref/*
+!/ref/README.md
+
+# Local dependency research and generated build output.
+/research/
+/external/
+/vendor/
+/worktrees/
+/build/
+/build-*/
+/DerivedData/
+/artifacts/
+/logs/
+
+# Apple/Xcode user state and signing output.
+*.xcuserstate
+xcuserdata/
+*.mobileprovision
+*.p12
+*.cer
+*.ipa
+*.app/
+*.xcarchive/
+*.dSYM/
+
+# Generated recompilation output is derived from the user's ROM.
+/generated/
+/generated-*/
+/assets/generated/

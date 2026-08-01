@@ -1,0 +1,36 @@
+diff --git a/src/main/recomp_audio_debug.h b/src/main/recomp_audio_debug.h
+--- a/src/main/recomp_audio_debug.h
++++ b/src/main/recomp_audio_debug.h
+@@ -36,6 +36,26 @@
+ #include <stdint.h>
+ #include <stddef.h>
+ 
++#if defined(ANNEPAD_RELEASE_BUILD)
++
++enum { RAD_SYNTH_OFF = -1, RAD_SYNTH_SILENCE = 0, RAD_SYNTH_SINE = 1,
++       RAD_SYNTH_SQUARE = 2, RAD_SYNTH_IMPULSE = 3 };
++
++static inline int recomp_audio_debug_init(void) { return 0; }
++static inline int recomp_audio_debug_enabled(void) { return 0; }
++static inline void recomp_audio_debug_push_i16(const char*, const int16_t*,
++                                                int, double, int) {}
++static inline void recomp_audio_debug_push_f32(const char*, const float*,
++                                                int, double, int) {}
++static inline void recomp_audio_debug_eventf(const char*, const char*, ...) {}
++static inline double recomp_audio_debug_now_ms(void) { return 0.0; }
++static inline int recomp_audio_debug_dump(double, const char*) { return -1; }
++static inline int recomp_audio_synth_mode(void) { return RAD_SYNTH_OFF; }
++static inline void recomp_audio_synth_fill(int, int16_t*, int, int, double,
++                                           uint64_t*) {}
++
++#else
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+@@ -401,4 +421,5 @@ void recomp_audio_synth_fill(int mode, int16_t *out, int frames, int channels,
+ }
+ 
+ #endif /* RECOMP_AUDIO_DEBUG_IMPL */
++#endif /* ANNEPAD_RELEASE_BUILD */
+ #endif /* RECOMP_AUDIO_DEBUG_H */

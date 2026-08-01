@@ -1,0 +1,13 @@
+diff --git a/src/fragments/62/fragment62_35DF70.c b/src/fragments/62/fragment62_35DF70.c
+index bcff846..0022fb3 100644
+--- a/src/fragments/62/fragment62_35DF70.c
++++ b/src/fragments/62/fragment62_35DF70.c
+@@ -3,7 +3,7 @@
+ 
+ typedef void (*func_D_8438AE50)(void);
+ 
+-static const char D_8438DC80[] = "は\nこんらんした";
++static const char D_8438DC80[] = "は" "\n" "こんらんした";
+ static const char D_8438DC90[] = "SP %d\n";
+ static const char D_8438DC98[] = "index %d  step %d\n";
+ static const char D_8438DCAC[] = "index %d  step %d\n";

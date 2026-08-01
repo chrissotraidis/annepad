@@ -1,0 +1,12 @@
+diff --git a/librecomp/include/librecomp/audio_uaf_protect.hpp b/librecomp/include/librecomp/audio_uaf_protect.hpp
+index d2b95c2..909d487 100644
+--- a/librecomp/include/librecomp/audio_uaf_protect.hpp
++++ b/librecomp/include/librecomp/audio_uaf_protect.hpp
+@@ -9,6 +9,7 @@
+ #ifndef __LIBRECOMP_AUDIO_UAF_PROTECT__
+ #define __LIBRECOMP_AUDIO_UAF_PROTECT__
+ 
++#include <stddef.h>
+ #include <cstdint>
+ 
+ // libnaudio voice UAF protection.

@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7a0d41d..d1588fa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -176,6 +176,8 @@ target_sources(OfflineModRecomp PRIVATE
+ target_link_libraries(OfflineModRecomp fmt rabbitizer tomlplusplus::tomlplusplus N64Recomp)
+ 
+ # Live recompiler
++option(N64MODERN_NO_DYNAMIC_CODE "Do not build runtime-generated executable code support" OFF)
++if (NOT N64MODERN_NO_DYNAMIC_CODE)
+ project(LiveRecomp)
+ add_library(LiveRecomp)
+ 
+@@ -214,6 +216,7 @@ target_include_directories(JitHangRepro PRIVATE
+     ${CMAKE_CURRENT_SOURCE_DIR}/lib/sljit/sljit_src
+ )
+ target_link_libraries(JitHangRepro LiveRecomp)
++endif()
+ 
+ # Ares oracle bridge — generic divergence-checking oracle for any
+ # N64Recomp consumer. Stub by default; opt in to real Ares with
