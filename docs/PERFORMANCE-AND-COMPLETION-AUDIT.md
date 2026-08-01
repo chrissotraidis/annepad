@@ -1,11 +1,11 @@
 # Performance and completion audit
 
-Updated: 2026-08-01 16:20 CDT
+Updated: 2026-08-01 18:20 CDT
 
 ## Bottom line
 
 AnnePad does not have one generic “slow game” problem. The current evidence
-separates three different concerns:
+separates four different concerns:
 
 1. The iPad Simulator misses the game's 30 Hz presentation cadence in some
    scenes, with synchronous Simulator Metal argument-buffer/XPC work dominating
@@ -13,10 +13,14 @@ separates three different concerns:
 2. Release previously executed several upstream reverse-engineering probes.
    Ninety-six diagnostic hook sites are now compiled out while the six
    separately classified correctness hooks remain active.
-3. Gameplay completion is gated less by compilation than by deterministic
-   touch acceptance, a full battle with the corrected overlay, and physical
-   iPad signing, lifecycle, audio, controller, sustained-performance, and
-   thermal tests.
+3. Gameplay correctness has touch-only battle proof. Release completion is now
+   gated by the exact package/clean-build proof, timed Z acceptance, and
+   physical iPad signing, lifecycle, audio, controller, sustained-performance,
+   orientation, and thermal tests.
+4. The retained Simulator process is stable enough to finish a touch-only
+   battle and remain alive for hours, but occasional Simulator CoreAudio
+   overloads and unresolved cold-orientation behavior are separate acceptance
+   issues. Neither should be mislabeled as a game crash or as renderer FPS.
 
 The macOS static recompilation has completed a full rental battle. The native
 iOS build renders, advances, accepts touch, saves, resumes, and packages, but it
@@ -98,14 +102,31 @@ is not yet physically proven or release-ready.
   six rentals through an explicit `LOSE`, and returned to the main selection
   menu. The timed UIKit Z-latch and physical-device ergonomics remain open.
 
-### 5. The remaining finish line is mostly acceptance work
+### 5. Current evidence does not reproduce an AnnePad crash
+
+- The corrected-overlay rental battle reached its explicit result, returned to
+  the main selection menu, and observed no crash or stuck input.
+- A follow-up live check found the same Simulator process still alive and
+  rendering after approximately two hours. No AnnePad report was present in
+  the host DiagnosticReports or that Simulator's CrashReporter directory.
+- The Simulator log does contain occasional CoreAudio
+  `IOWorkLoop: skipping cycle due to overload` entries. That is a real audio
+  scheduling symptom under the measured Simulator load, not evidence of a
+  process crash. Real-speaker/audio-underrun acceptance remains a physical-iPad
+  gate.
+- Cold orientation is not accepted. The app has recovered through earlier
+  rotation/resume smokes, but raw display capture can still show the landscape
+  game surface rotated inside a portrait-oriented Simulator display.
+
+### 6. The remaining finish line is mostly acceptance work
 
 In priority order:
 
-1. Complete timed Z-latch UI acceptance with the corrected overlay.
-2. Rebuild and reproduce the exact current unsigned device package from a clean
-   checkout.
-3. On an attached signed iPad, run the same heavy scene and collect frame-time,
+1. Complete the active source-consistent optimized device build and reproduce
+   its exact unsigned package from a clean checkout.
+2. Complete timed Z-latch UI acceptance with the corrected overlay.
+3. On an attached signed iPad, resolve cold orientation and run the same heavy
+   scene while collecting frame-time,
    memory, thermal, audio, lifecycle, and controller evidence.
 4. Resolve upstream licensing and store/distribution requirements before any
    public release.
