@@ -28,7 +28,6 @@ case "$profile" in
         build_suffix=
         ;;
     release)
-        [[ "$platform" == device ]] || die "release core is supported only for device builds"
         shipping_core=ON
         build_suffix=-release
         ;;

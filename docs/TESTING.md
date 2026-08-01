@@ -34,9 +34,11 @@ evidence.
 - Forbidden symbol/dependency scan for TCC, LiveRecomp, sljit JIT execution,
   `dlopen`, writable+executable memory, desktop AppKit in iOS, and simulator
   frameworks in device builds.
-- Unit tests for byte-order normalization, hashes, paths, atomic saves, config
-  migration, touch geometry/state, normalized input merging, and lifecycle
-  transition idempotence.
+- Required automated tests include byte-order normalization, hashes, paths,
+  atomic saves, config migration, touch geometry/state, normalized input
+  merging, and lifecycle transition idempotence. The repository currently has
+  policy/build/audit automation, but no Apple touch/lifecycle unit-test target;
+  those tests remain an open gate and must not be reported as passing.
 
 Gate 2 passed 2026-07-31 under the iPhoneSimulator 26.5 SDK for arm64. The audit
 found only static AOT/runtime archives, no LiveRecomp/sljit target or artifact,
@@ -69,6 +71,12 @@ result; the exact team was Squirtle/Pikachu/Bulbasaur against
 Oddish/Magnemite/Meowth. Durable evidence is
 `evidence/m5-ios-touch-rental-battle-result.png`. This does not close the
 physical-hardware touch gate.
+
+The 2026-08-01 HarkinianPad-derived correction also builds and installs on that
+iPad Simulator. Its low-grip layout, pressed feedback, Start navigation,
+editor resize/reset/done path, and a short Home/relaunch cycle were observed.
+The timed Z latch and sustained battle were not completed, so this is a partial
+rerun rather than a replacement Gate 5 acceptance.
 
 Gate 6 native ROM setup passed 2026-07-31 on an iPhone 16 Pro Simulator, iOS
 18.5. Remove cleared the private normalized/runtime copies and config; cold
@@ -188,6 +196,17 @@ thermal state, device/OS, resolution/internal scale, and game scene. Do not hide
 short stalls in averages. Initial acceptance is stable full-speed battle and
 responsive input without sustained thermal collapse; numeric budgets are set
 after the first physical baseline.
+
+On 2026-08-01, a temporary counter immediately after RT64's Metal swap-chain
+present call measured the `-O0` validation app on iPad Pro 11-inch (M4), iOS
+18.5. The title/attract path briefly reached 28-30 presents/s but commonly
+reported 3-17 presents/s; other samples landed in the high teens and twenties.
+The process remained alive and CPU was roughly 42-55%, but survival and CPU do
+not make the uneven pacing acceptable. `MTL_HUD_ENABLED` did not expose useful
+Simulator metrics, and an attached Game Performance trace failed to finish a
+valid document, so neither is recorded as evidence. The source probe was removed
+after collection. Repeat the exact scene on the new release-optimized Simulator
+core and in an animated battle before accepting performance.
 
 ## Failure report template
 

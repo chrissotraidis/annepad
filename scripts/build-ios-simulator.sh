@@ -9,17 +9,24 @@ require_command find
 require_command rg
 require_command xcrun
 
-core_build="$ANNEPAD_ROOT/build-ios-core-simulator"
+profile=${1:-release}
+case "$profile" in
+    validation) build_suffix= ;;
+    release) build_suffix=-release ;;
+    *) die "usage: scripts/build-ios-simulator.sh [validation|release]" ;;
+esac
+
+core_build="$ANNEPAD_ROOT/build-ios-core-simulator$build_suffix"
 core_archive="$core_build/libAnnePadRecompiledCore.a"
 deps_prefix="$ANNEPAD_ROOT/build-ios-dependencies/simulator/sdl2"
-build_dir="$ANNEPAD_ROOT/build-ios-app-simulator"
+build_dir="$ANNEPAD_ROOT/build-ios-app-simulator$build_suffix"
 game="$ANNEPAD_SOURCES/PokemonStadiumRecomp"
 renderer="$ANNEPAD_SOURCES/rt64"
 
 if [[ ! -f "$core_archive" ]]; then
-    "$script_dir/build-ios-core.sh" simulator
+    "$script_dir/build-ios-core.sh" simulator "$profile"
 else
-    "$script_dir/audit-ios-core.sh" "$core_build" simulator
+    "$script_dir/audit-ios-core.sh" "$core_build" simulator "$profile"
 fi
 "$script_dir/build-ios-dependencies.sh" simulator
 "$script_dir/apply-patches.sh"
@@ -41,6 +48,7 @@ cmake -S "$game" -B "$build_dir" -G Xcode \
     -DSDL2_DIR="$deps_prefix/lib/cmake/SDL2" \
     -DANNEPAD_IOS_DIR="$ANNEPAD_ROOT/apple/app" \
     -DANNEPAD_RECOMPILED_ARCHIVE="$core_archive" \
+    -DANNEPAD_BUILD_PROFILE="$profile" \
     -DDXC_PATH="$dxc" \
     -DSPIRV_CROSS_MSL_PATH="$spirv_cross_msl" \
     -DFILE_TO_C_PATH="$file_to_c" \
@@ -56,4 +64,4 @@ if find "$app" -type f \( -iname '*.z64' -o -iname '*.n64' -o -iname '*.v64' -o 
     die "ROM material leaked into the iOS application bundle"
 fi
 
-note "Built ROM-free iOS Simulator app: ${app#"$ANNEPAD_ROOT/"}"
+note "Built ROM-free $profile iOS Simulator app: ${app#"$ANNEPAD_ROOT/"}"

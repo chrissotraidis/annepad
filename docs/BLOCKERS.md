@@ -84,6 +84,50 @@ Resolved entries are never deleted.
   iPhone/iPad are attached, sign/install this bundle and execute the separate
   controller, audio, orientation, lifecycle, and sustained-battle gates.
 
+## B-016 — Simulator playtest used the unoptimized validation AOT core
+
+- Status: active performance/build gap
+- Evidence: `apple/core/CMakeLists.txt` intentionally compiles validation AOT at
+  `-O0`, and the old Simulator script could only select that profile. A temporary
+  counter at RT64's Metal present call measured the iPad title/attract path at
+  3-17 presents/s in many one-second windows, with brief 28-30 presents/s peaks.
+  The user's visible slowdown is therefore real for the tested artifact.
+- Correction: Simulator release cores are now supported in a separate
+  `build-ios-core-simulator-release/` tree, and the normal Simulator app command
+  defaults to that `-O2` product. Validation remains available explicitly for
+  fast SDK/static-policy checks and is no longer presented as a playability build.
+- Gate: finish the retained optimized build, install it without erasing private
+  ROM/save state, repeat present-rate capture on the same title and animated
+  battle scenes, and check input/audio/lifecycle stability. The build is slow
+  because 1,006 generated C files include 10-17 MB translation units; partial
+  objects are preserved. Physical iPad sustained-battle and thermal evidence
+  remains required regardless of the Simulator result.
+
+## B-015 — Touch overlay diverged from the preferred HarkinianPad reference
+
+- Status: active implementation/acceptance gap
+- Evidence: direct comparison with HarkinianPad commit
+  `4db21e4be0f0be52948438de5d8c755d191897ae` found that the retained AnnePad
+  build used one hand-drawn full-screen view and generic geometry. It reused
+  safe-area normalization, separate profiles, cancellation, and normalized
+  input concepts, but not HarkinianPad's accepted low-grip layouts, pressed
+  feedback, or safe Z latch. The goal names HarkinianPad as the preferred touch
+  starting point unless a materially better implementation is proven; no such
+  proof was recorded.
+- Current correction: working source now adapts HarkinianPad's physically
+  accepted phone/tablet positions, pressed/latched visuals, 0.5-second Z latch
+  with haptic confirmation, and cancellation on editor/ROM/lifecycle changes.
+  AnnePad keeps its direct analog N64 snapshot bridge because the reference's
+  synthetic keyboard path would discard analog magnitude.
+- Partial proof: the corrected candidate builds and installs on the iPad
+  Simulator; Start navigation, visible pressed feedback, editor resize/reset,
+  Done, and one Home/relaunch cycle passed. Cold iPad orientation still needs a
+  manual rotate after some boots.
+- Gate: exercise stick and multi-button input, timed latch/release Z, persistence,
+  background/foreground cancellation, and a sustained touch-only battle. Repeat
+  ergonomics and stuck-input acceptance on physical iPhone and iPad before
+  resolving this blocker.
+
 ## B-014 — iOS platform and dynamic-code separation is not yet compiled
 
 - Status: resolved 2026-07-31

@@ -43,7 +43,7 @@ external proof gate.
 ./scripts/generate-game.sh --rom /absolute/path/to/user-rom.v64
 ./scripts/build-macos.sh
 ./scripts/run-macos.sh --rom /absolute/path/to/pokemon-stadium-us-1.0.z64
-./scripts/build-ios-core.sh simulator
+./scripts/build-ios-core.sh simulator release
 ./scripts/build-ios-dependencies.sh simulator
 ./scripts/build-ios-simulator.sh
 ./scripts/build-ios-device.sh validation
@@ -97,15 +97,20 @@ system frameworks and explicitly audited permitted libraries.
 The passing core proofs are:
 
 ```sh
-./scripts/build-ios-core.sh simulator
+./scripts/build-ios-core.sh simulator validation
+./scripts/build-ios-core.sh simulator release
 ./scripts/build-ios-core.sh device
 ./scripts/build-ios-device.sh validation
 ```
 
-The default validation core compiles private generated AOT source with `-O0`
-because that gate proves SDK compatibility and static policy. Packaging invokes
-`build-ios-core.sh device release` and `build-ios-device.sh release`, producing
-a separate `-O2` archive and app under `build-ios-core-device-release/` and
+The validation core compiles private generated AOT source with `-O0` because
+that gate proves SDK compatibility and static policy quickly; it is not a
+playability or performance candidate. `build-ios-simulator.sh` defaults to the
+release profile and produces separate `-O2` output under
+`build-ios-core-simulator-release/` and `build-ios-app-simulator-release/`.
+Pass `validation` explicitly only for the fast compile gate. Packaging likewise
+invokes `build-ios-core.sh device release` and `build-ios-device.sh release`,
+producing `-O2` output under `build-ios-core-device-release/` and
 `build-ios-app-device-release/`. A profile marker in `Info.plist` prevents the
 package script from accepting the validation app. `audit-ios-core.sh` checks
 arm64 iPhoneSimulator or iPhoneOS load commands, required archives, the selected

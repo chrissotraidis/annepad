@@ -43,29 +43,51 @@ struct TouchControl {
 constexpr size_t kControlCount = 15;
 
 std::array<TouchControl, kControlCount> defaultControls() {
+    // Adapt HarkinianPad's physically accepted grip-first phone/tablet layouts
+    // to AnnePad's direct analog N64 input bridge. The game-specific native HUD
+    // artwork and synthetic SDL-key path deliberately remain HarkinianPad-only.
+    if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return {{
+            {"stick", "", ControlKind::Stick, 0x0000, 0.164, 0.745, 0.090, 0.42, true},
+            {"d_up", "D\u2191", ControlKind::Button, 0x0800, 0.080, 0.550, 0.032, 0.42, true},
+            {"d_down", "D\u2193", ControlKind::Button, 0x0400, 0.080, 0.665, 0.032, 0.42, true},
+            {"d_left", "D\u2190", ControlKind::Button, 0x0200, 0.040, 0.608, 0.032, 0.42, true},
+            {"d_right", "D\u2192", ControlKind::Button, 0x0100, 0.120, 0.608, 0.032, 0.42, true},
+            {"c_up", "C\u2191", ControlKind::Button, 0x0008, 0.903, 0.805, 0.033, 0.42, true},
+            {"c_down", "C\u2193", ControlKind::Button, 0x0004, 0.902, 0.905, 0.033, 0.42, true},
+            {"c_left", "C\u2190", ControlKind::Button, 0x0002, 0.857, 0.854, 0.033, 0.42, true},
+            {"c_right", "C\u2192", ControlKind::Button, 0x0001, 0.948, 0.853, 0.033, 0.42, true},
+            {"a", "A", ControlKind::Button, 0x8000, 0.893, 0.693, 0.048, 0.48, true},
+            {"b", "B", ControlKind::Button, 0x4000, 0.826, 0.635, 0.048, 0.48, true},
+            {"z", "Z", ControlKind::Button, 0x2000, 0.193, 0.613, 0.048, 0.44, true},
+            {"l", "L", ControlKind::Button, 0x0020, 0.941, 0.514, 0.041, 0.38, true},
+            {"r", "R", ControlKind::Button, 0x0010, 0.941, 0.434, 0.041, 0.38, true},
+            {"start", "START", ControlKind::Button, 0x1000, 0.865, 0.434, 0.033, 0.40, true},
+        }};
+    }
     return {{
-        {"stick", "", ControlKind::Stick, 0x0000, 0.15, 0.70, 0.13, 0.42, true},
-        {"d_up", "D\u2191", ControlKind::Button, 0x0800, 0.34, 0.61, 0.040, 0.42, true},
-        {"d_down", "D\u2193", ControlKind::Button, 0x0400, 0.34, 0.79, 0.040, 0.42, true},
-        {"d_left", "D\u2190", ControlKind::Button, 0x0200, 0.29, 0.70, 0.040, 0.42, true},
-        {"d_right", "D\u2192", ControlKind::Button, 0x0100, 0.39, 0.70, 0.040, 0.42, true},
-        {"c_up", "C\u2191", ControlKind::Button, 0x0008, 0.75, 0.40, 0.038, 0.42, true},
-        {"c_down", "C\u2193", ControlKind::Button, 0x0004, 0.75, 0.56, 0.038, 0.42, true},
-        {"c_left", "C\u2190", ControlKind::Button, 0x0002, 0.70, 0.48, 0.038, 0.42, true},
-        {"c_right", "C\u2192", ControlKind::Button, 0x0001, 0.80, 0.48, 0.038, 0.42, true},
-        {"a", "A", ControlKind::Button, 0x8000, 0.88, 0.69, 0.066, 0.48, true},
-        {"b", "B", ControlKind::Button, 0x4000, 0.75, 0.77, 0.058, 0.48, true},
-        {"z", "Z", ControlKind::Button, 0x2000, 0.62, 0.70, 0.052, 0.44, true},
-        {"l", "L", ControlKind::Button, 0x0020, 0.14, 0.10, 0.058, 0.38, true},
-        {"r", "R", ControlKind::Button, 0x0010, 0.86, 0.10, 0.058, 0.38, true},
-        {"start", "START", ControlKind::Button, 0x1000, 0.50, 0.82, 0.046, 0.40, true},
+        {"stick", "", ControlKind::Stick, 0x0000, 0.214, 0.722, 0.112, 0.42, true},
+        {"d_up", "D\u2191", ControlKind::Button, 0x0800, 0.131, 0.365, 0.042, 0.42, true},
+        {"d_down", "D\u2193", ControlKind::Button, 0x0400, 0.131, 0.502, 0.042, 0.42, true},
+        {"d_left", "D\u2190", ControlKind::Button, 0x0200, 0.080, 0.434, 0.042, 0.42, true},
+        {"d_right", "D\u2192", ControlKind::Button, 0x0100, 0.182, 0.434, 0.042, 0.42, true},
+        {"c_up", "C\u2191", ControlKind::Button, 0x0008, 0.867, 0.398, 0.039, 0.42, true},
+        {"c_down", "C\u2193", ControlKind::Button, 0x0004, 0.867, 0.570, 0.039, 0.42, true},
+        {"c_left", "C\u2190", ControlKind::Button, 0x0002, 0.824, 0.485, 0.039, 0.42, true},
+        {"c_right", "C\u2192", ControlKind::Button, 0x0001, 0.911, 0.486, 0.039, 0.42, true},
+        {"a", "A", ControlKind::Button, 0x8000, 0.876, 0.738, 0.051, 0.48, true},
+        {"b", "B", ControlKind::Button, 0x4000, 0.806, 0.665, 0.051, 0.48, true},
+        {"z", "Z", ControlKind::Button, 0x2000, 0.242, 0.499, 0.051, 0.44, true},
+        {"l", "L", ControlKind::Button, 0x0020, 0.895, 0.270, 0.043, 0.38, true},
+        {"r", "R", ControlKind::Button, 0x0010, 0.895, 0.170, 0.043, 0.38, true},
+        {"start", "START", ControlKind::Button, 0x1000, 0.810, 0.170, 0.040, 0.40, true},
     }};
 }
 
 NSString* layoutDefaultsKey() {
     return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad
-        ? @"annepad.touch.layout.ipad.v1"
-        : @"annepad.touch.layout.iphone.v1";
+        ? @"annepad.touch.layout.ipad.v2"
+        : @"annepad.touch.layout.iphone.v2";
 }
 
 } // namespace
@@ -81,6 +103,8 @@ NSString* layoutDefaultsKey() {
     CGPoint _stickKnob;
     BOOL _editing;
     BOOL _hasUndo;
+    BOOL _zLatched;
+    NSUInteger _zLatchGeneration;
     NSInteger _selected;
 }
 
@@ -217,10 +241,24 @@ NSString* layoutDefaultsKey() {
         CGRect circle = CGRectMake(center.x - radius, center.y - radius,
                                    radius * 2.0, radius * 2.0);
         CGFloat alpha = control.visible ? control.opacity : 0.16;
-        UIColor* fill = [UIColor colorWithWhite:0.05 alpha:alpha];
+        BOOL pressed = NO;
+        for (const auto& item : _touchRoles) {
+            if (item.second == index) {
+                pressed = YES;
+                break;
+            }
+        }
+        const BOOL latched = control.mask == 0x2000 && _zLatched;
+        UIColor* fill = latched
+            ? [UIColor colorWithRed:0.22 green:0.58 blue:0.96 alpha:0.92]
+            : (pressed
+                ? [UIColor colorWithWhite:0.32 alpha:MIN(0.90, alpha + 0.30)]
+                : [UIColor colorWithWhite:0.05 alpha:alpha]);
         UIColor* stroke = (index == _selected && _editing)
             ? [UIColor colorWithRed:1.0 green:0.82 blue:0.18 alpha:0.95]
-            : [UIColor colorWithWhite:1.0 alpha:MIN(0.75, alpha + 0.18)];
+            : (latched
+                ? [UIColor colorWithRed:0.62 green:0.82 blue:1.0 alpha:1.0]
+                : [UIColor colorWithWhite:1.0 alpha:MIN(0.75, alpha + 0.18)]);
         CGContextSetFillColorWithColor(context, fill.CGColor);
         CGContextFillEllipseInRect(context, circle);
         CGContextSetStrokeColorWithColor(context, stroke.CGColor);
@@ -230,7 +268,7 @@ NSString* layoutDefaultsKey() {
         CGContextSetLineDash(context, 0, nullptr, 0);
 
         if (control.kind == ControlKind::Stick) {
-            CGPoint knob = _touchRoles.empty() ? center : _stickKnob;
+            CGPoint knob = pressed ? _stickKnob : center;
             if (CGPointEqualToPoint(knob, CGPointZero)) knob = center;
             CGFloat knobRadius = radius * 0.42;
             CGContextSetFillColorWithColor(context,
@@ -356,7 +394,7 @@ NSString* layoutDefaultsKey() {
 }
 
 - (void)publishInput {
-    uint16_t buttons = 0;
+    uint16_t buttons = _zLatched ? 0x2000 : 0;
     CGFloat x = 0.0;
     CGFloat y = 0.0;
     for (const auto& item : _touchRoles) {
@@ -388,6 +426,8 @@ NSString* layoutDefaultsKey() {
 }
 
 - (void)clearInput {
+    ++_zLatchGeneration;
+    _zLatched = NO;
     _touchRoles.clear();
     _stickOrigin = CGPointZero;
     _stickKnob = CGPointZero;
@@ -406,6 +446,12 @@ NSString* layoutDefaultsKey() {
         NSInteger control = [self controlAtPoint:point includeHidden:_editing];
         if (control == NSNotFound) continue;
         _selected = control;
+        if (!_editing && _controls[control].mask == 0x2000 && _zLatched) {
+            ++_zLatchGeneration;
+            _zLatched = NO;
+            g_touch_taps.fetch_and((uint16_t)~0x2000, std::memory_order_relaxed);
+            continue;
+        }
         _touchRoles[touch] = (int)control;
         if (_editing) {
             [self moveSelectedToPoint:point];
@@ -424,6 +470,27 @@ NSString* layoutDefaultsKey() {
             while (current < holdPolls &&
                    !g_touch_tap_polls.compare_exchange_weak(
                        current, holdPolls, std::memory_order_relaxed)) {}
+            if (mask == 0x2000) {
+                const NSUInteger generation = ++_zLatchGeneration;
+                dispatch_after(
+                    dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)),
+                    dispatch_get_main_queue(), ^{
+                        if (_editing || _zLatched || _zLatchGeneration != generation) return;
+                        for (const auto& item : _touchRoles) {
+                            const NSInteger role = item.second;
+                            if (role >= 0 && role < (NSInteger)kControlCount &&
+                                _controls[role].mask == 0x2000) {
+                                _zLatched = YES;
+                                UIImpactFeedbackGenerator* feedback =
+                                    [[UIImpactFeedbackGenerator alloc]
+                                        initWithStyle:UIImpactFeedbackStyleMedium];
+                                [feedback impactOccurred];
+                                [self publishInput];
+                                break;
+                            }
+                        }
+                    });
+            }
         }
     }
     if (!_editing) [self publishInput];
@@ -444,7 +511,17 @@ NSString* layoutDefaultsKey() {
 }
 
 - (void)finishTouches:(NSSet<UITouch*>*)touches {
-    for (UITouch* touch in touches) _touchRoles.erase(touch);
+    for (UITouch* touch in touches) {
+        auto found = _touchRoles.find(touch);
+        if (found != _touchRoles.end()) {
+            const NSInteger role = found->second;
+            if (role >= 0 && role < (NSInteger)kControlCount &&
+                _controls[role].mask == 0x2000 && !_zLatched) {
+                ++_zLatchGeneration;
+            }
+            _touchRoles.erase(found);
+        }
+    }
     if (_editing) {
         [self saveLayout];
     } else {

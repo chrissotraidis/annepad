@@ -365,3 +365,15 @@ index 7305736..7f3f28c 100644
      const bool flagHasMipmaps = gpuTileFlagHasMipmaps(gpuTile.flags);
      uint numRDPSamples = 0;
      uint RDPMipLevels[2];
+
+diff --git a/src/hle/rt64_present_queue.cpp b/src/hle/rt64_present_queue.cpp
+index 63b58fe..0b91121 100644
+--- a/src/hle/rt64_present_queue.cpp
++++ b/src/hle/rt64_present_queue.cpp
+@@ -595,4 +595,4 @@ namespace RT64 {
+             ext.presentGraphicsWorker->wait();
+         }
+     }
+-};
+\ No newline at end of file
++};

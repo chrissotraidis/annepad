@@ -25,7 +25,7 @@ verify_clean_checkout "$game/recomp-ui" recomp-ui
 verify_clean_checkout "$generator" N64Recomp-generator
 
 renderer_changes=$(git -C "$renderer" diff --name-only --ignore-submodules=dirty)
-expected_renderer_changes=$'CMakeLists.txt\nsrc/apple/rt64_apple.h\nsrc/apple/rt64_apple.mm\nsrc/common/rt64_user_paths.cpp\nsrc/metal/rt64_metal.cpp\nsrc/render/rt64_shader_library.cpp\nsrc/shaders/TextureSampler.hlsli'
+expected_renderer_changes=$'CMakeLists.txt\nsrc/apple/rt64_apple.h\nsrc/apple/rt64_apple.mm\nsrc/common/rt64_user_paths.cpp\nsrc/hle/rt64_present_queue.cpp\nsrc/metal/rt64_metal.cpp\nsrc/render/rt64_shader_library.cpp\nsrc/shaders/TextureSampler.hlsli'
 [[ "$renderer_changes" == "$expected_renderer_changes" ]] || \
     die "rt64 has unexpected tracked modifications"
 git -C "$renderer" apply --reverse --check \

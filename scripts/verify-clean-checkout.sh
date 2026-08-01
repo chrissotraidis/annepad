@@ -63,7 +63,9 @@ git -C "$checkout" checkout --quiet --detach HEAD
     ./scripts/build-macos.sh
     ./scripts/build-ios-core.sh simulator
     ./scripts/build-ios-dependencies.sh simulator
-    ./scripts/build-ios-simulator.sh
+    # The isolated gate proves Simulator SDK/static compatibility with the fast
+    # validation core. Interactive playtesting uses the release default.
+    ./scripts/build-ios-simulator.sh validation
     ./scripts/package-ios.sh
     ./scripts/test-repository.sh
     [[ -z "$(git status --porcelain --untracked-files=all)" ]] || {

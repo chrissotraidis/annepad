@@ -81,11 +81,17 @@ replacement.
 ## D-009 — One normalized input path
 
 - Date: 2026-07-31
-- Status: accepted
+- Status: accepted; touch implementation corrected 2026-08-01
 - Decision: touch, GameController/SDL, and desktop keyboard feed the same N64
-  input snapshot; UI does not invoke game logic.
-- Evidence: required multi-input correctness and proven HarkinianPad/BearBirdPad
-  control architecture.
+  input snapshot; UI does not invoke game logic. HarkinianPad is the preferred
+  starting point for touch geometry, feedback, customization, and cancellation
+  behavior, adapted to this direct analog bridge rather than converted into
+  synthetic keyboard events.
+- Evidence: the first AnnePad overlay proved a full Simulator touch battle but
+  did not justify its visual/state-machine divergence from HarkinianPad. The
+  corrected candidate uses the reference's accepted phone/tablet grip geometry,
+  pressed feedback, Z latch/haptic, and lifecycle release behavior while
+  preserving analog stick values and normalized N64 button masks.
 
 ## D-010 — Public redistribution remains gated
 

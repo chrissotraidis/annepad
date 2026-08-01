@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 02:39 CDT
+Updated: 2026-08-01 12:25 CDT
 
 ## Current state
 
@@ -9,17 +9,28 @@ reconstruction, AOT generation, the native macOS runtime gate, and the static
 iOS core-separation and iPad Simulator first-frame gates are complete. A
 ROM-free unsigned arm64 iPhoneOS app and release-optimized unsigned IPA now
 build, pass their static artifact audits, and reproduce from an isolated clean
-source snapshot. Native first-run ROM setup, a customizable multitouch overlay,
-touch-only battle completion, and atomic save/lifecycle recovery are proven in
-Simulator. Physical-device runtime acceptance remains externally gated.
+source snapshot. Native first-run ROM setup, touch-only battle completion, and
+atomic save/lifecycle recovery have Simulator evidence. A live rerun on
+2026-08-01 found the retained build process stable and frame-advancing across a
+short sample and one background/foreground cycle, but also confirmed that its
+touch overlay was a bespoke approximation rather than an adaptation of the
+preferred HarkinianPad mechanism. The corrected HarkinianPad-derived low-grip
+layout now builds, installs, accepts touch navigation, survives a short
+background/foreground cycle, and keeps the editor functional on the iPad
+Simulator. Its current executable still links the validation AOT core compiled
+at `-O0`; direct RT64 present-call measurement confirms visibly uneven title
+and attract-mode pacing. An optimized Simulator core is now supported and is
+partially built, but its runtime comparison is not yet complete. Physical-device
+runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
 game save, and has completed a full rental battle through an explicit result.
 
 The leading game foundation is `mstan/PokemonStadiumRecomp` at
 `de27b7b8481630d41fc7fb913dbd02572d421efd`. The leading Apple architecture
-reference is BearBirdPad; HarkinianPad remains a secondary reference for touch,
-files, lifecycle, and packaging. The selected direct-Metal RT64 lineage now has
+reference is BearBirdPad; HarkinianPad is the preferred touch/Apple interaction
+reference while remaining secondary for the static-recomp architecture. The
+selected direct-Metal RT64 lineage now has
 both macOS runtime proof and a native iOS Simulator frame under maintained
 patches.
 
@@ -67,8 +78,8 @@ patches.
   and its undefined-symbol audit rejects `dlopen`, `dlclose`, `dlsym`, and Apple
   JIT cache-control entry points. The 933 MiB AOT archive SHA-256 is
   `6113f6032877a0e65b7f3ed430de94c9c0322e6ac8c540c260ebbe979cd75305`.
-- `./scripts/build-ios-simulator.sh` produces a ROM-free native arm64
-  iPhoneSimulator app. Its executable SHA-256 is
+- `./scripts/build-ios-simulator.sh validation` produces a ROM-free native arm64
+  iPhoneSimulator app. Its earlier executable SHA-256 is
   `d78061dc29b2e0d91185224e7934d436f7e29c96c6ca53b57d663fc3966c4301`.
 - The app was installed on an iPad Pro 11-inch (M4) Simulator running iOS 18.5.
   A private normalized ROM was supplied only through the app data container;
@@ -88,12 +99,34 @@ patches.
 - The iPhoneOS static core passed the no-dynamic-code archive audit. Its hashes
   are `11e404d5...` (AnnePad core), `16b541c4...` (validation AOT game),
   `e36cdd1b...` (`librecomp`), and `a78f39c6...` (`ultramodern`).
-- The native UIKit touch layer exposes all N64 controls, handles independent
-  simultaneous touches, and supports move/resize/opacity/hide/reset with
-  separate phone/tablet persistence. A full three-on-three rental battle was
+- The retained native UIKit touch layer exposes all N64 controls, handles
+  independent simultaneous touches, and supports
+  move/resize/opacity/hide/reset with separate phone/tablet persistence. A full
+  three-on-three rental battle was
   completed using touch only from team selection through the explicit `LOSE`
   result. Evidence: `evidence/m5-ios-touch-rental-battle-result.png` (SHA-256
   `5054e4799b43b0b825eaa3094b89cae31fc39aa32fc70081df7017522fda3572`).
+  That proof does not accept its ergonomics. The corrected candidate replaces
+  its generic defaults with HarkinianPad-derived, physically accepted low-grip
+  phone/tablet geometry, adds pressed-state feedback and a lifecycle-safe
+  hold-to-latch Z control, and keeps AnnePad's direct analog N64 input bridge.
+  It builds and runs on the iPad Simulator; touch navigation, editor/reset, and
+  one background/foreground cycle passed. A timed Z-latch and sustained-battle
+  rerun plus physical-device acceptance remain required.
+- A temporary source-local counter at RT64's actual Metal swap-chain present
+  call measured the validation candidate on the iPad Pro 11-inch (M4), iOS
+  18.5. In the title/attract path it reached the scene's observed 30 Hz ceiling
+  briefly but commonly delivered 3-17 presents/s, with other one-second samples
+  in the high teens and twenties. The probe was removed after collection and
+  the locked source tree again passes verification. This proves that the user's
+  visible slowdown was real for this artifact; it does not establish release
+  device performance because the measured AOT core was deliberately `-O0`.
+- Simulator release builds are now first-class: `build-ios-core.sh simulator
+  release` produces a separate `-O2` core, and `build-ios-simulator.sh` defaults
+  to that optimized product. The first build has 283 of 1,110 Ninja steps
+  retained locally; runtime comparison remains open because optimizing the
+  1,006 very large generated translation units is a multi-hour build on this
+  16 GB Mac.
 - On an iPhone 16 Pro Simulator, a cold launch with no ROM presents an upright
   native setup screen. The document picker imported the user's local `.v64`,
   normalized and validated it to the exact 32 MiB supported image, stored it
@@ -163,6 +196,8 @@ patches.
   physical-device runtime success.
 - Real-speaker audio, lock/unlock, interruptions/routes, thermal performance,
   and a touch-only battle on physical hardware remain open.
+- Optimized iOS Simulator frame pacing is not yet measured. The current
+  validation candidate is functional but too uneven to call performance-accepted.
 - `xctrace` reports no attached physical iPhone or iPad, the keychain has zero
   valid code-signing identities, and no provisioning profile is installed.
 - App Store compatibility and redistribution of unlicensed upstream components
@@ -175,10 +210,12 @@ patches.
 
 ## Known regressions
 
-The earlier upside-down first landscape setup presentation was corrected and
-an upright cold-launch/setup flow was re-proven on the iPhone Simulator. The
-desktop window close action returns from gameplay to the launcher by design;
-App-menu Quit exits cleanly. Physical-device orientation remains untested.
+An upright cold-launch/setup flow was re-proven on the iPhone Simulator, but a
+fresh iPad Simulator boot can initially stretch the landscape-only app into a
+portrait surface until the Simulator is rotated once. That cold-start iPad
+orientation remains open. The desktop window close action returns from gameplay
+to the launcher by design; App-menu Quit exits cleanly. Physical-device
+orientation remains untested.
 
 ## Current targets
 
@@ -192,7 +229,10 @@ App-menu Quit exits cleanly. Physical-device orientation remains untested.
 
 ## Next concrete task
 
-When lawful signing assets and physical hardware are available, build/install
-the isolated signed product and execute the iPhone/iPad,
-controller, real-speaker audio, lifecycle, performance, and hardware
-touch-battle matrix. Keep public redistribution blocked on license review.
+Finish the retained `-O2` Simulator core, install the optimized touch candidate,
+and repeat the same present-call/title plus animated battle measurement. Then
+exercise the Z latch, cold iPad orientation, and a sustained touch battle before
+publishing a new device package. When lawful signing assets and hardware are
+available, execute the signed iPhone/iPad, controller, speaker, lifecycle,
+performance, and hardware touch-battle matrix. Keep public redistribution
+blocked on license review.

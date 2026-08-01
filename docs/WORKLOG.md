@@ -306,3 +306,52 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Remaining: rerun the full fail-closed isolated verifier for this exact
   hardened digest. Physical signing/install, controller, real-speaker audio,
   lifecycle/performance, touch battle, and licensing remain open.
+
+## 2026-08-01 — Live iPad rerun and HarkinianPad touch correction
+
+- Goal: answer whether AnnePad still runs on this Mac's iPad Simulator and
+  verify that the preferred `ref/harkinianpad` touch mechanism was actually
+  used.
+- Runtime evidence: booted the iPad Pro 11-inch (M4), iOS 18.5 Simulator;
+  relaunched the retained ROM-free AnnePad install as PID `21296`; observed
+  live Metal gameplay, the full touch surface, successful A input, and 48 kHz
+  audio initialization. Six samples over roughly two minutes kept the same PID
+  alive and produced changing framebuffer hashes. Home/background and relaunch
+  returned on the same PID to an upright, advancing frame in the visible
+  Simulator UI. A fresh boot can initially present the Simulator in portrait
+  until it is rotated once; that cold-start orientation remains open.
+- Touch audit: AnnePad had reused design principles but not HarkinianPad's
+  proven control/state implementation. The working correction adapts the
+  accepted low-grip phone/tablet defaults, pressed/latched feedback, Z
+  hold-to-latch haptic, and cancellation rules while retaining direct analog
+  normalized N64 input. The saved-layout keys move to `v2` so old generic
+  geometry cannot mask the new defaults.
+- Documentation correction: removed the unsupported statement that Apple
+  touch/lifecycle unit tests already exist. The repo currently has policy,
+  build, and artifact audits; a real touch/lifecycle unit-test target is open.
+- Remaining: compile/install/playtest this corrected source, exercise the latch
+  and editor, complete the current clean verifier, and repeat the full touch
+  and stability gate on physical iPhone/iPad.
+
+## 2026-08-01 — iPad frame pacing measured and build profile corrected
+
+- Observation: the corrected HarkinianPad-derived candidate built, installed,
+  reached the title and menus through touch, kept the editor operational, and
+  survived a short Home/relaunch cycle. A fresh iPad boot can still require one
+  Simulator rotate before the landscape surface is correct.
+- Diagnosis: the app linked `build-ios-core-simulator/`, whose generated AOT is
+  deliberately `-O0`. A temporary, environment-gated counter immediately after
+  RT64's Metal swap-chain present measured many title/attract windows at 3-17
+  presents/s, with brief high-twenties/30 Hz windows. That confirms the visible
+  unevenness without confusing process survival for performance acceptance.
+- Tool fallback: Metal HUD logging emitted no useful Simulator metrics and an
+  attached Game Performance `xctrace` run did not finish a valid trace. The
+  narrow source probe supplied the direct evidence and was removed afterward;
+  exact-source verification passes again.
+- Build correction: release-optimized Simulator cores are now supported in a
+  separate ignored tree, and `build-ios-simulator.sh` defaults to that product.
+  The retained `-O2` build completed 283 of 1,110 steps before this checkpoint;
+  the remaining large AOT files require a multi-hour compile on this 16 GB Mac.
+- Remaining: finish/install the optimized candidate, repeat frame pacing in the
+  same title and an animated battle, verify timed Z latch/cancellation and cold
+  iPad orientation, then rebuild/package and rerun the isolated verifier.
