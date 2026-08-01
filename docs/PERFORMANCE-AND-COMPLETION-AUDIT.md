@@ -1,6 +1,6 @@
 # Performance and completion audit
 
-Updated: 2026-08-01 16:14 CDT
+Updated: 2026-08-01 16:20 CDT
 
 ## Bottom line
 
@@ -89,9 +89,10 @@ is not yet physically proven or release-ready.
 - AnnePad intentionally uses a direct normalized N64 snapshot instead of
   HarkinianPad's synthetic keyboard events so analog stick magnitude is not
   discarded.
-- Quick taps are retained across runtime polls. The present implementation uses
-  one shared poll window for all tap bits, so overlapping taps can extend one
-  another and a producer/consumer boundary still needs deterministic coverage.
+- Quick taps now have independent atomic poll lifetimes per N64 button, so a
+  later shoulder/Z tap cannot extend A/B/Start or another button. Host tests
+  cover exact quick-tap expiry, the longer shoulder chord window, overlapping
+  A+R, Z cancellation, and lifecycle clearing.
 - Start navigation and editor/lifecycle smokes pass in Simulator. A full
   touch-only battle after the HarkinianPad-derived replacement has not been
   completed.
@@ -100,8 +101,8 @@ is not yet physically proven or release-ready.
 
 In priority order:
 
-1. Add deterministic tap/Z/cancellation coverage and complete a touch-only
-   rental battle with the corrected overlay.
+1. Complete a touch-only rental battle and timed Z-latch UI acceptance with the
+   corrected overlay.
 2. Rebuild and reproduce the exact current unsigned device package from a clean
    checkout.
 3. On an attached signed iPad, run the same heavy scene and collect frame-time,

@@ -224,3 +224,12 @@
   removal cleans the shipping surface but does not solve Simulator cadence.
 - Made Simulator and device app builds always run the incremental AOT core build
   so regenerated sources cannot silently reuse an older archive.
+
+## 2026-08-01 — Touch tap lifetimes made independent and testable
+
+- Replaced the shared tap countdown with one atomic lifetime per N64 button, so
+  overlapping shoulder/Z taps cannot prolong unrelated buttons.
+- Added host tests for six-poll taps, the 45-poll shoulder grace window,
+  overlapping A+R, Z clearing, and lifecycle cancellation.
+- Rebuilt and launched Release on the iPad Simulator; quick Start input returned
+  from attract mode and advanced into Game Pak Check.

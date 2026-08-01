@@ -11,6 +11,7 @@ jq empty "$ANNEPAD_LOCK"
 for script in "$ANNEPAD_ROOT"/scripts/*.sh "$ANNEPAD_ROOT"/scripts/lib/*.sh; do
     bash -n "$script"
 done
+"$ANNEPAD_ROOT/scripts/test-touch-tap-latch.sh"
 
 required_docs=(
     GOAL.md RESEARCH.md REPOSITORY-INVENTORY.md ARCHITECTURE.md PLAN.md

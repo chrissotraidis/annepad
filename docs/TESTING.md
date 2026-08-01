@@ -75,8 +75,10 @@ physical-hardware touch gate.
 The 2026-08-01 HarkinianPad-derived correction also builds and installs on that
 iPad Simulator. Its low-grip layout, pressed feedback, Start navigation,
 editor resize/reset/done path, and a short Home/relaunch cycle were observed.
-The timed Z latch and sustained battle were not completed, so this is a partial
-rerun rather than a replacement Gate 5 acceptance.
+Independent per-button tap lifetimes now have deterministic host coverage for
+quick taps, shoulder chords, overlapping A+R, Z cancellation, and lifecycle
+clearing. The timed Z latch in UIKit and sustained battle were not completed, so
+this remains a partial rerun rather than replacement Gate 5 acceptance.
 
 Gate 6 native ROM setup passed 2026-07-31 on an iPhone 16 Pro Simulator, iOS
 18.5. Remove cleared the private normalized/runtime copies and config; cold

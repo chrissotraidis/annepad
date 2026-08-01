@@ -12,14 +12,14 @@
 #import <UIKit/UIKit.h>
 
 #include "rom_setup.h"
+#include "touch_tap_latch.h"
 
 int annepad_recomp_main(int argc, char** argv);
 
 namespace {
 
 std::atomic<uint16_t> g_touch_buttons{0};
-std::atomic<uint16_t> g_touch_taps{0};
-std::atomic<uint8_t> g_touch_tap_polls{0};
+AnnePadTouchTapLatch g_touch_taps;
 std::atomic<int32_t> g_touch_x{0};
 std::atomic<int32_t> g_touch_y{0};
 
@@ -432,8 +432,7 @@ NSString* layoutDefaultsKey() {
     _stickOrigin = CGPointZero;
     _stickKnob = CGPointZero;
     g_touch_buttons.store(0, std::memory_order_relaxed);
-    g_touch_taps.store(0, std::memory_order_relaxed);
-    g_touch_tap_polls.store(0, std::memory_order_relaxed);
+    g_touch_taps.clearAll();
     g_touch_x.store(0, std::memory_order_relaxed);
     g_touch_y.store(0, std::memory_order_relaxed);
     [self setNeedsDisplay];
@@ -449,7 +448,7 @@ NSString* layoutDefaultsKey() {
         if (!_editing && _controls[control].mask == 0x2000 && _zLatched) {
             ++_zLatchGeneration;
             _zLatched = NO;
-            g_touch_taps.fetch_and((uint16_t)~0x2000, std::memory_order_relaxed);
+            g_touch_taps.clear(0x2000);
             continue;
         }
         _touchRoles[touch] = (int)control;
@@ -463,13 +462,9 @@ NSString* layoutDefaultsKey() {
             // get a slightly longer grace window so Stadium's R+button party
             // selection chord can also be entered sequentially on a touchscreen.
             const uint16_t mask = _controls[control].mask;
-            g_touch_taps.fetch_or(mask, std::memory_order_relaxed);
             const uint8_t holdPolls = (mask & 0x0030u) != 0
                 ? kShoulderTapHoldPolls : kTapHoldPolls;
-            uint8_t current = g_touch_tap_polls.load(std::memory_order_relaxed);
-            while (current < holdPolls &&
-                   !g_touch_tap_polls.compare_exchange_weak(
-                       current, holdPolls, std::memory_order_relaxed)) {}
+            g_touch_taps.extend(mask, holdPolls);
             if (mask == 0x2000) {
                 const NSUInteger generation = ++_zLatchGeneration;
                 dispatch_after(
@@ -562,17 +557,8 @@ extern "C" void annepad_touch_attach(void* window_pointer) {
 
 extern "C" void annepad_touch_snapshot(uint16_t* buttons, float* x, float* y) {
     if (buttons != nullptr) {
-        uint16_t taps = 0;
-        uint8_t polls = g_touch_tap_polls.load(std::memory_order_relaxed);
-        while (polls != 0 &&
-               !g_touch_tap_polls.compare_exchange_weak(
-                   polls, (uint8_t)(polls - 1), std::memory_order_relaxed)) {}
-        if (polls != 0) {
-            taps = g_touch_taps.load(std::memory_order_relaxed);
-            if (polls == 1) g_touch_taps.fetch_and((uint16_t)~taps,
-                                                    std::memory_order_relaxed);
-        }
-        *buttons = g_touch_buttons.load(std::memory_order_relaxed) | taps;
+        *buttons = g_touch_buttons.load(std::memory_order_relaxed) |
+                   g_touch_taps.consume();
     }
     if (x != nullptr) *x = g_touch_x.load(std::memory_order_relaxed) / 10000.0F;
     if (y != nullptr) *y = g_touch_y.load(std::memory_order_relaxed) / 10000.0F;

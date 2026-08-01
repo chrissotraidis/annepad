@@ -155,10 +155,10 @@ Resolved entries are never deleted.
   with haptic confirmation, and cancellation on editor/ROM/lifecycle changes.
   AnnePad keeps its direct analog N64 snapshot bridge because the reference's
   synthetic keyboard path would discard analog magnitude.
-- Input audit: quick taps are already retained across several runtime polls, so
-  the problem is not a missing latch. The current latch uses one shared poll
-  window for all button bits; overlapping taps can extend one another and the
-  producer/consumer boundary lacks deterministic tests.
+- Input correction: quick taps now use independent atomic poll lifetimes per
+  N64 button. Deterministic host tests prove exact quick-tap expiry, the longer
+  shoulder chord window, overlapping A+R without cross-extension, explicit Z
+  clearing, and lifecycle cancellation.
 - Partial proof: the corrected candidate builds and installs on the iPad
   Simulator; Start navigation, visible pressed feedback, editor resize/reset,
   Done, and one Home/relaunch cycle passed. Two portrait-origin cold boots
@@ -166,7 +166,7 @@ Resolved entries are never deleted.
   transient stale overlay bounds; replacing frame/autoresizing attachment with
   four host-edge constraints kept every control in place across three timed
   startup screenshots.
-- Gate: exercise stick and multi-button input, timed latch/release Z, persistence,
+- Gate: exercise timed latch/release Z in UIKit, persistence,
   background/foreground cancellation, and a sustained touch-only battle. Repeat
   ergonomics and stuck-input acceptance on physical iPhone and iPad before
   resolving this blocker.

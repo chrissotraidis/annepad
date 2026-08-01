@@ -495,3 +495,17 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   8,243 bytes). A temporary 29-window present counter averaged 23.31 presents/s
   (4.15–30.56; five below 20, seven at least 28), showing that diagnostics were
   not the leading FPS cause. The counter was removed before the final rebuild.
+
+## 2026-08-01 — Independent touch tap lifetimes
+
+- Replaced the overlay's shared tap countdown with 16 independent atomic
+  counters, one per N64 button bit. A later R/L/Z tap can no longer extend an
+  unrelated quick A/B/Start tap.
+- Added a host-compiled test covering exact six-poll expiry, the 45-poll
+  shoulder window, overlapping A+R without cross-extension, Z clearing, and
+  lifecycle cancellation. It is part of `test-repository.sh`.
+- The Release iOS Simulator target rebuilt successfully. On iPad Pro 11-inch
+  (M4), iOS 18.5, quick Start taps returned from attract mode and advanced into
+  Game Pak Check. The clean executable is 380,988,920 bytes with SHA-256
+  `73d456b930fe0501840ffb544d7f05a61320cb3c30cd2a9faeb0675663fa077b`.
+- Timed UIKit Z-latch and full corrected-overlay battle acceptance remain open.

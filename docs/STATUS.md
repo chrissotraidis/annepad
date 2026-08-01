@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 16:14 CDT
+Updated: 2026-08-01 16:20 CDT
 
 ## Current state
 
@@ -37,6 +37,9 @@ correctness hooks remain; targeted runtime lines fell to zero, but a 29-window
 title/attract sample still averaged 23.31 presents/s. This confirms that logging
 was not the leading FPS cause. Simulator/device app builds now always invoke the
 incremental AOT core build so regenerated source cannot link a stale archive.
+Touch quick-tap retention now uses independent atomic lifetimes per button;
+deterministic tests cover overlap, expiry, Z clearing, and lifecycle clearing,
+and the rebuilt Release app accepted quick Start navigation in Simulator.
 Physical-device runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
@@ -288,12 +291,10 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Compile diagnostic-only reverse-engineering hooks out of Release while
-preserving the adjacent fragment, audio-UAF, and scheduler correctness fixes;
-then repeat the controlled Simulator measurement. Next add deterministic
-touch-state coverage for the Z latch/cancellation semantics, rebuild the device
-Release package, and rerun the fail-closed clean verifier. When lawful signing
-assets and hardware are available, measure the same heavy battle on a physical
+Complete the corrected-overlay touch-only battle and timed Z-latch UIKit gate,
+then rebuild the device Release package and rerun the fail-closed clean verifier.
+When lawful signing assets and hardware are available, measure the same heavy
+battle on a physical
 iPad before changing the renderer for a Simulator-specific bottleneck, and
 execute the signed controller, speaker, lifecycle, thermal, and hardware
 touch-battle matrix. Keep public redistribution blocked on license review.
