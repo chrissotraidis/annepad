@@ -123,31 +123,35 @@ patches.
   (AOT game), `8535ef7c...` (`librecomp`), and `8325b873...`
   (`ultramodern`).
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
-  Its arm64 iPhoneOS executable is 378,469,952 bytes, has no linker UUID, and
+  Its arm64 iPhoneOS executable is 378,173,192 bytes, has no linker UUID, and
   has SHA-256
-  `e6b2ab11cee127b5f2cb89f7318b1e03138e31d3f93e6fb98184f90e119ef363`.
+  `6453dac196bbda1631ce499fb019118df6f07cf6cf083ca485b9c788187eb27a`.
   Unsigned builds deliberately link with `-reproducible,-no_uuid`; signed
-  builds retain the normal UUID for symbolication. Release builds also compile out the
-  validation-only audio capture/synthetic hooks and the unavailable-transport
-  log; the app audit rejects their marker strings.
+  builds retain the normal UUID for symbolication. Release builds compile out
+  validation-only audio capture/synthetic hooks, `aspMain` capture/replay and
+  reference-oracle sources, Ares worker, debug server/port, turbo override,
+  environment autoboot, and the unavailable-transport log. The app audit
+  rejects their markers and avoids `pipefail`/SIGPIPE false negatives.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `24dc9caa60851e6a204c6435ff7a9054b84dccac4ff8a3999b999024cfe7d9e6`.
-  The fail-closed clean pass used temporary source commit
-  `915b171bfcf666533d39b8bcece2ce2107a3a9ae` and dependency-lock SHA-256
+  `b0f62f11d11bff4f9a6f15770da65b41fea6f7efc3686eca0dc18238a3c562b0`.
+  This hardened candidate is committed at
+  `ee4f1af807d4c9f7281668a37765d1a1760e77f2`; its full isolated clean-checkout
+  rerun remains open. The preceding fail-closed clean pass used temporary
+  source commit `915b171bfcf666533d39b8bcece2ce2107a3a9ae` and dependency-lock SHA-256
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
-  It passed every fetch, generation, native macOS, Simulator, optimized device,
-  app, package, and repository audit, then matched the retained expected
-  manifest byte-for-byte. All eight bundle files reproduce exactly.
+  That predecessor passed every fetch, generation, native macOS, Simulator,
+  optimized device, app, package, and repository audit, then matched its
+  retained expected manifest (`24dc9caa...d9e6`) byte-for-byte.
   The bundle contains only the executable, compiled icons/catalog, metadata,
   privacy manifest, and notices; it has no ROM, save, desktop artwork,
   provisioning profile, signature, unexpected dylib, or local developer path.
-- The audited 71-file source/document baseline is committed on `main` at
-  `136d145287d3374b93a3dfe0275a46980df85b9c` and pushed to the private GitHub
-  repository. Local `HEAD` and `origin/main` were compared and match exactly;
-  ignored ROM, generated, build, artifact, log, and signing material was not
-  published.
+- The audited 71-file source/document baseline and later release-hardening
+  checkpoint (`ee4f1af8...77f2`) are committed on `main` and backed up to the
+  private GitHub repository. Local `HEAD` and `origin/main` are compared after
+  each push; ignored ROM, generated, build, artifact, log, and signing material
+  is not published.
 
 ## Not yet proven
 
@@ -163,10 +167,11 @@ patches.
   valid code-signing identities, and no provisioning profile is installed.
 - App Store compatibility and redistribution of unlicensed upstream components
   are not established.
-- The targeted audio capture/synthetic release hooks are removed, but the
-  upstream static core still contributes dormant diagnostic environment toggles
-  and trace strings. The broader release-configuration checklist item remains
-  open until those surfaces are classified or compiled out.
+- High-cost replay, capture, oracle, debug-server, turbo, and autoboot release
+  surfaces are removed. Gameplay/render/audio configuration and lower-level
+  trace toggles remain in the upstream static core; the broader release-
+  configuration checklist remains open until those surfaces are classified or
+  compiled out.
 
 ## Known regressions
 

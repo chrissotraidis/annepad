@@ -45,8 +45,10 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 
 - [ ] Release configuration has no debug menus, test ROM paths, verbose private
       logs, assertions that expose data, or unsupported feature toggles.
-      Targeted audio capture/synthetic hooks are absent; broader upstream
-      diagnostic environment toggles and trace strings remain under audit.
+      Audio capture/synthetic, `aspMain` replay/capture/oracle, Ares worker,
+      TCP debug server/port, turbo, and environment-autoboot surfaces are
+      absent; remaining upstream render/audio configuration and trace toggles
+      remain under audit.
 - [x] Device Mach-O is arm64, has expected load commands/frameworks, contains no
       Simulator slice, unexpected dylib, JIT/TCC/LiveRecomp/code-mod loader,
       writable-executable entitlement, or runtime tool dependency.
@@ -55,8 +57,9 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       correct and internally consistent.
 - [x] IPA manifest contains only expected files and every third-party notice.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
-- [ ] Canonical sorted uncompressed-content digest and full audit report are
-      recorded; physical install/retest has not yet used that exact candidate.
+- [x] Canonical sorted uncompressed-content digest and full audit report are
+      recorded (`b0f62f11...562b0`); physical install/retest and a fresh
+      isolated reproduction of this hardened digest remain open.
 
 ## Documentation and handoff
 

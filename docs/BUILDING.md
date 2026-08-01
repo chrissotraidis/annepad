@@ -167,29 +167,29 @@ sorted uncompressed path+content hashing is the package reproducibility gate.
 no-hardlink clone and runs the complete fetch, generation, macOS build,
 Simulator/device build, package, and audit sequence using an explicit ROM
 outside the checkout. It fails if the clean package differs from that expected
-manifest. The working AnnePad repository still has no commit, so publishing its
-source baseline remains a separate repository-state task and is not a reason to
-commit private inputs or generated output.
+manifest. The source baseline is committed and backed up to private GitHub
+`main`; private inputs and generated output remain ignored and must never be
+added to make a verifier pass.
 
 ## Passing local unsigned candidate
 
 The 2026-08-01 local release build produced:
 
-- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,690,547 bytes. Raw ZIP hashes vary
+- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,654,914 bytes. Raw ZIP hashes vary
   between archive passes and are not the reproducibility authority.
 - `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
 - `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
   manifest SHA-256
-  `24dc9caa60851e6a204c6435ff7a9054b84dccac4ff8a3999b999024cfe7d9e6`.
+  `b0f62f11d11bff4f9a6f15770da65b41fea6f7efc3686eca0dc18238a3c562b0`.
 
 Two local archive passes have the exact same manifest bytes/digest. The
-378,469,952-byte local unsigned executable hashes to `e6b2ab11...f363` and has
-no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`; repeated local
-links and temporary snapshot commit `915b171b...a9ae` produce the same binary
-and `24dc9caa...d9e6` canonical manifest. The clean verifier requires the
-retained manifest explicitly and fails closed on any difference. The
-validation-only audio capture/synthetic hooks and
-unavailable-transport log are compiled out of this release profile and enforced
-by the app audit. Signed builds retain the normal linker UUID for crash
-symbolication. These are local ignored artifacts, not a signed install or
-public distribution authorization.
+378,173,192-byte local unsigned executable hashes to `6453dac1...b27a` and has
+no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
+hardened source commit is `ee4f1af8...77f2`; its local packages match at
+`b0f62f11...562b0`, but the full isolated clean verifier has not yet been rerun
+for this digest. The previous `915b171b...a9ae` snapshot remains valid proof
+for its predecessor (`e6b2ab11...f363`, `24dc9caa...d9e6`). Release audio,
+replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
+surfaces are compiled out and enforced by the app audit. Signed builds retain
+the normal linker UUID for crash symbolication. These are local ignored
+artifacts, not a signed install or public distribution authorization.

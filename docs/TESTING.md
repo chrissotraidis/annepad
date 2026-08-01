@@ -90,19 +90,23 @@ was not exposed by the installed Xcode UI, and physical audio route,
 interruption, lock/unlock, termination, and real-speaker acceptance remain open.
 
 Gate 9's local unsigned-package sub-gate and the isolated verifier's internal
-checks passed 2026-08-01. The release app is arm64 iPhoneOS 16.0, links only Apple system libraries, and passed profile,
+checks passed 2026-08-01. The release app is arm64 iPhoneOS 16.0, links only
+Apple system libraries, and passed profile,
 privacy, metadata, icon, forbidden-runtime, local-path, ROM/save/artwork,
 signature, provisioning, and targeted release-diagnostic audits. Unsigned
 linking omits the nondeterministic Mach-O UUID; signed linking retains it. The
-validation-only audio capture/synthetic hooks and unavailable-transport log are
-compiled out. Repeated local packages and isolated snapshot commit
-`915b171b...a9ae` produced identical 8-file canonical manifests with SHA-256
-`24dc9caa60851e6a204c6435ff7a9054b84dccac4ff8a3999b999024cfe7d9e6`;
-raw ZIP hashes differ because archive timestamps are not the authority. The
-isolated app executable and retained local executable both hash to
-`e6b2ab11...f363`; the fail-closed expected-manifest comparison passed.
-Working-repository publication, signing, install/retest, physical hardware, and
-public-license acceptance remain open.
+validation-only audio capture/synthetic, `aspMain` replay/capture/oracle, Ares
+worker, TCP debug-server/port, turbo, environment-autoboot, and unavailable-
+transport surfaces are compiled out. The app audit rejects their markers using
+process substitution so `pipefail` cannot turn an expected `strings` SIGPIPE
+into a false negative. Repeated local packages for source commit
+`ee4f1af8...77f2` produced identical 8-file canonical manifests with SHA-256
+`b0f62f11d11bff4f9a6f15770da65b41fea6f7efc3686eca0dc18238a3c562b0`;
+the 378,173,192-byte executable hashes to `6453dac1...b27a`. The previous
+`915b171b...a9ae` snapshot passed the full fail-closed isolated verifier; the
+current hardened digest still needs that rerun. Private source publication
+passes. Signing, install/retest, physical hardware, and public-license
+acceptance remain open.
 
 ### Runtime smoke automation
 

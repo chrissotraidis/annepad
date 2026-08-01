@@ -281,3 +281,28 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Boundary: this is a private source backup, not a public or signed release.
   Physical iPhone/iPad, controller, real-speaker audio, lifecycle/performance,
   hardware touch-battle, signing, and licensing gates remain open.
+
+## 2026-08-01 — Release-only diagnostics hardening
+
+- Inventory: the release executable still contained high-cost offline replay,
+  Ares reference-oracle, `aspMain` capture/spike hooks, debug-server, turbo, and
+  environment-autoboot surfaces, including large diagnostic rings in the app
+  target.
+- Change: source commit `ee4f1af807d4c9f7281668a37765d1a1760e77f2`
+  adds a maintained patch that compiles those surfaces out only for the iOS
+  release profile. Validation builds retain them; native `aspMain`, touch,
+  controller, ROM setup, renderer configuration, saves, and voluntary
+  preemption remain intact.
+- Audit correction: reproduced a false negative caused by `strings | rg -q`
+  under `pipefail`, switched executable scans to process substitution, and
+  proved the old `PSR_AUTOBOOT` marker failed before rebuilding. The rebuilt
+  candidate contains none of the targeted markers and passes the expanded app
+  and IPA audits.
+- Evidence: binary size 378,173,192 bytes, SHA-256
+  `6453dac196bbda1631ce499fb019118df6f07cf6cf083ca485b9c788187eb27a`,
+  UUID absent. Two local packages had different raw ZIP hashes but identical
+  eight-file canonical manifest SHA-256
+  `b0f62f11d11bff4f9a6f15770da65b41fea6f7efc3686eca0dc18238a3c562b0`.
+- Remaining: rerun the full fail-closed isolated verifier for this exact
+  hardened digest. Physical signing/install, controller, real-speaker audio,
+  lifecycle/performance, touch battle, and licensing remain open.

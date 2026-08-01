@@ -35,14 +35,14 @@ evidence pass; compilation is never substituted for interaction.
   physical interruption/route/lock/update/termination acceptance remains open.
 - M8: intentionally absent from the base candidate.
 - M9: release resources, optimized arm64 app, app/IPA audits, and two-pass
-  canonical unsigned-IPA reproduction pass locally. An isolated committed
-  snapshot also passed the fail-closed full clean-checkout verifier and exactly
-  matched the retained executable and canonical IPA manifest.
-  Validation-only audio capture/synthetic hooks and the
-  unavailable-transport log are compiled out of the release profile and
-  rejected by audit if present. Working-repository publication,
-  signing, installation, physical retest, and public-license gates remain open
-  until separately evidenced.
+  canonical unsigned-IPA reproduction pass locally. The previous candidate's
+  isolated committed snapshot passed the fail-closed full clean-checkout
+  verifier. The current hardened candidate compiles out validation-only audio,
+  replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-
+  transport surfaces and rejects them by audit; its isolated reproduction is
+  the next software gate. Private repository publication passes. Signing,
+  installation, physical retest, and public-license gates remain open until
+  separately evidenced.
 
 Progress past M4 uses independent Simulator sub-gates so the external hardware
 block does not stall software hardening. It does not reorder or waive any M4–M7

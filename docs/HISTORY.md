@@ -153,3 +153,18 @@
   and pushed it to the previously empty private GitHub repository.
 - Fetched the new remote branch and proved local `HEAD` and `origin/main` are
   equal. The private backup does not clear public-license or release gates.
+
+## 2026-08-01 — Release diagnostic surface narrowed
+
+- Added a maintained, stack-verified release patch that omits the Ares worker,
+  `aspMain` replay/reference sources, capture rings/hooks, TCP debug server,
+  turbo override, and environment-autoboot path from iPhoneOS release builds.
+- Preserved native iOS startup by making release autoboot a compile-time choice;
+  validation builds retain their existing environment-controlled behavior.
+- Fixed the executable string audit so `pipefail` cannot hide a marker match
+  when `rg -q` closes `strings` early, then expanded the deny-list for every
+  removed surface.
+- Rebuilt with the release macro scoped only to the app target. The audited
+  378,173,192-byte binary hashes to `6453dac1...b27a`; two local packages share
+  canonical manifest `b0f62f11...562b0`. Full isolated reproduction of this
+  new candidate remains open.

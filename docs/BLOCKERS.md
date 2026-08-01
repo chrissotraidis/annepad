@@ -174,7 +174,9 @@ Resolved entries are never deleted.
 - Reproducibility evidence: isolated snapshot
   `915b171bfcf666533d39b8bcece2ce2107a3a9ae` passes the fail-closed verifier;
   its `e6b2ab11...f363` executable and `24dc9caa...d9e6` canonical IPA manifest
-  match the retained local candidate exactly.
+  matched the then-retained local candidate exactly. The later hardened
+  `ee4f1af8...77f2` candidate has independent local two-pass package proof and
+  still needs its own full isolated rerun.
 - Safety: ROMs, generated source, build trees, saves, IPAs, logs, and signing
   material remain ignored and were not published. Public release and licensing
   are still separate open gates.
