@@ -549,7 +549,14 @@ extern "C" void annepad_touch_attach(void* window_pointer) {
         }
         AnnePadTouchOverlayView* overlay =
             [[AnnePadTouchOverlayView alloc] initWithFrame:host.bounds];
+        overlay.translatesAutoresizingMaskIntoConstraints = NO;
         [host addSubview:overlay];
+        [NSLayoutConstraint activateConstraints:@[
+            [overlay.leadingAnchor constraintEqualToAnchor:host.leadingAnchor],
+            [overlay.trailingAnchor constraintEqualToAnchor:host.trailingAnchor],
+            [overlay.topAnchor constraintEqualToAnchor:host.topAnchor],
+            [overlay.bottomAnchor constraintEqualToAnchor:host.bottomAnchor],
+        ]];
     });
 }
 

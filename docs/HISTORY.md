@@ -179,3 +179,11 @@
   performance remains open, with physical iPad evidence required.
 - Rejected and reverted a visually incorrect half-resolution workaround, then
   rebuilt the clean full-resolution Release app and re-verified locked sources.
+
+## 2026-08-01 — Cold iPad overlay bounds fixed
+
+- Reproduced transient touch-control clipping during a portrait-origin cold boot.
+- Constrained the touch overlay to all four edges of its live UIKit host instead
+  of relying on its initial frame and autoresizing-mask conversion.
+- Rebuilt Release and proved stable control geometry throughout a repeated cold
+  boot; physical orientation acceptance remains open.

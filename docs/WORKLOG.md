@@ -376,3 +376,21 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Remaining: physical iPad battle/thermal measurement, cold iPad orientation,
   timed Z latch/cancellation coverage, new device package/clean verifier, and
   signed controller/speaker/lifecycle acceptance.
+
+## 2026-08-01 — Cold iPad overlay geometry stabilized
+
+- Reproduction: launched the clean Release app after two separate portrait-origin
+  iPad Simulator shutdown/boot cycles. Both rotated into landscape without a
+  manual toolbar rotation, but the second intermittently pushed controls off
+  both edges while UIKit/SDL settled their view bounds.
+- Fix: replaced the overlay's initial-frame/autoresizing attachment with four
+  Auto Layout edge constraints to the live root host. This keeps the HarkinianPad-
+  derived normalized geometry tied to the actual play surface through cold
+  rotation and SDL view transitions.
+- Proof: rebuilt and installed the optimized Release app, repeated the
+  portrait-origin cold boot, and inspected startup at three timed intervals.
+  The overlay stayed complete and correctly positioned throughout visible live
+  gameplay. The ROM-free arm64 Simulator executable hashes to
+  `ca173975eb88915f4e2c3e151087d4808a731caf6ad820c8970ca77faa817b9d`.
+- Remaining: deterministic Z latch/cancellation coverage and physical-device
+  orientation/ergonomics acceptance.

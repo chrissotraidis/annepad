@@ -114,8 +114,12 @@ patches.
   phone/tablet geometry, adds pressed-state feedback and a lifecycle-safe
   hold-to-latch Z control, and keeps AnnePad's direct analog N64 input bridge.
   It builds and runs on the iPad Simulator; touch navigation, editor/reset, and
-  one background/foreground cycle passed. A timed Z-latch and sustained-battle
-  rerun plus physical-device acceptance remain required.
+  one background/foreground cycle passed. The overlay is now edge-constrained
+  to the live UIKit host rather than relying on an initial frame: three timed
+  screenshots across a portrait-origin cold boot retained correct landscape
+  geometry where the prior build intermittently clipped controls off both
+  edges. A timed Z-latch and sustained-battle rerun plus physical-device
+  acceptance remain required.
 - A temporary source-local counter at RT64's actual Metal swap-chain present
   call measured the validation candidate on the iPad Pro 11-inch (M4), iOS
   18.5. In the title/attract path it reached the scene's observed 30 Hz ceiling
@@ -138,7 +142,7 @@ patches.
   (`ultramodern`). The clean Release Simulator executable is arm64,
   `platform IOSSIMULATOR`, minimum iOS 16.0, profile-marked `release`, ROM-free,
   and hashes to
-  `e56f2415e079ad7bd5baf20db3f39c15b69506bb9670ec038e1e041546f33af8`.
+  `ca173975eb88915f4e2c3e151087d4808a731caf6ad820c8970ca77faa817b9d`.
 - The optimized app installed over the existing private ROM/save state and
   visibly rendered full-resolution title, menu, and battle-attract scenes.
   A/Start touch navigation, editor resize/reset/done, and Home/resume passed.
@@ -234,12 +238,14 @@ patches.
 
 ## Known regressions
 
-An upright cold-launch/setup flow was re-proven on the iPhone Simulator, but a
-fresh iPad Simulator boot can initially stretch the landscape-only app into a
-portrait surface until the Simulator is rotated once. That cold-start iPad
-orientation remains open. The desktop window close action returns from gameplay
-to the launcher by design; App-menu Quit exits cleanly. Physical-device
-orientation remains untested.
+An upright cold-launch/setup flow is proven on iPhone Simulator. On iPad, two
+portrait-origin cold boots rotated to landscape without manual intervention;
+the second exposed transient stale overlay bounds during startup. Constraining
+all four overlay edges to the live UIKit host removed that clipping across three
+timed startup screenshots. The prior manual-rotate Simulator regression is not
+currently reproducible, but physical-device orientation remains untested. The
+desktop window close action returns from gameplay to the launcher by design;
+App-menu Quit exits cleanly.
 
 ## Current targets
 
@@ -253,9 +259,9 @@ orientation remains untested.
 
 ## Next concrete task
 
-Fix the cold iPad orientation and add deterministic touch-state coverage for the
-Z latch/cancellation semantics, then rebuild the device Release package and rerun
-the fail-closed clean verifier. When lawful signing assets and hardware are
+Add deterministic touch-state coverage for the Z latch/cancellation semantics,
+then rebuild the device Release package and rerun the fail-closed clean verifier.
+When lawful signing assets and hardware are
 available, measure the same heavy battle on a physical iPad before changing the
 renderer for a Simulator-specific bottleneck, and execute the signed controller,
 speaker, lifecycle, thermal, and hardware touch-battle matrix. Keep public

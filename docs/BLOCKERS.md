@@ -132,8 +132,11 @@ Resolved entries are never deleted.
   synthetic keyboard path would discard analog magnitude.
 - Partial proof: the corrected candidate builds and installs on the iPad
   Simulator; Start navigation, visible pressed feedback, editor resize/reset,
-  Done, and one Home/relaunch cycle passed. Cold iPad orientation still needs a
-  manual rotate after some boots.
+  Done, and one Home/relaunch cycle passed. Two portrait-origin cold boots
+  rotated to landscape without manual intervention. The second reproduced
+  transient stale overlay bounds; replacing frame/autoresizing attachment with
+  four host-edge constraints kept every control in place across three timed
+  startup screenshots.
 - Gate: exercise stick and multi-button input, timed latch/release Z, persistence,
   background/foreground cancellation, and a sustained touch-only battle. Repeat
   ergonomics and stuck-input acceptance on physical iPhone and iPad before
