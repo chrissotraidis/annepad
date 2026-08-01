@@ -81,7 +81,7 @@ is not yet physically proven or release-ready.
 - The non-frame-identical intro measurement did not prove a material FPS gain.
   Keep this as a correctness/leak fix, not a claimed performance breakthrough.
 
-### 4. The corrected touch layer is HarkinianPad-derived but not accepted yet
+### 4. The corrected touch layer is HarkinianPad-derived and battle-proven
 
 - The current overlay adapts HarkinianPad's accepted phone/tablet grip geometry,
   safe-area behavior, customization model, pressed/latched visuals, 0.5-second
@@ -94,15 +94,15 @@ is not yet physically proven or release-ready.
   cover exact quick-tap expiry, the longer shoulder chord window, overlapping
   A+R, Z cancellation, and lifecycle clearing.
 - Start navigation and editor/lifecycle smokes pass in Simulator. A full
-  touch-only battle after the HarkinianPad-derived replacement has not been
-  completed.
+  touch-only Battle Now rerun selected Squirtle/Pikachu/Bulbasaur, resolved all
+  six rentals through an explicit `LOSE`, and returned to the main selection
+  menu. The timed UIKit Z-latch and physical-device ergonomics remain open.
 
 ### 5. The remaining finish line is mostly acceptance work
 
 In priority order:
 
-1. Complete a touch-only rental battle and timed Z-latch UI acceptance with the
-   corrected overlay.
+1. Complete timed Z-latch UI acceptance with the corrected overlay.
 2. Rebuild and reproduce the exact current unsigned device package from a clean
    checkout.
 3. On an attached signed iPad, run the same heavy scene and collect frame-time,

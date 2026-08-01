@@ -509,3 +509,23 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   Game Pak Check. The clean executable is 380,988,920 bytes with SHA-256
   `73d456b930fe0501840ffb544d7f05a61320cb3c30cd2a9faeb0675663fa077b`.
 - Timed UIKit Z-latch and full corrected-overlay battle acceptance remain open.
+
+## 2026-08-01 16:25–16:52 CDT — Corrected-overlay rental battle acceptance
+
+- Goal: replace the historical bespoke-overlay battle proof with a complete
+  run using the corrected HarkinianPad-derived touch layer.
+- Runtime: on iPad Pro 11-inch (M4), iOS 18.5, used touch only to pass Game Pak
+  Check, enter Battle Now, select Squirtle/Pikachu/Bulbasaur, issue battle moves,
+  replace fainted rentals, and resolve Psyduck/Oddish/Meowth.
+- Result: reached the explicit `LOSE` screen after all six rentals resolved and
+  pressed A to return to the main selection menu. No crash or stuck input was
+  observed. Long battle animations and transitions remained visibly uneven,
+  consistent with the measured Simulator cadence blocker.
+- Evidence: `docs/evidence/m5-ios-touch-rental-battle-corrected-result.png`
+  hashes to
+  `1b931d2d684884fdac983086a4ddb4a439c7d868d1ba1e4a7da9d07bb449b0f3`.
+- Boundary: a desktop gesture-driver drag did not trigger the blue timed Z
+  latch, so that UIKit gate is not claimed. Physical-device touch, controller,
+  speaker, lifecycle, and performance acceptance also remain open.
+- Next: build a duration-controlled Z UI test, then rebuild/reproduce the exact
+  current unsigned device package and clean-checkout verifier.

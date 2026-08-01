@@ -233,3 +233,14 @@
   overlapping A+R, Z clearing, and lifecycle cancellation.
 - Rebuilt and launched Release on the iPad Simulator; quick Start input returned
   from attract mode and advanced into Game Pak Check.
+
+## 2026-08-01 — Corrected touch overlay completes rental battle
+
+- Used only the HarkinianPad-derived on-screen controls to select
+  Squirtle/Pikachu/Bulbasaur and play a complete Battle Now match against
+  Psyduck/Oddish/Meowth.
+- Resolved all six rentals, reached the explicit `LOSE` result, and returned to
+  the main selection menu without a crash.
+- Preserved a correctly oriented Simulator screenshot at
+  `docs/evidence/m5-ios-touch-rental-battle-corrected-result.png`; timed UIKit Z
+  latch and physical-device acceptance remain open.

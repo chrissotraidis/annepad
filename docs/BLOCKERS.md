@@ -166,10 +166,14 @@ Resolved entries are never deleted.
   transient stale overlay bounds; replacing frame/autoresizing attachment with
   four host-edge constraints kept every control in place across three timed
   startup screenshots.
-- Gate: exercise timed latch/release Z in UIKit, persistence,
-  background/foreground cancellation, and a sustained touch-only battle. Repeat
-  ergonomics and stuck-input acceptance on physical iPhone and iPad before
-  resolving this blocker.
+- Follow-up proof: the corrected overlay completed a full touch-only rental
+  battle using Squirtle/Pikachu/Bulbasaur against Psyduck/Oddish/Meowth, reached
+  the explicit `LOSE`, and returned to the main selection menu without a crash.
+  Evidence SHA-256 is
+  `1b931d2d684884fdac983086a4ddb4a439c7d868d1ba1e4a7da9d07bb449b0f3`.
+- Gate: exercise timed latch/release Z in UIKit plus persistence and
+  background/foreground cancellation. Repeat ergonomics and stuck-input
+  acceptance on physical iPhone and iPad before resolving this blocker.
 
 ## B-014 — iOS platform and dynamic-code separation is not yet compiled
 

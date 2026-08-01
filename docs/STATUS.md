@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 16:20 CDT
+Updated: 2026-08-01 16:52 CDT
 
 ## Current state
 
@@ -39,7 +39,11 @@ was not the leading FPS cause. Simulator/device app builds now always invoke the
 incremental AOT core build so regenerated source cannot link a stale archive.
 Touch quick-tap retention now uses independent atomic lifetimes per button;
 deterministic tests cover overlap, expiry, Z clearing, and lifecycle clearing,
-and the rebuilt Release app accepted quick Start navigation in Simulator.
+and the rebuilt Release app accepted quick Start navigation in Simulator. A
+complete corrected-overlay rerun then selected Squirtle/Pikachu/Bulbasaur,
+resolved all six rentals through the explicit `LOSE` result, and returned to
+the main selection menu using touch only. Timed UIKit Z-latch acceptance remains
+open.
 Physical-device runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
@@ -134,8 +138,13 @@ patches.
   to the live UIKit host rather than relying on an initial frame: three timed
   screenshots across a portrait-origin cold boot retained correct landscape
   geometry where the prior build intermittently clipped controls off both
-  edges. A timed Z-latch and sustained-battle rerun plus physical-device
-  acceptance remain required.
+  edges. The corrected overlay subsequently completed a
+  separate full rental battle using Squirtle/Pikachu/Bulbasaur against
+  Psyduck/Oddish/Meowth, reached the explicit `LOSE` result, and returned to
+  the main selection menu. Evidence:
+  `evidence/m5-ios-touch-rental-battle-corrected-result.png` (SHA-256
+  `1b931d2d684884fdac983086a4ddb4a439c7d868d1ba1e4a7da9d07bb449b0f3`).
+  The timed UIKit Z-latch and physical-device acceptance remain required.
 - A temporary source-local counter at RT64's actual Metal swap-chain present
   call measured the validation candidate on the iPad Pro 11-inch (M4), iOS
   18.5. In the title/attract path it reached the scene's observed 30 Hz ceiling
@@ -256,10 +265,9 @@ patches.
   release blocker.
 - `xctrace` reports no attached physical iPhone or iPad, the keychain has zero
   valid code-signing identities, and no provisioning profile is installed.
-- Release still executes upstream reverse-engineering probes in `extras.c` and
-  `game.toml`. A captured title/attract window contained 838 non-counter
-  diagnostic lines. These must be compiled out without removing neighboring
-  correctness hooks before release timing and privacy acceptance.
+- Release now compiles 96 upstream diagnostic hook sites and their argument
+  evaluation out while retaining six correctness hooks. Targeted probe output
+  is zero; the wider release-configuration classification remains open.
 - App Store compatibility and redistribution of unlicensed upstream components
   are not established.
 - High-cost replay, capture, oracle, debug-server, turbo, and autoboot release
@@ -291,8 +299,8 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Complete the corrected-overlay touch-only battle and timed Z-latch UIKit gate,
-then rebuild the device Release package and rerun the fail-closed clean verifier.
+Complete the timed Z-latch UIKit gate, then rebuild the device Release package
+and rerun the fail-closed clean verifier.
 When lawful signing assets and hardware are available, measure the same heavy
 battle on a physical
 iPad before changing the renderer for a Simulator-specific bottleneck, and
