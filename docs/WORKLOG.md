@@ -264,3 +264,20 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Remaining: publish the audited source baseline, then keep signed physical
   iPhone/iPad, controller, speaker/audio-route, lifecycle/performance,
   hardware touch-battle, and licensing gates open until directly tested.
+
+## 2026-08-01 — Private GitHub baseline published
+
+- Authorization and scope: after explicit user approval, reviewed the 71-file
+  intended baseline and confirmed the GitHub repository is private and empty.
+  The staged index passed repository policy and contained no forbidden ROM,
+  save, generated, IPA, signing, credential, or build material.
+- Publication: created root commit
+  `136d145287d3374b93a3dfe0275a46980df85b9c` directly on `main`. A pull request
+  was not possible or useful because the remote had no base commit or branch.
+- Transport recovery: the first image-bearing HTTPS push returned HTTP 400;
+  the remote still had zero heads. Retrying the same push with a 15 MiB HTTP
+  post buffer succeeded, then a fetch and SHA comparison proved local `HEAD`
+  and `origin/main` identical.
+- Boundary: this is a private source backup, not a public or signed release.
+  Physical iPhone/iPad, controller, real-speaker audio, lifecycle/performance,
+  hardware touch-battle, signing, and licensing gates remain open.

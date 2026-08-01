@@ -163,21 +163,21 @@ Resolved entries are never deleted.
   Japanese C strings. The native compiler then emits the intended bytes and the
   complete rebuilt ROM matches MD5 `ed1378bc12115f71209a77844965ba50`.
 
-## B-015 — Project baseline is not committed or backed up
-
-- Status: active repository-state gate
-- Evidence: AnnePad has no commit at `HEAD`; all intended project files are
-  currently untracked and no project source has been pushed to GitHub.
-- Technical gate: resolved. A committed isolated snapshot at
-  `915b171bfcf666533d39b8bcece2ce2107a3a9ae` passed the complete no-hardlink
-  clean verifier and its `e6b2ab11...f363` executable plus
-  `24dc9caa...d9e6` canonical IPA manifest match the retained local candidate
-  exactly. The remaining gate is repository publication, not reproducibility.
-- Next action: review, commit, and publish the intended source baseline only
-  when explicitly authorized. Do not include the ROM, generated source, build
-  trees, saves, IPA, logs, or signing material.
-
 ## Resolved blockers
+
+### B-R015 — Project baseline was not committed or backed up
+
+- Status: resolved 2026-08-01
+- Evidence: the audited 71-file baseline was committed to `main` at
+  `136d145287d3374b93a3dfe0275a46980df85b9c` and pushed to the private GitHub
+  repository; local `HEAD` and `origin/main` matched after a fresh fetch.
+- Reproducibility evidence: isolated snapshot
+  `915b171bfcf666533d39b8bcece2ce2107a3a9ae` passes the fail-closed verifier;
+  its `e6b2ab11...f363` executable and `24dc9caa...d9e6` canonical IPA manifest
+  match the retained local candidate exactly.
+- Safety: ROMs, generated source, build trees, saves, IPAs, logs, and signing
+  material remain ignored and were not published. Public release and licensing
+  are still separate open gates.
 
 ### B-R001 — ROM revision uncertainty
 

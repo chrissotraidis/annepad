@@ -10,7 +10,7 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       every redistributed component's terms.
 - [ ] `pret/pokestadium` and `recomp-ui` licensing is clarified, or their
       unlicensed material is absent from redistributed source and binaries.
-- [ ] Repository/package audits find no ROM, save, extracted game asset/source,
+- [x] Repository/package audits find no ROM, save, extracted game asset/source,
       cartridge image, firmware, signing secret, credential, or private data.
 - [ ] Public screenshots/media have a documented rights and privacy review.
 - [x] Release language requires a legally obtained user ROM and does not imply

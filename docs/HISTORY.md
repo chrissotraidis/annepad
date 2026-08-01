@@ -143,3 +143,13 @@
   repository-policy gates. The 378,469,952-byte executable hashes to
   `e6b2ab11...f363`; the exact 8-file manifest hashes to `24dc9caa...d9e6` in
   both the retained and isolated builds.
+
+## 2026-08-01 — Private main backup established
+
+- Audited and staged the complete 71-file source, patch, documentation, and
+  evidence scope while excluding ROMs, generated source, builds, artifacts,
+  logs, and signing material.
+- Created initial `main` commit `136d145287d3374b93a3dfe0275a46980df85b9c`
+  and pushed it to the previously empty private GitHub repository.
+- Fetched the new remote branch and proved local `HEAD` and `origin/main` are
+  equal. The private backup does not clear public-license or release gates.

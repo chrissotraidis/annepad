@@ -143,6 +143,11 @@ patches.
   The bundle contains only the executable, compiled icons/catalog, metadata,
   privacy manifest, and notices; it has no ROM, save, desktop artwork,
   provisioning profile, signature, unexpected dylib, or local developer path.
+- The audited 71-file source/document baseline is committed on `main` at
+  `136d145287d3374b93a3dfe0275a46980df85b9c` and pushed to the private GitHub
+  repository. Local `HEAD` and `origin/main` were compared and match exactly;
+  ignored ROM, generated, build, artifact, log, and signing material was not
+  published.
 
 ## Not yet proven
 
@@ -154,10 +159,6 @@ patches.
   physical-device runtime success.
 - Real-speaker audio, lock/unlock, interruptions/routes, thermal performance,
   and a touch-only battle on physical hardware remain open.
-- The isolated committed snapshot passes the fail-closed clean verifier and
-  reproduces the retained candidate exactly. The actual AnnePad repository
-  still has no committed `HEAD`: its intended project files remain untracked
-  and are not yet backed up to GitHub.
 - `xctrace` reports no attached physical iPhone or iPad, the keychain has zero
   valid code-signing identities, and no provisioning profile is installed.
 - App Store compatibility and redistribution of unlicensed upstream components
@@ -186,8 +187,7 @@ App-menu Quit exits cleanly. Physical-device orientation remains untested.
 
 ## Next concrete task
 
-Review and publish the intended AnnePad source baseline without adding ignored
-private or generated material. When lawful signing assets and physical hardware are available,
-build/install the isolated signed product and execute the iPhone/iPad,
+When lawful signing assets and physical hardware are available, build/install
+the isolated signed product and execute the iPhone/iPad,
 controller, real-speaker audio, lifecycle, performance, and hardware
 touch-battle matrix. Keep public redistribution blocked on license review.
