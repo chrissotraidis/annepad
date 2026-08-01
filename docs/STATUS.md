@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 15:02 CDT
+Updated: 2026-08-01 15:26 CDT
 
 ## Current state
 
@@ -27,8 +27,13 @@ RT64 descriptor-state cache now skips provably identical Metal argument-buffer
 writes. In a follow-up run spanning intro, Game Pak Check, menus, and rental
 battle setup, 117 30 Hz VI windows averaged 23.40 presents/s and 20 fell below
 20 presents/s. That is a useful reduction in Simulator stalls, but not
-performance acceptance. Physical-device runtime acceptance remains externally
-gated.
+performance acceptance. A fresh audit then ruled out internal resolution as the
+leading cause: a full-screen 1x RT64 internal-resolution run was visibly more
+pixelated and did not improve cadence over the default 3x path. The same audit
+found that Release still runs upstream reverse-engineering probes, and found a
+per-clear Metal depth-state allocation/leak. The bounded clear-state cache now
+builds and renders correctly; diagnostic-only hook removal is the next measured
+slice. Physical-device runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
 game save, and has completed a full rental battle through an explicit result.
@@ -146,7 +151,7 @@ patches.
   (`ultramodern`). The clean Release Simulator executable is arm64,
   `platform IOSSIMULATOR`, minimum iOS 16.0, profile-marked `release`, ROM-free,
   and hashes to
-  `3f0e291dd11b83e06dac0740213b8372d5b2a3c6a553b526c48ab7bc23bf2dfe`.
+  `0e4b09eb2fab410351c8cdee071fceecfa9cad6e0876fe32a6bd6013cc28a50f`.
 - The optimized app installed over the existing private ROM/save state and
   visibly rendered full-resolution title, menu, and battle-attract scenes.
   A/Start touch navigation, editor resize/reset/done, and Home/resume passed.
@@ -193,7 +198,7 @@ patches.
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
   Its arm64 iPhoneOS executable is 378,174,464 bytes, has no linker UUID, and
   has SHA-256
-  `4f55bc82833bbbe6a7b0eb9b24991392d0e7925898029929b60d8183edf14586`.
+  `cd205ee85f9ee58eafdefdea9479fda2ad888c86b4a2a45dff9de815881e338a`.
   Unsigned builds deliberately link with `-reproducible,-no_uuid`; signed
   builds retain the normal UUID for symbolication. Release builds compile out
   validation-only audio capture/synthetic hooks, `aspMain` capture/replay and
@@ -203,8 +208,8 @@ patches.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `75bea9dbba5bfe65d7ee5ddf73b4d2d7eddb10d0282b2806873d88758c188ff7`.
-  This touch-corrected, descriptor-cached candidate's full isolated
+  `ef38239ac11403538c9bb5a5ba1542c53f80b7c84c2c570ce13a68879aaa0ccd`.
+  This touch-corrected, descriptor/clear-state-cached candidate's full isolated
   clean-checkout rerun remains open. The preceding fail-closed clean pass used temporary
   source commit `915b171bfcf666533d39b8bcece2ce2107a3a9ae` and dependency-lock SHA-256
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
@@ -244,6 +249,10 @@ patches.
   release blocker.
 - `xctrace` reports no attached physical iPhone or iPad, the keychain has zero
   valid code-signing identities, and no provisioning profile is installed.
+- Release still executes upstream reverse-engineering probes in `extras.c` and
+  `game.toml`. A captured title/attract window contained 838 non-counter
+  diagnostic lines. These must be compiled out without removing neighboring
+  correctness hooks before release timing and privacy acceptance.
 - App Store compatibility and redistribution of unlicensed upstream components
   are not established.
 - High-cost replay, capture, oracle, debug-server, turbo, and autoboot release
@@ -275,10 +284,12 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Add deterministic touch-state coverage for the Z latch/cancellation semantics,
-then rebuild the device Release package and rerun the fail-closed clean verifier.
-When lawful signing assets and hardware are
-available, measure the same heavy battle on a physical iPad before changing the
-renderer for a Simulator-specific bottleneck, and execute the signed controller,
-speaker, lifecycle, thermal, and hardware touch-battle matrix. Keep public
-redistribution blocked on license review.
+Compile diagnostic-only reverse-engineering hooks out of Release while
+preserving the adjacent fragment, audio-UAF, and scheduler correctness fixes;
+then repeat the controlled Simulator measurement. Next add deterministic
+touch-state coverage for the Z latch/cancellation semantics, rebuild the device
+Release package, and rerun the fail-closed clean verifier. When lawful signing
+assets and hardware are available, measure the same heavy battle on a physical
+iPad before changing the renderer for a Simulator-specific bottleneck, and
+execute the signed controller, speaker, lifecycle, thermal, and hardware
+touch-battle matrix. Keep public redistribution blocked on license review.

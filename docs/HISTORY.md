@@ -1,5 +1,14 @@
 # Project history
 
+## 2026-08-01 — Fresh completion audit and Metal clear-state leak fix
+
+- Ruled out RT64 internal resolution as the leading Simulator slowdown with a
+  full-screen 1x experiment.
+- Cached Metal color-clear depth state instead of allocating and leaking one
+  object per depth-backed clear.
+- Identified retained Release reverse-engineering probes as the next bounded
+  cleanup and documented the remaining touch and physical-device gates.
+
 ## 2026-07-31 — Repository established
 
 - Read and adopted the end-to-end AnnePad objective.

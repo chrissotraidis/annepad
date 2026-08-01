@@ -47,8 +47,9 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       logs, assertions that expose data, or unsupported feature toggles.
       Audio capture/synthetic, `aspMain` replay/capture/oracle, Ares worker,
       TCP debug server/port, turbo, and environment-autoboot surfaces are
-      absent; remaining upstream render/audio configuration and trace toggles
-      remain under audit.
+      absent; retained `extras.c`/`game.toml` reverse-engineering probes and
+      remaining upstream render/audio configuration and trace toggles remain
+      under audit.
 - [x] Device Mach-O is arm64, has expected load commands/frameworks, contains no
       Simulator slice, unexpected dylib, JIT/TCC/LiveRecomp/code-mod loader,
       writable-executable entitlement, or runtime tool dependency.
@@ -58,7 +59,7 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [x] IPA manifest contains only expected files and every third-party notice.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
 - [x] Canonical sorted uncompressed-content digest and full audit report are
-      recorded (`75bea9db...8ff7`); physical install/retest and a fresh
+      recorded (`ef38239a...0ccd`); physical install/retest and a fresh
       isolated reproduction of this hardened digest remain open.
 
 ## Documentation and handoff

@@ -32,6 +32,8 @@ git -C "$renderer" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/ios-metal-runtime.patch"
 git -C "$renderer" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/metal-descriptor-state-cache.patch"
+git -C "$renderer" apply --reverse --check \
+    "$ANNEPAD_ROOT/patches/rt64/metal-clear-state-cache.patch"
 
 renderer_nfd="$renderer/src/contrib/nativefiledialog-extended"
 renderer_nfd_changes=$(git -C "$renderer_nfd" status --porcelain --untracked-files=all)

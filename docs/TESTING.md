@@ -107,12 +107,14 @@ validation-only audio capture/synthetic, `aspMain` replay/capture/oracle, Ares
 worker, TCP debug-server/port, turbo, environment-autoboot, and unavailable-
 transport surfaces are compiled out. The app audit rejects their markers using
 process substitution so `pipefail` cannot turn an expected `strings` SIGPIPE
-into a false negative. Repeated local packages for the current descriptor-cache
+into a false negative. Repeated local packages for the current
+descriptor/clear-state-cache
 candidate produced identical 8-file canonical manifests with SHA-256
-`75bea9dbba5bfe65d7ee5ddf73b4d2d7eddb10d0282b2806873d88758c188ff7`;
-the 378,174,464-byte executable hashes to `4f55bc82...4586`. The previous
+`ef38239ac11403538c9bb5a5ba1542c53f80b7c84c2c570ce13a68879aaa0ccd`;
+the 378,174,464-byte executable hashes to `cd205ee8...338a`. The previous
 `915b171b...a9ae` snapshot passed the full fail-closed isolated verifier; the
-current touch-corrected, descriptor-cached digest still needs that rerun. Private source publication
+current touch-corrected, descriptor/clear-state-cached digest still needs that
+rerun. Private source publication
 passes. Signing, install/retest, physical hardware, and public-license
 acceptance remain open.
 
@@ -215,6 +217,20 @@ animated intro at full size, and accepted Start touch into Game Pak Check.
 Because the scene mix was not frame-identical and a fresh sample still showed
 changing descriptor/XPC work, treat this as directional evidence, not a final
 benchmark or performance sign-off.
+
+A fresh internal-resolution test used RT64's actual manual resolution
+multiplier rather than shrinking the Metal drawable. The 1x run remained
+full-screen but visibly pixelated and did not improve cadence over the default
+3x path; this rejects resolution/fill rate as the leading Simulator hypothesis.
+The same audit found a per-clear native Metal depth-state allocation/leak and
+replaced it with a cached state. The candidate renders correctly and removes
+that state-creation call from sampling, but its non-frame-identical intro run is
+not a proven FPS improvement.
+
+Do not use stderr-redirection captures as final performance evidence until the
+Release-only reverse-engineering probes are compiled out. One observed window
+contained 838 non-counter lines from retained loader, fragment, pool, and
+geometry diagnostics.
 
 `MTL_HUD_ENABLED` did not expose useful Simulator metrics, and an attached Game
 Performance trace failed to finish a valid document. A five-second live process

@@ -117,6 +117,19 @@ Resolved entries are never deleted.
   showed changing descriptor calls and their synchronous XPC waits as the main
   Simulator cost, so a broader batching rewrite is not justified without
   physical-device evidence.
+- Fresh audit: changing RT64's internal resolution multiplier from the default
+  3x to 1x kept the output full-screen and made it visibly more pixelated, but
+  did not improve the measured intro cadence. The earlier upper-left-quarter
+  result changed drawable size and tested the wrong knob. Fill rate is not the
+  leading current Simulator hypothesis.
+- Fresh audit: RT64 also created and leaked a native depth-stencil object on
+  every depth-backed color clear. A cached state removes that allocation and
+  samples cleanly, but the non-frame-identical follow-up does not prove a
+  material FPS gain. Changing descriptor/XPC traffic remains dominant.
+- Release-surface finding: the Release app still calls and prints explicit
+  upstream reverse-engineering probes. The observed window contained 838
+  non-counter diagnostic lines. Compile those probes out before the next
+  controlled measurement, while retaining neighboring correctness hooks.
 - Gate: measure the same heavy scene on a physical iPad before changing shared
   renderer behavior for a Simulator-specific driver cost. If hardware also
   misses the 30 Hz target, capture device GPU/frame-time evidence and optimize
@@ -139,6 +152,10 @@ Resolved entries are never deleted.
   with haptic confirmation, and cancellation on editor/ROM/lifecycle changes.
   AnnePad keeps its direct analog N64 snapshot bridge because the reference's
   synthetic keyboard path would discard analog magnitude.
+- Input audit: quick taps are already retained across several runtime polls, so
+  the problem is not a missing latch. The current latch uses one shared poll
+  window for all button bits; overlapping taps can extend one another and the
+  producer/consumer boundary lacks deterministic tests.
 - Partial proof: the corrected candidate builds and installs on the iPad
   Simulator; Start navigation, visible pressed feedback, editor resize/reset,
   Done, and one Home/relaunch cycle passed. Two portrait-origin cold boots

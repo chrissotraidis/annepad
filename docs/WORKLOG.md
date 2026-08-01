@@ -441,3 +441,34 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   still dominate the Simulator sample. Physical iPad measurement is required
   before a broader renderer rewrite; the isolated clean verifier also needs a
   rerun for this exact source digest.
+
+## 2026-08-01 — Fresh performance and completion audit
+
+- Reframed the work into separate cadence, shipping-surface, touch-acceptance,
+  and physical-device gates instead of treating every symptom as generic FPS.
+- Tested RT64's real internal-resolution multiplier. A 1x run remained
+  full-screen but visibly pixelated and did not improve cadence over the default
+  3x path, rejecting fill rate as the leading Simulator hypothesis.
+- Found that depth-backed Metal color clears created a new depth-stencil state
+  and never released it. Added one cached no-depth-write clear state, reused it,
+  and released both cached clear states at teardown. Release builds and renders;
+  the change is retained as a correctness/leak fix without claiming a measured
+  FPS breakthrough.
+- Found 838 non-counter Release diagnostic lines in the observed title/attract
+  window. The probes are interleaved with load-bearing fragment, scheduler, and
+  audio-UAF hooks, so the next slice will compile only diagnostic work out and
+  then repeat timing.
+- Confirmed the current touch layer adapts HarkinianPad grip layouts,
+  customization, feedback, Z latch, and cancellation while intentionally using
+  a direct analog N64 bridge. Quick-tap latching exists, but its shared poll
+  window and cancellation edges still require deterministic tests and a full
+  battle with the corrected overlay.
+- Added `PERFORMANCE-AND-COMPLETION-AUDIT.md` as the ranked evidence and decision
+  record.
+- Clean proof: after removing the temporary counter, the Release Simulator app
+  rebuilt, rendered full-size animation, and accepted Start into Game Pak Check;
+  its executable hashes to `0e4b09eb...a50f`. The unsigned arm64 iPhoneOS app
+  passed audit at 378,174,464 bytes with SHA-256 `cd205ee8...338a`. A normal
+  package and separate `--no-build` pass produced raw ZIP hashes
+  `c5ccb45d...8e5f` and `25d85e91...2ef1`, with identical canonical manifest
+  `ef38239ac11403538c9bb5a5ba1542c53f80b7c84c2c570ce13a68879aaa0ccd`.

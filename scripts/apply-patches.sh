@@ -73,6 +73,11 @@ apply_patch_file \
     "RT64 Metal descriptor state cache"
 
 apply_patch_file \
+    "$ANNEPAD_SOURCES/rt64" \
+    "$ANNEPAD_ROOT/patches/rt64/metal-clear-state-cache.patch" \
+    "RT64 Metal clear state cache"
+
+apply_patch_file \
     "$ANNEPAD_SOURCES/rt64/src/contrib/nativefiledialog-extended" \
     "$ANNEPAD_ROOT/patches/rt64/ios-native-file-dialog-null.patch" \
     "RT64 iOS native-file-dialog null backend"

@@ -15,7 +15,8 @@ done
 required_docs=(
     GOAL.md RESEARCH.md REPOSITORY-INVENTORY.md ARCHITECTURE.md PLAN.md
     STATUS.md BLOCKERS.md DECISIONS.md TESTING.md BUILDING.md
-    LEGAL-AND-ASSET-BOUNDARIES.md RELEASE-CHECKLIST.md HISTORY.md WORKLOG.md
+    LEGAL-AND-ASSET-BOUNDARIES.md PERFORMANCE-AND-COMPLETION-AUDIT.md
+    RELEASE-CHECKLIST.md HISTORY.md WORKLOG.md
 )
 for document in "${required_docs[@]}"; do
     [[ -s "$ANNEPAD_ROOT/docs/$document" ]] || die "missing required document: docs/$document"

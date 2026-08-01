@@ -188,13 +188,14 @@ The 2026-08-01 local release build produced:
 - `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
 - `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
   manifest SHA-256
-  `75bea9dbba5bfe65d7ee5ddf73b4d2d7eddb10d0282b2806873d88758c188ff7`.
+  `ef38239ac11403538c9bb5a5ba1542c53f80b7c84c2c570ce13a68879aaa0ccd`.
 
 Two local archive passes have the exact same manifest bytes/digest. The
-378,174,464-byte local unsigned executable hashes to `4f55bc82...4586` and has
+378,174,464-byte local unsigned executable hashes to `cd205ee8...338a` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
-touch-corrected, descriptor-cached source candidate has local packages matching at
-`75bea9db...8ff7`, but the full isolated clean verifier has not yet been rerun
+touch-corrected, descriptor/clear-state-cached source candidate has local
+packages matching at `ef38239a...0ccd`, but the full isolated clean verifier has
+not yet been rerun
 for this digest. The previous `915b171b...a9ae` snapshot remains valid proof
 for its predecessor (`e6b2ab11...f363`, `24dc9caa...d9e6`). Release audio,
 replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
