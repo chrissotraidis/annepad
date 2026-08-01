@@ -19,8 +19,8 @@ separates four different concerns:
    orientation, and thermal tests.
 4. The retained Simulator process is stable enough to finish a touch-only
    battle and remain alive for hours, but occasional Simulator CoreAudio
-   overloads and unresolved cold-orientation behavior are separate acceptance
-   issues. Neither should be mislabeled as a game crash or as renderer FPS.
+   overloads and incomplete cold-orientation acceptance are separate concerns.
+   Neither should be mislabeled as a game crash or as renderer FPS.
 
 The macOS static recompilation has completed a full rental battle. The native
 iOS build renders, advances, accepts touch, saves, resumes, and packages, but it
@@ -114,9 +114,10 @@ is not yet physically proven or release-ready.
   scheduling symptom under the measured Simulator load, not evidence of a
   process crash. Real-speaker/audio-underrun acceptance remains a physical-iPad
   gate.
-- Cold orientation is not accepted. The app has recovered through earlier
-  rotation/resume smokes, but raw display capture can still show the landscape
-  game surface rotated inside a portrait-oriented Simulator display.
+- The current live Simulator window is correctly landscape with the complete
+  overlay visible. Cold orientation still needs the planned repeated-boot
+  matrix; a raw framebuffer whose pixels are stored in portrait order is not
+  itself evidence that the visible app is sideways.
 
 ### 6. The remaining finish line is mostly acceptance work
 
