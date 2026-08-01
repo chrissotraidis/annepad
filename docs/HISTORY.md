@@ -213,3 +213,14 @@
   30 Hz VI windows, while keeping the performance gate open.
 - Rebuilt and visibly smoke-tested the diagnostic-free iPad Simulator app, then
   rebuilt and twice audited the ROM-free unsigned device package.
+
+## 2026-08-01 — Release hook surface classified and stale core reuse closed
+
+- Compiled 96 diagnostic-only game hooks and their argument evaluation out of
+  Release while retaining the six fragment/audio correctness hooks.
+- Reduced the observed clean runtime log to 95 lines / 8,243 bytes with zero
+  targeted reverse-engineering probe lines.
+- Measured 23.31 presents/s across 29 title/attract windows, confirming that log
+  removal cleans the shipping surface but does not solve Simulator cadence.
+- Made Simulator and device app builds always run the incremental AOT core build
+  so regenerated sources cannot silently reuse an older archive.

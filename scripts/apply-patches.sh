@@ -63,6 +63,11 @@ apply_patch_file \
     "iOS release diagnostics exclusion"
 
 apply_patch_file \
+    "$game_checkout" \
+    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-hook-surface.patch" \
+    "iOS release diagnostic hook exclusion"
+
+apply_patch_file \
     "$ANNEPAD_SOURCES/rt64" \
     "$ANNEPAD_ROOT/patches/rt64/ios-metal-runtime.patch" \
     "RT64 iOS Metal runtime"

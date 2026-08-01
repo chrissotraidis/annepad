@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 15:26 CDT
+Updated: 2026-08-01 16:14 CDT
 
 ## Current state
 
@@ -30,10 +30,14 @@ battle setup, 117 30 Hz VI windows averaged 23.40 presents/s and 20 fell below
 performance acceptance. A fresh audit then ruled out internal resolution as the
 leading cause: a full-screen 1x RT64 internal-resolution run was visibly more
 pixelated and did not improve cadence over the default 3x path. The same audit
-found that Release still runs upstream reverse-engineering probes, and found a
-per-clear Metal depth-state allocation/leak. The bounded clear-state cache now
-builds and renders correctly; diagnostic-only hook removal is the next measured
-slice. Physical-device runtime acceptance remains externally gated.
+found active upstream reverse-engineering probes and a per-clear Metal
+depth-state allocation/leak. The clear-state cache now builds and renders.
+Ninety-six diagnostic hook sites now compile out of Release while six
+correctness hooks remain; targeted runtime lines fell to zero, but a 29-window
+title/attract sample still averaged 23.31 presents/s. This confirms that logging
+was not the leading FPS cause. Simulator/device app builds now always invoke the
+incremental AOT core build so regenerated source cannot link a stale archive.
+Physical-device runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
 game save, and has completed a full rental battle through an explicit result.

@@ -126,10 +126,13 @@ Resolved entries are never deleted.
   every depth-backed color clear. A cached state removes that allocation and
   samples cleanly, but the non-frame-identical follow-up does not prove a
   material FPS gain. Changing descriptor/XPC traffic remains dominant.
-- Release-surface finding: the Release app still calls and prints explicit
-  upstream reverse-engineering probes. The observed window contained 838
-  non-counter diagnostic lines. Compile those probes out before the next
-  controlled measurement, while retaining neighboring correctness hooks.
+- Release-surface result: 96 diagnostic-only hooks and their argument
+  evaluation now compile out of the shipping AOT core while fragment/audio
+  correctness hooks remain. The clean follow-up had zero targeted loader,
+  fragment, pool, geometry, or input-probe lines. Its 29 title/attract windows
+  averaged 23.31 presents/s (4.15–30.56), effectively unchanged from the prior
+  23.40 mixed-scene result. Logging is therefore no longer a shipping-surface
+  blocker and was not the leading FPS cause.
 - Gate: measure the same heavy scene on a physical iPad before changing shared
   renderer behavior for a Simulator-specific driver cost. If hardware also
   misses the 30 Hz target, capture device GPU/frame-time evidence and optimize

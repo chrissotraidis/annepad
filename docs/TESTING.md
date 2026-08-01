@@ -227,10 +227,14 @@ replaced it with a cached state. The candidate renders correctly and removes
 that state-creation call from sampling, but its non-frame-identical intro run is
 not a proven FPS improvement.
 
-Do not use stderr-redirection captures as final performance evidence until the
-Release-only reverse-engineering probes are compiled out. One observed window
-contained 838 non-counter lines from retained loader, fragment, pool, and
-geometry diagnostics.
+The Release-only hook classification now compiles 96 reverse-engineering probes
+and their arguments out while retaining the six functional fragment/audio
+hooks. The clean runtime window contained zero targeted loader, fragment, pool,
+geometry, segment-map, or input-probe lines. A temporary 29-window title/attract
+counter then averaged 23.31 presents/s (4.15–30.56), with five windows below 20
+and seven at or above 28. The near-identical mean to the preceding 23.40 result
+shows that diagnostic output was not the leading cadence cost. The temporary
+counter was removed and the clean app rebuilt before source verification.
 
 `MTL_HUD_ENABLED` did not expose useful Simulator metrics, and an attached Game
 Performance trace failed to finish a valid document. A five-second live process

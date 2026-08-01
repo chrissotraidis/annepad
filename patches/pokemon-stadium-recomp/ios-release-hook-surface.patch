@@ -1,0 +1,694 @@
+diff --git a/extras.c b/extras.c
+index 45d9d8d..275387a 100644
+--- a/extras.c
++++ b/extras.c
+@@ -914,7 +914,9 @@ void pkmnstadium_memmap_set_fragment(uint8_t* rdram, uint32_t id, uint32_t vaddr
+     memmap_ring_push(2u, id, vaddr, size, caller, MEM_LOAD_BE32(rdram, 0x00075668u));
+ }
+ void pkmnstadium_memmap_clear_fragment(uint8_t* rdram, uint32_t id, uint32_t caller) {
++#if !defined(ANNEPAD_RELEASE_BUILD)
+     memmap_ring_push(3u, id, 0u, 0u, caller, MEM_LOAD_BE32(rdram, 0x00075668u));
++#endif
+     /* Functional fix (not just diagnostic): mirror the game's fragment
+      * clear into the recompiler's overlay table so RELOC_HI16/LO16 for
+      * this fragment's section fall back to the link literal once it is
+diff --git a/game.toml b/game.toml
+index b1948ad..dcd45b3 100644
+--- a/game.toml
++++ b/game.toml
+@@ -2915,7 +2915,7 @@ text = "recomp_register_runtime_fragment(rdram, ctx->r4, ctx->r5);"
+ [[patches.hook]]
+ func = "Memmap_SetFragmentMap"
+ before_vram = 0x800020B0
+-text = "pkmnstadium_memmap_set_fragment(rdram, ctx->r4, ctx->r5, ctx->r6, ctx->r31);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_memmap_set_fragment(rdram, ctx->r4, ctx->r5, ctx->r6, ctx->r31));"
+ 
+ [[patches.hook]]
+ func = "Memmap_ClearFragmentMemmap"
+@@ -2932,172 +2932,172 @@ text = "pkmnstadium_memmap_clear_fragment(rdram, ctx->r4, ctx->r31);"
+ [[patches.hook]]
+ func = "func_81206D9C"
+ before_vram = 0x81206D9C
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206D9C, (uint32_t)ctx->r4, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206D9C, (uint32_t)ctx->r4, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81206E64"
+ before_vram = 0x81206E64
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206E64, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206E64, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81206E64"
+ before_vram = 0x81206E78
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206E78, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206E78, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81206E64"
+ before_vram = 0x81206EC4
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206EC4, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206EC4, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81206E64"
+ before_vram = 0x81206EF8
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206EF8, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206EF8, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81206E64"
+ before_vram = 0x81206F08
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206F08, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206F08, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81206E64"
+ before_vram = 0x81206F28
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206F28, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206F28, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81206F38"
+ before_vram = 0x81206F38
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206F38, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206F38, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81206F38"
+ before_vram = 0x81206F80
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206F80, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206F80, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x8120583C
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x8120583C, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x8120583C, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81205A3C
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81205A3C, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81205A3C, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81205B80
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81205B80, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81205B80, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81205C30
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81205C30, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81205C30, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81205DD8
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81205DD8, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81205DD8, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81205E68
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81205E68, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81205E68, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81205E94
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81205E94, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81205E94, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81205EA0
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81205EA0, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81205EA0, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81205EEC
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81205EEC, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81205EEC, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x812062C0
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x812062C0, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x812062C0, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206434
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206434, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206434, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x812064B8
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x812064B8, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x812064B8, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206518
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206518, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206518, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206620
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206620, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206620, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206648
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206648, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206648, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x812066E4
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x812066E4, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x812066E4, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x812066EC
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x812066EC, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x812066EC, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206758
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206758, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206758, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x812069F8
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x812069F8, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x812069F8, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206AAC
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206AAC, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206AAC, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206B24
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206B24, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206B24, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206CD4
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206CD4, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206CD4, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206CDC
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206CDC, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206CDC, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206D10
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206D10, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206D10, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120572C"
+ before_vram = 0x81206D84
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81206D84, (uint32_t)ctx->r16, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81206D84, (uint32_t)ctx->r16, ctx));"
+ 
+ [[patches.hook]]
+ func = "osGbSetNextBuffer"
+@@ -3107,102 +3107,102 @@ text = "pkmnstadium_gbtower_queue_audio(rdram, (uint32_t)ctx->r10, (uint32_t)ctx
+ [[patches.hook]]
+ func = "func_81209078"
+ before_vram = 0x81209078
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81209078, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81209078, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81209870"
+ before_vram = 0x81209870
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81209870, (uint32_t)ctx->r4, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81209870, (uint32_t)ctx->r4, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81209EB4"
+ before_vram = 0x81209FB4
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81209FB4, (uint32_t)ctx->r28, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81209FB4, (uint32_t)ctx->r28, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120B490"
+ before_vram = 0x8120B490
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x8120B490, (uint32_t)ctx->r28, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x8120B490, (uint32_t)ctx->r28, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120B4B8"
+ before_vram = 0x8120B4B8
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x8120B4B8, (uint32_t)ctx->r28, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x8120B4B8, (uint32_t)ctx->r28, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120B4B8"
+ before_vram = 0x8120B4D0
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x8120B4D0, (uint32_t)ctx->r28, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x8120B4D0, (uint32_t)ctx->r28, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120B4D8"
+ before_vram = 0x8120B4D8
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x8120B4D8, (uint32_t)ctx->r28, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x8120B4D8, (uint32_t)ctx->r28, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120B4E4"
+ before_vram = 0x8120B4E4
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x8120B4E4, (uint32_t)ctx->r28, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x8120B4E4, (uint32_t)ctx->r28, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_8120B4EC"
+ before_vram = 0x8120B4EC
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x8120B4EC, (uint32_t)ctx->r28, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x8120B4EC, (uint32_t)ctx->r28, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81202FCC"
+ before_vram = 0x81202FCC
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81202FCC, 0, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81202FCC, 0, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81200B88
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81200B88, (uint32_t)ctx->r14, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81200B88, (uint32_t)ctx->r14, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81200B90
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81200B90, (uint32_t)ctx->r15, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81200B90, (uint32_t)ctx->r15, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81200CB4
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81200CB4, (uint32_t)ctx->r15, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81200CB4, (uint32_t)ctx->r15, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81200E80
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81200E80, (uint32_t)ctx->r9, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81200E80, (uint32_t)ctx->r9, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81200EE8
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81200EE8, (uint32_t)ctx->r4, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81200EE8, (uint32_t)ctx->r4, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81200F88
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81200F88, (uint32_t)ctx->r9, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81200F88, (uint32_t)ctx->r9, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81201018
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81201018, (uint32_t)ctx->r9, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81201018, (uint32_t)ctx->r9, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81201144
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81201144, (uint32_t)ctx->r8, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81201144, (uint32_t)ctx->r8, ctx));"
+ 
+ [[patches.hook]]
+ func = "func_81200AA8"
+ before_vram = 0x81201180
+-text = "pkmnstadium_gbtower_state_trace(rdram, 0x81201180, (uint32_t)ctx->r9, ctx);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_gbtower_state_trace(rdram, 0x81201180, (uint32_t)ctx->r9, ctx));"
+ 
+ [[patches.hook]]
+ func = "n_alLoadParam"
+ before_vram = 0x8004FAE4
+-text = "pkmnstadium_audio_voice_check(ctx->r7, ctx->r2, ctx->r3);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_audio_voice_check(ctx->r7, ctx->r2, ctx->r3));"
+ 
+ # n_alAdpcmPull aClearBuffer-overflow probe (post-title audio bug
+ # 2026-05-06). Fires at the START of the inlined `aClearBuffer(...)`
+@@ -3218,7 +3218,7 @@ text = "pkmnstadium_audio_voice_check(ctx->r7, ctx->r2, ctx->r3);"
+ [[patches.hook]]
+ func = "n_alAdpcmPull"
+ before_vram = 0x8004F908
+-text = "pkmnstadium_adpcm_overflow_dump(rdram, ctx->r16, ctx->r18, ctx->r3, ctx->r11);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_adpcm_overflow_dump(rdram, ctx->r16, ctx->r18, ctx->r3, ctx->r11));"
+ 
+ # n_alLoadParam(SET_WAVETABLE) entry probe — captures (filter, paramID,
+ # param) for every call. When paramID == 5 (SET_WAVETABLE) AND the
+@@ -3230,7 +3230,7 @@ text = "pkmnstadium_adpcm_overflow_dump(rdram, ctx->r16, ctx->r18, ctx->r3, ctx-
+ [[patches.hook]]
+ func = "n_alLoadParam"
+ before_vram = 0x8004F95C
+-text = "pkmnstadium_set_wavetable_probe(rdram, ctx->r4, ctx->r5, ctx->r6);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_set_wavetable_probe(rdram, ctx->r4, ctx->r5, ctx->r6));"
+ 
+ # main_pool_pop_state caller probe — track who frees memory in the
+ # pool. The post-title audio UAF (2026-05-06) traced to a 1 MiB
+@@ -3252,7 +3252,7 @@ text = "pkmnstadium_set_wavetable_probe(rdram, ctx->r4, ctx->r5, ctx->r6);"
+ [[patches.hook]]
+ func = "main_pool_pop_state"
+ before_vram = 0x80002838
+-text = "pkmnstadium_pool_pop_log(rdram, ctx->r4, ctx->r31); pkmnstadium_pool_pop_silence_voices(rdram);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_pool_pop_log(rdram, ctx->r4, ctx->r31)); pkmnstadium_pool_pop_silence_voices(rdram);"
+ 
+ # n_alFxPull / n_alMainBusPull triangulation for the quick-battle
+ # audio cmd-buffer NULL+0xBC crash 2026-05-03. The crash is in
+@@ -3264,17 +3264,17 @@ text = "pkmnstadium_pool_pop_log(rdram, ctx->r4, ctx->r31); pkmnstadium_pool_pop
+ [[patches.hook]]
+ func = "n_alFxPull"
+ before_vram = 0x800500C0   # entry instr (addiu $sp,$sp,-0x70)
+-text = "pkmnstadium_afxpull_enter(ctx->r4, ctx->r5);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_afxpull_enter(ctx->r4, ctx->r5));"
+ 
+ [[patches.hook]]
+ func = "n_alFxPull"
+ before_vram = 0x80050398   # `jr $ra` — $v0 = $s0+8 already set at 0x80050370
+-text = "pkmnstadium_afxpull_exit(ctx->r2, ctx->r16);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_afxpull_exit(ctx->r2, ctx->r16));"
+ 
+ [[patches.hook]]
+ func = "n_alMainBusPull"
+ before_vram = 0x80050D14   # the exact `sw $s7, 0x4($v0)` that SEH'd
+-text = "pkmnstadium_mbp_precrash(ctx->r2, ctx->r23, ctx->r5);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_mbp_precrash(ctx->r2, ctx->r23, ctx->r5));"
+ 
+ # Dispatch-time probes: who actually gets called by `jalr $t9` at
+ # 0x80050CF4? Repro 2 (2026-05-03) showed mbp_precrash BAD without
+@@ -3284,12 +3284,12 @@ text = "pkmnstadium_mbp_precrash(ctx->r2, ctx->r23, ctx->r5);"
+ [[patches.hook]]
+ func = "n_alMainBusPull"
+ before_vram = 0x80050CF4   # the `jalr $t9` itself ($t8=n_syn, $t9=handler)
+-text = "pkmnstadium_mbp_dispatch(ctx->r24, ctx->r25);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_mbp_dispatch(ctx->r24, ctx->r25));"
+ 
+ [[patches.hook]]
+ func = "n_alMainBusPull"
+ before_vram = 0x80050CFC   # right at after_0: label, $v0=handler return
+-text = "pkmnstadium_mbp_dispatch_ret(ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_mbp_dispatch_ret(ctx->r2));"
+ 
+ # n_alMainBusPull entry/exit recursion-depth probes.
+ # At seq 3436 the dispatch (recursive call) returned v0=0xB8 — a value
+@@ -3299,12 +3299,12 @@ text = "pkmnstadium_mbp_dispatch_ret(ctx->r2);"
+ [[patches.hook]]
+ func = "n_alMainBusPull"
+ before_vram = 0x80050CA0   # entry: addiu $sp,$sp,-0x40 (function prolog start)
+-text = "pkmnstadium_mbp_entry(ctx->r4, ctx->r5, ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_mbp_entry(ctx->r4, ctx->r5, ctx->r2));"
+ 
+ [[patches.hook]]
+ func = "n_alMainBusPull"
+ before_vram = 0x80050F14   # exit: jr $ra (after $v0 = $s0 set at 0x80050EEC)
+-text = "pkmnstadium_mbp_exit(ctx->r2, ctx->r16);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_mbp_exit(ctx->r2, ctx->r16));"
+ 
+ # func_80019D18 lookup diagnostic — capture (input_idx, return_v0)
+ # pairs to identify which idx Stadium asks for that misses. The
+@@ -3313,12 +3313,12 @@ text = "pkmnstadium_mbp_exit(ctx->r2, ctx->r16);"
+ [[patches.hook]]
+ func = "func_80019D18"
+ before_vram = 0x80019D18  # entry instr (addiu $sp,$sp,-0x30)
+-text = "pkmnstadium_lookup_enter(ctx->r4);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_lookup_enter(ctx->r4));"
+ 
+ [[patches.hook]]
+ func = "func_80019D18"
+ before_vram = 0x80019D84  # right after `lw $v0, 0x24($sp)` — v0 is set
+-text = "pkmnstadium_lookup_exit(ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_lookup_exit(ctx->r2));"
+ 
+ # func_80003DC4 = PERS-SZP wrapper validator/loader. Logs every call's
+ # (rom_start, rom_end) → return value. Lets us see which entries
+@@ -3326,12 +3326,12 @@ text = "pkmnstadium_lookup_exit(ctx->r2);"
+ [[patches.hook]]
+ func = "func_80003DC4"
+ before_vram = 0x80003DC4   # entry instr (addiu $sp,$sp,-0x38)
+-text = "pkmnstadium_pers_enter(ctx->r4, ctx->r5);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_pers_enter(ctx->r4, ctx->r5));"
+ 
+ [[patches.hook]]
+ func = "func_80003DC4"
+ before_vram = 0x80003F4C   # right after `lw $v0, 0x2C($sp)` — v0 is set
+-text = "pkmnstadium_pers_exit(rdram, ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_pers_exit(rdram, ctx->r2));"
+ 
+ # main_pool_alloc diagnostic: log size + result + sMemPool.available
+ # on every call, with full state on alloc-failure. sMemPool is the
+@@ -3345,12 +3345,12 @@ text = "pkmnstadium_pers_exit(rdram, ctx->r2);"
+ [[patches.hook]]
+ func = "main_pool_alloc"
+ before_vram = 0x800025C4   # entry instr (addiu $sp,$sp,-0x20)
+-text = "pkmnstadium_pool_alloc_enter(ctx->r4);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_pool_alloc_enter(ctx->r4));"
+ 
+ [[patches.hook]]
+ func = "main_pool_alloc"
+ before_vram = 0x80002618   # right after `lw $v0, 0x1C($sp)` — v0 set
+-text = "pkmnstadium_pool_alloc_exit(rdram, ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_pool_alloc_exit(rdram, ctx->r2));"
+ 
+ # Game_DoCopyProtection — returns -0x10 if check trips. Hooks log
+ # (input state, output state) on every call; warn loudly if state
+@@ -3358,12 +3358,12 @@ text = "pkmnstadium_pool_alloc_exit(rdram, ctx->r2);"
+ [[patches.hook]]
+ func = "Game_DoCopyProtection"
+ before_vram = 0x80028FA0   # entry
+-text = "pkmnstadium_copyprot_enter(ctx->r4);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_copyprot_enter(ctx->r4));"
+ 
+ [[patches.hook]]
+ func = "Game_DoCopyProtection"
+ before_vram = 0x80029000   # right after `lw $v0, 0x18($sp)` — v0 set, before jr
+-text = "pkmnstadium_copyprot_exit(ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_copyprot_exit(ctx->r2));"
+ 
+ # fragment36 loop body — log buttonPressed + D_82100EC8 each iter.
+ # Hook position 0x82100A1C is right after `lhu $t8, 0x8($t7)` (load
+@@ -3373,19 +3373,19 @@ text = "pkmnstadium_copyprot_exit(ctx->r2);"
+ [[patches.hook]]
+ func = "func_821009B4"
+ before_vram = 0x82100A1C
+-text = "pkmnstadium_frag36_check((uint32_t)MEM_HU(ctx->r15, 0X8), MEM_W(ctx->r17, 0));"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_frag36_check((uint32_t)MEM_HU(ctx->r15, 0X8), MEM_W(ctx->r17, 0)));"
+ 
+ # Cont_ReadInputs entry — log rate and rising-edge captures.
+ [[patches.hook]]
+ func = "Cont_ReadInputs"
+ before_vram = 0x80005AB0   # entry
+-text = "pkmnstadium_cri_enter(0);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_cri_enter(0));"
+ 
+ # fragment36 exit hook — log the return value (= next gCurrentGameState)
+ [[patches.hook]]
+ func = "func_82100C98"
+ before_vram = 0x82100DAC   # right before jr — $v0 already loaded
+-text = "pkmnstadium_frag36_exit(ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_frag36_exit(ctx->r2));"
+ 
+ # Disabled 2026-04-29: fade-out wait bypass hooks for func_82100B1C
+ # are removed in favor of letting the fade run naturally. Reason:
+@@ -3416,7 +3416,7 @@ text = "pkmnstadium_frag36_exit(ctx->r2);"
+ [[patches.hook]]
+ func = "func_8003AD58"
+ before_vram = 0x8003AF60
+-text = "pkmnstadium_audio_diag(rdram, (uint32_t)ctx->r16, (uint32_t)ctx->r17, (uint32_t)ctx->r11, (uint32_t)MEM_W(ctx->r16, 0X28), (uint16_t)ctx->r3);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_audio_diag(rdram, (uint32_t)ctx->r16, (uint32_t)ctx->r17, (uint32_t)ctx->r11, (uint32_t)MEM_W(ctx->r16, 0X28), (uint16_t)ctx->r3));"
+ 
+ # Memmap_GetFragmentVaddr data-context override.
+ #
+@@ -3450,12 +3450,12 @@ text = "ctx->r4 = librecomp_fragment_resolve_exit((uint32_t)ctx->r4, (uint32_t)M
+ [[patches.hook]]
+ func = "Memmap_SetSegmentMap"
+ before_vram = 0x80001CE0   # entry — function start
+-text = "pkmnstadium_segmap_set_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6, (uint32_t)MEM_W(0, (int32_t)0x80075668), (uint32_t)ctx->r31);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_segmap_set_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6, (uint32_t)MEM_W(0, (int32_t)0x80075668), (uint32_t)ctx->r31));"
+ 
+ [[patches.hook]]
+ func = "Memmap_ClearSegmentMemmap"
+ before_vram = 0x80001D9C   # entry — function start
+-text = "pkmnstadium_segmap_clear_enter((uint32_t)ctx->r4, (uint32_t)MEM_W(0, (int32_t)0x80075668), (uint32_t)ctx->r31);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_segmap_clear_enter((uint32_t)ctx->r4, (uint32_t)MEM_W(0, (int32_t)0x80075668), (uint32_t)ctx->r31));"
+ 
+ # func_80004258 = ASSET_LOAD inner. Hook at function entry so we can
+ # see every (id, rom_range, arg3) attempted, regardless of whether
+@@ -3466,7 +3466,7 @@ text = "pkmnstadium_segmap_clear_enter((uint32_t)ctx->r4, (uint32_t)MEM_W(0, (in
+ [[patches.hook]]
+ func = "func_80004258"
+ before_vram = 0x80004258   # entry — function start
+-text = "pkmnstadium_asset_load_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6, (uint32_t)ctx->r7, (uint32_t)MEM_W(0, (int32_t)0x80075668));"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_asset_load_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6, (uint32_t)ctx->r7, (uint32_t)MEM_W(0, (int32_t)0x80075668)));"
+ 
+ # Asset-loader chain hooks — trace ASSET_LOAD2 (func_800044F4) and
+ # its sub-asset getter (func_8000484C / func_800047C4) so we can
+@@ -3475,22 +3475,22 @@ text = "pkmnstadium_asset_load_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint
+ [[patches.hook]]
+ func = "func_800044F4"
+ before_vram = 0x800044F4   # entry
+-text = "pkmnstadium_load2_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6, (uint32_t)ctx->r7);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_load2_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6, (uint32_t)ctx->r7));"
+ 
+ [[patches.hook]]
+ func = "func_800044F4"
+ before_vram = 0x80004658   # right before jr $ra
+-text = "pkmnstadium_load2_exit((uint32_t)ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_load2_exit((uint32_t)ctx->r2));"
+ 
+ [[patches.hook]]
+ func = "func_8000484C"
+ before_vram = 0x8000484C   # entry
+-text = "pkmnstadium_aload_enter(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r31);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_aload_enter(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r31));"
+ 
+ [[patches.hook]]
+ func = "func_8000484C"
+ before_vram = 0x80004954   # right before jr $ra
+-text = "pkmnstadium_aload_exit((uint32_t)ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_aload_exit((uint32_t)ctx->r2));"
+ 
+ # Fragment-relocate dispatch hook (cursor/icon corruption root-cause).
+ # func_800043BC(s32 id, Fragment* addr) forwards `id` to
+@@ -3503,24 +3503,24 @@ text = "pkmnstadium_aload_exit((uint32_t)ctx->r2);"
+ [[patches.hook]]
+ func = "func_800043BC"
+ before_vram = 0x800043BC   # entry — relocate-fragment dispatch
+-text = "pkmnstadium_relocfrag_enter(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r31);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_relocfrag_enter(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r31));"
+ 
+ [[patches.hook]]
+ func = "func_800047C4"
+ before_vram = 0x800047C4   # entry
+-text = "pkmnstadium_persload_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_persload_enter((uint32_t)ctx->r4, (uint32_t)ctx->r5));"
+ 
+ [[patches.hook]]
+ func = "func_800047C4"
+ before_vram = 0x800047FC   # right before jr $ra
+-text = "pkmnstadium_persload_exit((uint32_t)ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_persload_exit((uint32_t)ctx->r2));"
+ 
+ # process_geo_layout entry hook — log (pool, segptr) so we can
+ # identify the geo-data source for the crashing call.
+ [[patches.hook]]
+ func = "process_geo_layout"
+ before_vram = 0x80018B70
+-text = "pkmnstadium_geo_entry_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_geo_entry_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5));"
+ 
+ # process_geo_layout dispatch-site hook — fires right before the
+ # `jalr $t9` at vram 0x80018C00 inside process_geo_layout. Logs
+@@ -3530,7 +3530,7 @@ text = "pkmnstadium_geo_entry_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5);"
+ [[patches.hook]]
+ func = "process_geo_layout"
+ before_vram = 0x80018C00
+-text = "pkmnstadium_geo_dispatch_log(rdram, (uint32_t)ctx->r14, (uint32_t)ctx->r25, (uint32_t)ctx->r16);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_geo_dispatch_log(rdram, (uint32_t)ctx->r14, (uint32_t)ctx->r25, (uint32_t)ctx->r16));"
+ 
+ # Util_ConvertAddrToVirtAddr exit hook — log every (input → output)
+ # where output is a non-NULL pass-through (= < 0x80000000). Those
+@@ -3546,7 +3546,7 @@ text = "pkmnstadium_geo_dispatch_log(rdram, (uint32_t)ctx->r14, (uint32_t)ctx->r
+ [[patches.hook]]
+ func = "Util_ConvertAddrToVirtAddr"
+ before_vram = 0x80002F20   # right before jr $ra
+-text = "pkmnstadium_addr_translate_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r2);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_addr_translate_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r2));"
+ 
+ # func_80010FDC entry diagnostic — geo layout cmd-8 handler that
+ # converts arg1 from seg-addr to vaddr then CALLS it. Stadium hits
+@@ -3558,7 +3558,7 @@ text = "pkmnstadium_addr_translate_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->
+ [[patches.hook]]
+ func = "func_80010FDC"
+ before_vram = 0x80010FDC   # entry
+-text = "pkmnstadium_geo_render_call_log((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_geo_render_call_log((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6));"
+ 
+ # Stadium-side audio-UAF voice silencing now lives in the generic
+ # main_pool_pop_state hook (pkmnstadium_pool_pop_silence_voices),
+@@ -3580,7 +3580,7 @@ text = "pkmnstadium_geo_render_call_log((uint32_t)ctx->r4, (uint32_t)ctx->r5, (u
+ [[patches.hook]]
+ func = "miniEkansInitCam"
+ before_vram = 0x86C03500   # entry
+-text = "pkmnstadium_mini_ekans_init_cam_enter(rdram);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_mini_ekans_init_cam_enter(rdram));"
+ 
+ # Phase 1 diagnosis: log first 64 invocations of the libnaudio
+ # offset->absolute lazy-resolver. Captures (arr_addr, base, count)
+@@ -3590,7 +3590,7 @@ text = "pkmnstadium_mini_ekans_init_cam_enter(rdram);"
+ [[patches.hook]]
+ func = "func_8003C204"
+ before_vram = 0x8003C204
+-text = "pkmnstadium_resolver_log((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_resolver_log((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t)ctx->r6));"
+ 
+ # func_8003BD2C entry hook — combined diag:
+ #   - sb_loader_enter dumps first 0x40 bytes of the struct (legacy
+@@ -3600,12 +3600,12 @@ text = "pkmnstadium_resolver_log((uint32_t)ctx->r4, (uint32_t)ctx->r5, (uint32_t
+ [[patches.hook]]
+ func = "func_8003BD2C"
+ before_vram = 0x8003BD2C
+-text = "pkmnstadium_sb_loader_enter(rdram, (uint32_t)ctx->r4); pkmnstadium_sb_loader_args_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_sb_loader_enter(rdram, (uint32_t)ctx->r4); pkmnstadium_sb_loader_args_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5));"
+ 
+ [[patches.hook]]
+ func = "func_8003BD2C"
+ before_vram = 0x8003BEEC   # right before jr — TLS-stack pop gets correct soundbank
+-text = "pkmnstadium_sb_loader_exit_log_tls(rdram);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_sb_loader_exit_log_tls(rdram));"
+ 
+ # __amDMA entry — log addr, len, D_800FC820 flag state. Used to
+ # distinguish bad DMAs from "RAM-resident bank, ROM-path-taken" vs
+@@ -3613,4 +3613,4 @@ text = "pkmnstadium_sb_loader_exit_log_tls(rdram);"
+ [[patches.hook]]
+ func = "__amDMA"
+ before_vram = 0x8003C8DC
+-text = "pkmnstadium_amdma_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5);"
++text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_amdma_log(rdram, (uint32_t)ctx->r4, (uint32_t)ctx->r5));"
+diff --git a/include/trace.h b/include/trace.h
+index cfe945b..b5bee62 100644
+--- a/include/trace.h
++++ b/include/trace.h
+@@ -54,6 +54,16 @@ void ultramodern_scheduler_tick(void);
+ #define PKMNSTADIUM_TRACE_HOOKS 0
+ #endif
+ 
++// Explicit game.toml diagnosis hooks are useful in validation builds but can
++// be numerous and hot. Remove both their calls and argument evaluation from
++// the shipping AOT core while leaving separately classified correctness hooks
++// in place.
++#if defined(ANNEPAD_RELEASE_BUILD)
++#define ANNEPAD_DIAGNOSTIC_HOOK(...)
++#else
++#define ANNEPAD_DIAGNOSTIC_HOOK(...) __VA_ARGS__
++#endif
++
+ #if PKMNSTADIUM_TRACE_HOOKS
+ #define TRACE_ENTRY()  pkmnstadium_trace_entry_ctx(__func__, ctx);
+ #define TRACE_RETURN() pkmnstadium_trace_return_ctx(__func__, ctx);

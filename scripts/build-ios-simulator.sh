@@ -23,11 +23,9 @@ build_dir="$ANNEPAD_ROOT/build-ios-app-simulator$build_suffix"
 game="$ANNEPAD_SOURCES/PokemonStadiumRecomp"
 renderer="$ANNEPAD_SOURCES/rt64"
 
-if [[ ! -f "$core_archive" ]]; then
-    "$script_dir/build-ios-core.sh" simulator "$profile"
-else
-    "$script_dir/audit-ios-core.sh" "$core_build" simulator "$profile"
-fi
+# Always run the incremental core build. Generated AOT sources can change while
+# an older archive remains present; auditing that stale archive is not enough.
+"$script_dir/build-ios-core.sh" simulator "$profile"
 "$script_dir/build-ios-dependencies.sh" simulator
 "$script_dir/apply-patches.sh"
 "$script_dir/verify-sources.sh"

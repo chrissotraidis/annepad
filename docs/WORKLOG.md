@@ -472,3 +472,26 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   package and separate `--no-build` pass produced raw ZIP hashes
   `c5ccb45d...8e5f` and `25d85e91...2ef1`, with identical canonical manifest
   `ef38239ac11403538c9bb5a5ba1542c53f80b7c84c2c570ce13a68879aaa0ccd`.
+
+## 2026-08-01 — Release hook cleanup and source-consistent app rebuilds
+
+- Classified explicit `game.toml` hooks instead of removing the diagnostic and
+  correctness surfaces together. Release now erases 96 diagnostic calls and
+  their arguments; fragment registration/cleanup, GB audio, fragment
+  input/resolve, and audio-UAF voice protection remain.
+- Added a Release core audit that permits only the three expected
+  `pkmnstadium_*` references. The updated Simulator archive passed it.
+- Found that app build scripts reused an existing AOT archive after generated
+  source changed. Both Simulator and device entry points now always run the
+  incremental core build before linking.
+- Local proof rebuilt the 38 generated units containing changed hooks and
+  refreshed the archive; the conservative full dependency rebuild remains the
+  published path and the exact clean-checkout rerun remains open.
+- The final clean iPad Pro 11-inch (M4), iOS 18.5 run rendered animated attract
+  mode and accepted Start touch into Game Pak Check. Its executable is
+  380,988,840 bytes with SHA-256
+  `609ecfa0ca06f5c103d2a019a21a87187e728d7ba8275ac7d9b3e34448f19b9f`.
+- Targeted reverse-engineering probe output fell to zero (95 total stderr lines,
+  8,243 bytes). A temporary 29-window present counter averaged 23.31 presents/s
+  (4.15–30.56; five below 20, seven at least 28), showing that diagnostics were
+  not the leading FPS cause. The counter was removed before the final rebuild.

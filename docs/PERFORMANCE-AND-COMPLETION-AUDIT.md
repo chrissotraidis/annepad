@@ -1,6 +1,6 @@
 # Performance and completion audit
 
-Updated: 2026-08-01 15:26 CDT
+Updated: 2026-08-01 16:14 CDT
 
 ## Bottom line
 
@@ -10,9 +10,9 @@ separates three different concerns:
 1. The iPad Simulator misses the game's 30 Hz presentation cadence in some
    scenes, with synchronous Simulator Metal argument-buffer/XPC work dominating
    sampled non-idle time.
-2. Release still executes and prints several upstream reverse-engineering
-   probes. They are not the sampled primary renderer cost, but they are
-   inappropriate for a shipping build and can distort timing evidence.
+2. Release previously executed several upstream reverse-engineering probes.
+   Ninety-six diagnostic hook sites are now compiled out while the six
+   separately classified correctness hooks remain active.
 3. Gameplay completion is gated less by compilation than by deterministic
    touch acceptance, a full battle with the corrected overlay, and physical
    iPad signing, lifecycle, audio, controller, sustained-performance, and
@@ -43,18 +43,31 @@ is not yet physically proven or release-ready.
   physical iPad trace is required before treating this as a device blocker or
   making a broad shared-renderer rewrite.
 
-### 2. Release diagnostics are still active
+### 2. Release diagnostics were real shipping noise, not the FPS root cause
 
 - A normal Release title/attract run produced 1,001 stderr lines and 74,440
   bytes in the observed window. Excluding the temporary 163-line present
   counter, 838 lines came from retained probes such as `[pers]`, `[aload]`,
   `[frag36]`, `[cri]`, pool, fragment, and geometry tracing.
 - These probes live mainly in upstream `extras.c` and are called from explicit
-  `game.toml` hooks. Some nearby hooks are load-bearing correctness fixes, so a
-  blanket removal would be unsafe.
-- The next release-surface slice must compile diagnostic-only hooks/logging out
-  while retaining fragment cleanup, audio UAF protection, scheduler preemption,
-  and loud persistent errors for genuinely unhandled code.
+  `game.toml` hooks. Ninety-six diagnostic-only call sites now compile to
+  nothing in the shipping AOT core, including their argument evaluation.
+- Fragment registration/cleanup, GB audio, fragment input/resolve, and audio-UAF
+  voice protection remain active. The Release core audit fails unless its only
+  `pkmnstadium_*` references are the three expected parts of that functional
+  surface.
+- The clean follow-up emitted 95 stderr lines and 8,243 bytes in the observed
+  window, with zero `[pers]`, `[aload]`, `[frag36]`, `[cri]`, pool, geometry,
+  segment-map, or asset-load probe lines.
+- A temporary 29-window title/attract counter averaged 23.31 presents/s (4.15
+  minimum, 30.56 maximum), with five windows below 20 and seven at or above 28.
+  That is effectively unchanged from the preceding 23.40 mixed-scene result,
+  so retained logging was not the leading FPS bottleneck. The counter was
+  removed and the clean app rebuilt before this result was recorded.
+- The audit also exposed a stale-build defect: Simulator/device app entry points
+  previously audited an existing AOT archive instead of rebuilding it. Both now
+  always invoke the incremental core build, so regenerated game sources cannot
+  silently link against an old archive.
 
 ### 3. Metal color clears created and leaked native state
 
@@ -87,15 +100,13 @@ is not yet physically proven or release-ready.
 
 In priority order:
 
-1. Compile release-only reverse-engineering probes out and repeat the controlled
-   Simulator measurement.
-2. Add deterministic tap/Z/cancellation coverage and complete a touch-only
+1. Add deterministic tap/Z/cancellation coverage and complete a touch-only
    rental battle with the corrected overlay.
-3. Rebuild and reproduce the exact current unsigned device package from a clean
+2. Rebuild and reproduce the exact current unsigned device package from a clean
    checkout.
-4. On an attached signed iPad, run the same heavy scene and collect frame-time,
+3. On an attached signed iPad, run the same heavy scene and collect frame-time,
    memory, thermal, audio, lifecycle, and controller evidence.
-5. Resolve upstream licensing and store/distribution requirements before any
+4. Resolve upstream licensing and store/distribution requirements before any
    public release.
 
 ## Decision rules

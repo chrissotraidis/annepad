@@ -79,6 +79,14 @@ for archive in "${required[@]}"; do
         die "archive is not exclusively built for $platform_name: ${archive#"$ANNEPAD_ROOT/"}"
 done
 
+if [[ "$profile" == release ]]; then
+    diagnostic_surface=$(nm -u "$build_dir/libAnnePadRecompiledCore.a" 2>/dev/null | \
+        rg '^_pkmnstadium_' | sort -u || true)
+    expected_release_surface=$'_pkmnstadium_gbtower_queue_audio\n_pkmnstadium_memmap_clear_fragment\n_pkmnstadium_pool_pop_silence_voices'
+    [[ "$diagnostic_surface" == "$expected_release_surface" ]] || \
+        die "release AOT core contains unexpected Pokemon Stadium hook calls"
+fi
+
 for archive in "${required[@]}"; do
     printf '%s  %s\n' "$(shasum -a 256 "$archive" | awk '{print $1}')" \
         "${archive#"$ANNEPAD_ROOT/"}"

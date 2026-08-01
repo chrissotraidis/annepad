@@ -118,6 +118,11 @@ optimization profile, build-graph exclusions, and forbidden dynamic-loading/JIT
 symbols. Building either app does not claim installation or physical-device
 runtime success.
 
+Both app build entry points always invoke the corresponding incremental core
+build, even when an archive already exists. This is intentional: generated AOT
+sources can change while an older archive still passes static policy audits,
+and linking that stale archive would produce a source-inconsistent app.
+
 The iOS bundle contains only native app resources: compiled original AnnePad
 icons, `PrivacyInfo.xcprivacy`, `ThirdPartyNotices.txt`, metadata, and the
 executable. The desktop launcher's fonts, cartridge icons, and box art are not
