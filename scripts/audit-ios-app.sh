@@ -76,14 +76,15 @@ forbidden_symbols='pthread_jit_write_protect_np|sys_icache_invalidate|sljit_|tcc
 if printf '%s\n' "$undefined_symbols" | rg -i "$forbidden_symbols"; then
     die "forbidden JIT, runtime compiler, or emulator ABI symbol found"
 fi
-if strings -a "$binary" | rg -i -q 'LiveRecomp|MAP_JIT|libretro_(api|core)|TinyCC'; then
+if rg -i -q 'LiveRecomp|MAP_JIT|libretro_(api|core)|TinyCC' < <(strings -a "$binary"); then
     die "forbidden dynamic-code or emulator marker found"
 fi
+release_diagnostic_markers='RECOMP_AUDIO_(DEBUG|SYNTH)|\[audio-debug\]|TCP diagnostics|PSR_(ASPMAIN_(REPLAY|CAPTURE|SPIKE_DIR|DEBUG)|DEBUG_PORT|TURBO|AUTOBOOT)|debug server started|aspmain_(replay|capture)|spike-capture|ares_worker'
 if [[ "$expected_profile" == release ]] &&
-   strings -a "$binary" | rg -i -q 'RECOMP_AUDIO_(DEBUG|SYNTH)|\[audio-debug\]|TCP diagnostics'; then
+   rg -i -q "$release_diagnostic_markers" < <(strings -a "$binary"); then
     die "validation-only diagnostics leaked into release executable"
 fi
-if strings -a "$binary" | rg -q '/Users/|/home/|[A-Za-z]:\\Users\\'; then
+if rg -q '/Users/|/home/|[A-Za-z]:\\Users\\' < <(strings -a "$binary"); then
     die "absolute developer-machine path leaked into executable"
 fi
 

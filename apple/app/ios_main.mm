@@ -498,7 +498,9 @@ extern "C" int SDL_main(int argc, char** argv) {
     @autoreleasepool {
         SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
         SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+#if !defined(ANNEPAD_RELEASE_BUILD)
         setenv("PSR_AUTOBOOT", "1", 1);
+#endif
 
         NSFileManager* files = [NSFileManager defaultManager];
         NSURL* support = [[files URLsForDirectory:NSApplicationSupportDirectory

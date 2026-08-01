@@ -1,0 +1,195 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 69e8069..ff85644 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -189,15 +189,21 @@ else()
+     set(PSR_LAUNCHER_SOURCE src/main/recompui_launcher.cpp)
+ endif()
+ 
++set(PSR_DIAGNOSTIC_SOURCES
++    src/main/ares_worker.cpp
++    src/main/aspmain_replay.cpp
++    src/main/aspmain_refint.cpp)
++if(CMAKE_SYSTEM_NAME STREQUAL "iOS" AND ANNEPAD_BUILD_PROFILE STREQUAL "release")
++    set(PSR_DIAGNOSTIC_SOURCES)
++endif()
++
+ add_executable(PokemonStadiumRecomp
+     src/main/main.cpp
+     src/main/rt64_render_context.cpp
+     ${PSR_PLATFORM_SOURCES}
+-    src/main/ares_worker.cpp
++    ${PSR_DIAGNOSTIC_SOURCES}
+     src/main/register_overlays.cpp
+     src/main/rsp_aspmain_hook.cpp
+-    src/main/aspmain_replay.cpp
+-    src/main/aspmain_refint.cpp
+     src/main/transfer_pak.cpp
+     src/main/gb_audio.cpp
+     src/main/input_bindings.cpp
+diff --git a/src/main/main.cpp b/src/main/main.cpp
+index b703ace..753dd62 100644
+--- a/src/main/main.cpp
++++ b/src/main/main.cpp
+@@ -161,6 +161,11 @@ static bool task_boot_matches(uint8_t* rdram, const OSTask* task,
+            rdram_be_word_matches(rdram, boot + 4, word1);
+ }
+ 
++#if defined(ANNEPAD_RELEASE_BUILD)
++static RspExitReason aspMain_capture(uint8_t* rdram, uint32_t ucode_addr) {
++    return aspMain(rdram, ucode_addr);
++}
++#else
+ // Single-task replay capture (Milestone 1): wrap aspMain so we can dump the
+ // RDRAM the task reads (before) and writes (after). Paired with the input dump
+ // in rsp_aspmain_hook.cpp. Armed only when PSR_ASPMAIN_CAPTURE=<dir> is set;
+@@ -604,6 +609,7 @@ static RspExitReason aspMain_capture(uint8_t* rdram, uint32_t ucode_addr) {
+     }
+     return r;
+ }
++#endif
+ 
+ static RspUcodeFunc* get_rsp_microcode(uint8_t* rdram, const OSTask* task) {
+     if (task_boot_matches(rdram, task, 0xA40, 0x401A6000u, 0xC800207Cu)) {
+@@ -615,8 +621,10 @@ static RspUcodeFunc* get_rsp_microcode(uint8_t* rdram, const OSTask* task) {
+ 
+     switch (task->t.type) {
+         case M_AUDTASK:
++#if !defined(ANNEPAD_RELEASE_BUILD)
+             // Always-on: snapshot the CPU-built Acmd list before it runs.
+             audcmd_record(rdram, task);
++#endif
+             return aspMain_capture;   /* passthrough unless capture armed */
+         case M_NJPEGTASK: return njpgdspMain;
+         default:
+@@ -2109,9 +2117,11 @@ int main(int argc, char** argv) {
+     // through the recompiled aspMain, diffs RDRAM against the captured
+     // in-game result, and exits without booting the game. See
+     // aspmain_replay.cpp for the capture/replay contract.
++#if !defined(ANNEPAD_RELEASE_BUILD)
+     if (const char* replay_dir = std::getenv("PSR_ASPMAIN_REPLAY")) {
+         return psr_aspmain_replay_main(replay_dir);
+     }
++#endif
+ 
+ #ifdef _WIN32
+     // Force WASAPI for stable sample queueing.
+@@ -2126,6 +2136,7 @@ int main(int argc, char** argv) {
+     // past the 100ms decimation threshold -> sample-dropping -> audible
+     // clicks. Opt back in with PSR_TURBO=1 for fast softlock reproduction.
+     bool turbo_default = false;
++#if !defined(ANNEPAD_RELEASE_BUILD)
+     if (const char* turbo_env = std::getenv("PSR_TURBO")) {
+         // Accept 0/1, false/true, off/on (case-insensitive first char).
+         char c = turbo_env[0];
+@@ -2145,6 +2156,7 @@ int main(int argc, char** argv) {
+                  std::getenv("PSR_TURBO") ? std::getenv("PSR_TURBO") : "(unset)",
+                  turbo_default ? "ON" : "off");
+     std::fflush(stderr);
++#endif
+ 
+     // PSR_DISABLE_VOLUNTARY_PREEMPTION env var: short-circuit ultramodern's
+     // host-monitored "no context-switch in N seconds" yield mechanism.
+@@ -2155,6 +2167,9 @@ int main(int argc, char** argv) {
+     // (prior 2026-05-09 attempt flipped a pre-existing UAF â€” that UAF
+     // has since been fixed by SecondaryVoiceTableLayout, but this gate
+     // gives us a quick rollback if a new regression surfaces).
++#if defined(ANNEPAD_RELEASE_BUILD)
++    ultramodern_voluntary_preemption_set_enabled(1);
++#else
+     {
+         const char* dis_env = std::getenv("PSR_DISABLE_VOLUNTARY_PREEMPTION");
+         bool enabled = true;
+@@ -2167,6 +2182,7 @@ int main(int argc, char** argv) {
+             enabled ? "ENABLED" : "DISABLED");
+         std::fflush(stderr);
+     }
++#endif
+ 
+     SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER);
+     // Deliver raw SDL_JOY* events too, not just SDL_CONTROLLER* ones, so the
+@@ -2194,7 +2210,11 @@ int main(int argc, char** argv) {
+     // then tears that window (and, via SDL_Quit inside recomp-ui, the whole SDL
+     // instance) down. Unless PSR_AUTOBOOT bypasses it, we show the launcher,
+     // persist launcher.cfg, and pick up the chosen ROM + per-port input config.
++#if defined(ANNEPAD_RELEASE_BUILD)
++    const bool autoboot = true;
++#else
+     const bool autoboot = std::getenv("PSR_AUTOBOOT") != nullptr;
++#endif
+     if (!autoboot) {
+         // The ROM the launcher should display (rom.cfg -> legacy baserom.z64).
+         std::filesystem::path initial_rom;
+@@ -2234,6 +2254,7 @@ int main(int argc, char** argv) {
+     reset_audio(48000);
+     std::fprintf(stderr, "[PSR] reset_audio done\n"); std::fflush(stderr);
+ 
++#if !defined(ANNEPAD_RELEASE_BUILD)
+     // Start the dedicated Ares-oracle worker thread BEFORE the debug
+     // server so all ares_* TCP commands route to that one thread (Ares'
+     // libco scheduler uses thread_local state, so cothreads must be
+@@ -2252,6 +2273,7 @@ int main(int argc, char** argv) {
+     }
+     pkmnstadium::dbg::start(debug_port);
+     std::fprintf(stderr, "[PSR] debug server started on tcp:%d\n", debug_port); std::fflush(stderr);
++#endif
+ 
+     recomp::Version project_version{0, 1, 0, ""};
+     recomp::register_config_path(std::filesystem::current_path());
+diff --git a/src/main/rsp_aspmain_hook.cpp b/src/main/rsp_aspmain_hook.cpp
+index 15e4260..3a40ce7 100644
+--- a/src/main/rsp_aspmain_hook.cpp
++++ b/src/main/rsp_aspmain_hook.cpp
+@@ -75,6 +75,7 @@ constexpr uint32_t kAudioCommandsDmemOffset = 0x2B0;
+ // in the boot path and is documented scratch.
+ constexpr uint32_t kBootDmaSafeDmemOffset = 0xFA0;
+ 
++#if !defined(ANNEPAD_RELEASE_BUILD)
+ static void aspmain_capture_input(uint8_t* rdram, ::RspContext* ctx,
+                                   uint32_t ucode_addr, uint32_t data_ptr,
+                                   uint32_t data_size, uint32_t chunk);
+@@ -132,6 +133,7 @@ extern "C" int psr_aspmain_spike_write_inputs(const char* dir) {
+     }
+     return 1;
+ }
++#endif
+ 
+ void aspmain_pre_task(uint8_t* rdram,
+                       ::RspContext* ctx,
+@@ -139,7 +141,9 @@ void aspmain_pre_task(uint8_t* rdram,
+                       uint32_t ucode_addr) {
+     // A task that bypasses the seeding path below (empty task early-out)
+     // must not leave a stale spike-capture slot attributed to it.
++#if !defined(ANNEPAD_RELEASE_BUILD)
+     g_spike_slot_valid = false;
++#endif
+     // Read OSTask back from DMEM[0xFC0] where the runtime stored
+     // it. We could pass a separate OSTask* but reading from DMEM
+     // matches what real rspboot does: the task struct lives there
+@@ -247,6 +251,7 @@ void aspmain_pre_task(uint8_t* rdram,
+     ctx->r3               = chunk - 1;
+     ctx->r31              = 0x1144;
+ 
++#if !defined(ANNEPAD_RELEASE_BUILD)
+     // Single-task replay capture (Milestone 1): dump this task's input state.
+     aspmain_capture_input(rdram, ctx, ucode_addr, data_ptr, data_size, chunk);
+ 
+@@ -285,8 +290,10 @@ void aspmain_pre_task(uint8_t* rdram,
+         fprintf(stderr, "[aspmain_chunk0] ops: %s\n", ops);
+         fflush(stderr);
+     }
++#endif
+ }
+ 
++#if !defined(ANNEPAD_RELEASE_BUILD)
+ // ── Single-task replay capture (round-2 N64 crackle oracle, Milestone 1) ──
+ // PSR_ASPMAIN_CAPTURE=<dir> dumps ONE real aspMain task's complete starting
+ // state so it can be replayed through ares and diffed against our recompiled
+@@ -371,6 +378,7 @@ static void aspmain_capture_input(uint8_t* rdram, ::RspContext* ctx,
+                     "wrapper will dump RDRAM before/after\n", g_cap_dir);
+     fflush(stderr);
+ }
++#endif
+ 
+ void register_pre_task_hooks() {
+     ::recomp::rsp::set_pre_task_hook("aspMain", aspmain_pre_task);

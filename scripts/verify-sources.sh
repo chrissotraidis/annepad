@@ -64,13 +64,46 @@ git -C "$renderer_hlslpp" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/apple-scalar-labs-declaration.patch"
 
 game_changes=$(git -C "$game" status --porcelain --untracked-files=all --ignore-submodules=dirty)
-expected_game_changes=$' M CMakeLists.txt\n M src/main/main.cpp\n M src/main/recomp_audio_debug.h\n?? n64recomp\n?? src/main/non_windows_platform.cpp'
+expected_game_changes=$' M CMakeLists.txt\n M src/main/main.cpp\n M src/main/recomp_audio_debug.h\n M src/main/rsp_aspmain_hook.cpp\n?? n64recomp\n?? src/main/non_windows_platform.cpp'
 [[ "$game_changes" == "$expected_game_changes" ]] || \
     die "PokemonStadiumRecomp has unexpected modifications"
 git -C "$game" apply --reverse --check \
-    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/apple-platform-support.patch"
-git -C "$game" apply --reverse --check \
-    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-diagnostics.patch"
+    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-surface.patch"
+
+# The release-surface patch intentionally extends files introduced by the
+# Apple-platform patch, so the earlier patch can no longer be reverse-checked
+# independently against the final stacked tree. Recreate the stack from HEAD in
+# a disposable directory and byte-compare every maintained game source instead.
+game_patch_scratch=$(mktemp -d "${TMPDIR:-/tmp}/annepad-game-patches.XXXXXX")
+cleanup_game_patch_scratch() {
+    if [[ -n "${game_patch_scratch:-}" && -d "$game_patch_scratch" ]]; then
+        find "$game_patch_scratch" -depth -delete
+    fi
+}
+trap cleanup_game_patch_scratch EXIT
+git -C "$game" archive HEAD \
+    CMakeLists.txt \
+    src/main/main.cpp \
+    src/main/recomp_audio_debug.h \
+    src/main/rsp_aspmain_hook.cpp | tar -xf - -C "$game_patch_scratch"
+(
+    cd "$game_patch_scratch"
+    git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/apple-platform-support.patch"
+    git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-diagnostics.patch"
+    git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-surface.patch"
+)
+for maintained_path in \
+    CMakeLists.txt \
+    src/main/main.cpp \
+    src/main/recomp_audio_debug.h \
+    src/main/rsp_aspmain_hook.cpp \
+    src/main/non_windows_platform.cpp; do
+    cmp "$game_patch_scratch/$maintained_path" "$game/$maintained_path" >/dev/null || \
+        die "PokemonStadiumRecomp patch stack mismatch: $maintained_path"
+done
+cleanup_game_patch_scratch
+game_patch_scratch=
+trap - EXIT
 
 disasm_changes=$(git -C "$game/disasm" diff --name-only --ignore-submodules=dirty)
 expected_disasm_changes=$'lib/ultralib/Makefile\nsrc/fragments/62/fragment62_35DF70.c'

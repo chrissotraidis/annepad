@@ -39,13 +39,26 @@ apply_patch_file \
     "$ANNEPAD_ROOT/patches/pokestadium-disasm/macos-ido-eucjp-escape.patch" \
     "macOS IDO EUC-JP escape compatibility"
 
-apply_patch_file \
-    "$ANNEPAD_SOURCES/PokemonStadiumRecomp" \
-    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/apple-platform-support.patch" \
-    "Apple platform support"
+game_checkout="$ANNEPAD_SOURCES/PokemonStadiumRecomp"
+game_release_surface="$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-surface.patch"
+if git -C "$game_checkout" apply --reverse --check "$game_release_surface" >/dev/null 2>&1; then
+    # The release-surface patch extends Apple-platform hunks, so its presence is
+    # also the stack-aware signal that the earlier platform patch is present.
+    note "Already applied: Apple platform support"
+    note "Already applied: iOS release diagnostic surface exclusion"
+else
+    apply_patch_file \
+        "$game_checkout" \
+        "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/apple-platform-support.patch" \
+        "Apple platform support"
+    apply_patch_file \
+        "$game_checkout" \
+        "$game_release_surface" \
+        "iOS release diagnostic surface exclusion"
+fi
 
 apply_patch_file \
-    "$ANNEPAD_SOURCES/PokemonStadiumRecomp" \
+    "$game_checkout" \
     "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-diagnostics.patch" \
     "iOS release diagnostics exclusion"
 
