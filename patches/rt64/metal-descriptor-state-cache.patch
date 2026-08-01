@@ -1,0 +1,108 @@
+diff --git a/src/metal/rt64_metal.cpp b/src/metal/rt64_metal.cpp
+--- a/src/metal/rt64_metal.cpp
++++ b/src/metal/rt64_metal.cpp
+@@ -1533,50 +1533,76 @@ namespace RT64 {
+         const auto &setLayoutBinding = setLayout->setBindings[indexBase];
+         const MTL::DataType dtype = mapDataType(setLayoutBinding.descriptorType);
+         MTL::Resource *nativeResource = nullptr;
++        MTL::SamplerState *nativeSampler = nullptr;
++        uint32_t nativeOffset = 0;
+         RenderDescriptorRangeType descriptorType = getDescriptorType(bindingIndex);
+-
+-        if (dtype != MTL::DataTypeSampler) {
+-            if (resourceEntries[descriptorIndex].resource != nullptr) {
+-                resourceEntries[descriptorIndex].resource->release();
+-                resourceEntries[descriptorIndex].resource = nullptr;
+-            }
+-        }
+ 
+         if (descriptor != nullptr) {
+             switch (dtype) {
+                 case MTL::DataTypeTexture: {
+                     const TextureDescriptor *textureDescriptor = static_cast<const TextureDescriptor *>(descriptor);
+                     nativeResource = textureDescriptor->texture;
+-                    MTL::Texture *nativeTexture = static_cast<MTL::Texture *>(nativeResource);
+-                    argumentBuffer.argumentEncoder->setTexture(nativeTexture, descriptorIndex - indexBase + bindingIndex);
+-                    nativeTexture->retain();
+                     break;
+                 }
+                 case MTL::DataTypePointer: {
+                     const BufferDescriptor *bufferDescriptor = static_cast<const BufferDescriptor *>(descriptor);
+                     nativeResource = bufferDescriptor->buffer;
+-                    MTL::Buffer *nativeBuffer = static_cast<MTL::Buffer *>(nativeResource);
+-                    argumentBuffer.argumentEncoder->setBuffer(nativeBuffer, bufferDescriptor->offset, descriptorIndex - indexBase + bindingIndex);
+-                    nativeBuffer->retain();
++                    nativeOffset = bufferDescriptor->offset;
+                     break;
+                 }
+                 case MTL::DataTypeSampler: {
+                     const SamplerDescriptor *samplerDescriptor = static_cast<const SamplerDescriptor *>(descriptor);
+-                    argumentBuffer.argumentEncoder->setSamplerState(samplerDescriptor->state, descriptorIndex - indexBase + bindingIndex);
++                    nativeSampler = samplerDescriptor->state;
+                     break;
+                 }
+                     
++                default:
++                    assert(false && "Unsupported descriptor type.");
++            }
++        }
++
++        ResourceEntry &entry = resourceEntries[descriptorIndex];
++        if ((entry.resource == nativeResource) && (entry.sampler == nativeSampler) &&
++            (entry.offset == nativeOffset) && (entry.type == descriptorType)) {
++            return;
++        }
++
++        const bool resourceChanged = entry.resource != nativeResource;
++        if (resourceChanged && (entry.resource != nullptr)) {
++            entry.resource->release();
++        }
++
++        if (descriptor != nullptr) {
++            const uint32_t argumentIndex = descriptorIndex - indexBase + bindingIndex;
++            switch (dtype) {
++                case MTL::DataTypeTexture:
++                    argumentBuffer.argumentEncoder->setTexture(
++                        static_cast<MTL::Texture *>(nativeResource), argumentIndex);
++                    break;
++                case MTL::DataTypePointer:
++                    argumentBuffer.argumentEncoder->setBuffer(
++                        static_cast<MTL::Buffer *>(nativeResource), nativeOffset, argumentIndex);
++                    break;
++                case MTL::DataTypeSampler:
++                    argumentBuffer.argumentEncoder->setSamplerState(nativeSampler, argumentIndex);
++                    break;
+                 default:
+                     assert(false && "Unsupported descriptor type.");
+             }
+         }
++
++        if (resourceChanged && (nativeResource != nullptr)) {
++            nativeResource->retain();
++        }
+         
+         if (argumentBuffer.mtl->storageMode() == MTL::StorageModeManaged) {
+             argumentBuffer.mtl->didModifyRange(NS::Range(argumentBuffer.offset, argumentBuffer.mtl->length() - argumentBuffer.offset));
+         }
+ 
+-        resourceEntries[descriptorIndex].resource = nativeResource;
+-        resourceEntries[descriptorIndex].type = descriptorType;
++        entry.resource = nativeResource;
++        entry.sampler = nativeSampler;
++        entry.offset = nativeOffset;
++        entry.type = descriptorType;
+     }
+ 
+     RenderDescriptorRangeType MetalDescriptorSet::getDescriptorType(const uint32_t binding) const {
+diff --git a/src/metal/rt64_metal.h b/src/metal/rt64_metal.h
+--- a/src/metal/rt64_metal.h
++++ b/src/metal/rt64_metal.h
+@@ -166,6 +166,8 @@ namespace RT64 {
+     struct MetalDescriptorSet : RenderDescriptorSet {
+         struct ResourceEntry {
+             MTL::Resource* resource = nullptr;
++            MTL::SamplerState* sampler = nullptr;
++            uint32_t offset = 0;
+             RenderDescriptorRangeType type = RenderDescriptorRangeType::UNKNOWN;
+         };
+ 

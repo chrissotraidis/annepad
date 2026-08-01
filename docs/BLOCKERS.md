@@ -103,11 +103,20 @@ Resolved entries are never deleted.
   28-30 presents/s. In the extended battle/attract run, however, the 80 windows
   reporting a 30 Hz VI rate averaged 21.83 presents/s; 34 were below 20, with a
   4.44 minimum and 30.75 maximum. This is improved but not performance-accepted.
+- Optimization result: RT64 now avoids re-encoding a Metal argument-buffer entry
+  when resource, sampler, offset, and descriptor type are unchanged. A follow-up
+  intro/menu/rental-setup run measured 117 30 Hz VI windows at 23.40 presents/s
+  mean, 12.74 minimum, and 30.83 maximum; 20 were below 20 and 22 reached at
+  least 28. Full-size rendering and Start touch still passed after removing the
+  probe. The gain is real but insufficient for closing this blocker.
 - Diagnosis: a live process sample found synchronous `MTLSimDriver` descriptor
   encoding and XPC waits dominating the non-idle sampled work. A half-resolution
   experiment improved cadence but incorrectly reduced the visible game surface
   to the upper-left quarter and was rejected. Both temporary experiments were
-  removed; full-resolution source verification passes.
+  removed; full-resolution source verification passes. A post-cache sample still
+  showed changing descriptor calls and their synchronous XPC waits as the main
+  Simulator cost, so a broader batching rewrite is not justified without
+  physical-device evidence.
 - Gate: measure the same heavy scene on a physical iPad before changing shared
   renderer behavior for a Simulator-specific driver cost. If hardware also
   misses the 30 Hz target, capture device GPU/frame-time evidence and optimize

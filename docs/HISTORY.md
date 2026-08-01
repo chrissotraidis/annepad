@@ -195,3 +195,12 @@
   `--no-build` as the explicit reuse path.
 - Rebuilt and audited the touch-corrected unsigned IPA, then reproduced its
   canonical manifest in a separate no-build archive pass.
+
+## 2026-08-01 — RT64 descriptor cache improves Simulator pacing
+
+- Added maintained descriptor-state deduplication so identical Metal resource,
+  sampler, offset, and type bindings do not repeat synchronous encoder work.
+- Measured a directional improvement from 21.83 to 23.40 presents/s mean across
+  30 Hz VI windows, while keeping the performance gate open.
+- Rebuilt and visibly smoke-tested the diagnostic-free iPad Simulator app, then
+  rebuilt and twice audited the ROM-free unsigned device package.

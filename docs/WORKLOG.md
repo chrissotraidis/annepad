@@ -412,3 +412,32 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   different raw ZIP hashes but identical eight-file canonical manifest SHA-256
   `416db7aaad51bda6b46ca78801a35ec2eb5d0150d295da02ed690e2297c4b829`.
   A committed clean-checkout comparison remains open.
+
+## 2026-08-01 — Identical Metal descriptors no longer re-encode
+
+- Diagnosis: a second live sample confirmed that synchronous Simulator
+  `MTLArgumentEncoder` descriptor calls and their XPC replies remain the largest
+  non-idle rendering cost after the Release-profile correction.
+- Fix: retained each descriptor entry's resource, sampler, buffer offset, and
+  range type, and skipped the encoder call only when all four values were
+  unchanged. The change is maintained in the RT64 patch rather than left in the
+  ignored source checkout.
+- Measurement: across 117 one-second windows reporting a 30 Hz VI rate during
+  intro, menus, and rental-battle setup, the candidate averaged 23.40
+  presents/s (12.74 minimum, 30.83 maximum); 20 windows were below 20 and 22
+  reached at least 28. The earlier pre-cache run averaged 21.83 across 80 such
+  windows, with 34 below 20. The scene mixes were not frame-identical, so this
+  is directional evidence rather than a final benchmark.
+- Runtime proof: removed the counter/file sink, rebuilt Release, installed it
+  on iPad Pro 11-inch (M4), and visibly confirmed full-size animated rendering
+  plus Start touch into Game Pak Check. The clean Simulator binary hashes to
+  `3f0e291d...2dfe` and source verification passes.
+- Package proof: rebuilt the ROM-free unsigned device app. Its 378,174,464-byte
+  binary hashes to `4f55bc82...4586`. A normal package and separate
+  `--no-build` pass produced raw ZIP hashes `6094e223...a1f5` and
+  `dcf6fbd9...e096`, but the same canonical manifest
+  `75bea9dbba5bfe65d7ee5ddf73b4d2d7eddb10d0282b2806873d88758c188ff7`.
+- Remaining: performance acceptance stays open because changing descriptors
+  still dominate the Simulator sample. Physical iPad measurement is required
+  before a broader renderer rewrite; the isolated clean verifier also needs a
+  rerun for this exact source digest.

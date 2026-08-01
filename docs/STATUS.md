@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 14:38 CDT
+Updated: 2026-08-01 15:02 CDT
 
 ## Current state
 
@@ -22,9 +22,13 @@ playability. The separate `-O2` Simulator core and Release app are now complete,
 audited, installed, and smoke-tested. They bring title/menu scenes close to the
 game's 30 Hz cadence, but an extended full-resolution attract/battle capture
 still averaged 21.83 presents/s across 80 one-second windows where the game
-reported a 30 Hz VI rate, including 34 windows below 20 presents/s. Release is
-materially better, but Simulator performance is not accepted. Physical-device
-runtime acceptance remains externally gated.
+reported a 30 Hz VI rate, including 34 windows below 20 presents/s. A maintained
+RT64 descriptor-state cache now skips provably identical Metal argument-buffer
+writes. In a follow-up run spanning intro, Game Pak Check, menus, and rental
+battle setup, 117 30 Hz VI windows averaged 23.40 presents/s and 20 fell below
+20 presents/s. That is a useful reduction in Simulator stalls, but not
+performance acceptance. Physical-device runtime acceptance remains externally
+gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
 game save, and has completed a full rental battle through an explicit result.
@@ -142,7 +146,7 @@ patches.
   (`ultramodern`). The clean Release Simulator executable is arm64,
   `platform IOSSIMULATOR`, minimum iOS 16.0, profile-marked `release`, ROM-free,
   and hashes to
-  `ca173975eb88915f4e2c3e151087d4808a731caf6ad820c8970ca77faa817b9d`.
+  `3f0e291dd11b83e06dac0740213b8372d5b2a3c6a553b526c48ab7bc23bf2dfe`.
 - The optimized app installed over the existing private ROM/save state and
   visibly rendered full-resolution title, menu, and battle-attract scenes.
   A/Start touch navigation, editor resize/reset/done, and Home/resume passed.
@@ -150,6 +154,14 @@ patches.
   passed. A live five-second process sample identified synchronous
   `MTLSimDriver` descriptor/XPC work as the dominant non-idle sampled path;
   that is Simulator evidence and does not predict physical iPad performance.
+- RT64 now caches each descriptor entry's resource, sampler, buffer offset, and
+  range type and returns before re-encoding identical state. The optimized
+  follow-up recorded 117 one-second 30 Hz VI windows at a 23.40 presents/s mean
+  (12.74 minimum, 30.83 maximum), with 20 below 20 and 22 at or above 28. A
+  diagnostic-free rebuild then visibly rendered the animated intro at full
+  size and accepted Start touch into Game Pak Check. A fresh sample still found
+  changing descriptor writes in the dominant Simulator Metal/XPC path, so this
+  is retained as a bounded improvement rather than claimed as a complete fix.
 - On an iPhone 16 Pro Simulator, a cold launch with no ROM presents an upright
   native setup screen. The document picker imported the user's local `.v64`,
   normalized and validated it to the exact 32 MiB supported image, stored it
@@ -181,7 +193,7 @@ patches.
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
   Its arm64 iPhoneOS executable is 378,174,464 bytes, has no linker UUID, and
   has SHA-256
-  `f6e5eacc54fec661d310900cc80e2b1cdea03e4301b69b08ffb6ee4e13c9ddf2`.
+  `4f55bc82833bbbe6a7b0eb9b24991392d0e7925898029929b60d8183edf14586`.
   Unsigned builds deliberately link with `-reproducible,-no_uuid`; signed
   builds retain the normal UUID for symbolication. Release builds compile out
   validation-only audio capture/synthetic hooks, `aspMain` capture/replay and
@@ -191,10 +203,9 @@ patches.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `416db7aaad51bda6b46ca78801a35ec2eb5d0150d295da02ed690e2297c4b829`.
-  This touch-corrected candidate is committed at
-  `be25ee08383b35cf7bbe3623022b92b06a46ab1b`; its full isolated clean-checkout
-  rerun remains open. The preceding fail-closed clean pass used temporary
+  `75bea9dbba5bfe65d7ee5ddf73b4d2d7eddb10d0282b2806873d88758c188ff7`.
+  This touch-corrected, descriptor-cached candidate's full isolated
+  clean-checkout rerun remains open. The preceding fail-closed clean pass used temporary
   source commit `915b171bfcf666533d39b8bcece2ce2107a3a9ae` and dependency-lock SHA-256
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
   That predecessor passed every fetch, generation, native macOS, Simulator,
@@ -225,10 +236,10 @@ patches.
 - Real-speaker audio, lock/unlock, interruptions/routes, thermal performance,
   and a touch-only battle on physical hardware remain open.
 - Optimized iOS Simulator frame pacing is measured and remains below acceptance
-  in heavy scenes. Across 80 one-second 30 Hz VI windows, Release averaged
-  21.83 presents/s (4.44 minimum, 30.75 maximum), with 34 windows below 20.
-  Static title/menu stretches often held 28-30, while battle/transition stretches
-  commonly fell into the teens and low twenties. Physical iPad measurement is
+  in heavy scenes. The pre-cache run averaged 21.83 presents/s across 80 30 Hz
+  VI windows, with 34 below 20. Descriptor-state caching improved a follow-up
+  path to 23.40 across 117 windows, with 20 below 20, but changing descriptor
+  updates remain the sampled Simulator hotspot. Physical iPad measurement is
   required before deciding whether this is Simulator-only overhead or a device
   release blocker.
 - `xctrace` reports no attached physical iPhone or iPad, the keychain has zero

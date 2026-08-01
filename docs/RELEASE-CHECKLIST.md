@@ -58,7 +58,7 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [x] IPA manifest contains only expected files and every third-party notice.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
 - [x] Canonical sorted uncompressed-content digest and full audit report are
-      recorded (`416db7aa...b829`); physical install/retest and a fresh
+      recorded (`75bea9db...8ff7`); physical install/retest and a fresh
       isolated reproduction of this hardened digest remain open.
 
 ## Documentation and handoff

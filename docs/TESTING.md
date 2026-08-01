@@ -107,12 +107,12 @@ validation-only audio capture/synthetic, `aspMain` replay/capture/oracle, Ares
 worker, TCP debug-server/port, turbo, environment-autoboot, and unavailable-
 transport surfaces are compiled out. The app audit rejects their markers using
 process substitution so `pipefail` cannot turn an expected `strings` SIGPIPE
-into a false negative. Repeated local packages for source commit
-`be25ee08...ab1b` produced identical 8-file canonical manifests with SHA-256
-`416db7aaad51bda6b46ca78801a35ec2eb5d0150d295da02ed690e2297c4b829`;
-the 378,174,464-byte executable hashes to `f6e5eacc...ddf2`. The previous
+into a false negative. Repeated local packages for the current descriptor-cache
+candidate produced identical 8-file canonical manifests with SHA-256
+`75bea9dbba5bfe65d7ee5ddf73b4d2d7eddb10d0282b2806873d88758c188ff7`;
+the 378,174,464-byte executable hashes to `4f55bc82...4586`. The previous
 `915b171b...a9ae` snapshot passed the full fail-closed isolated verifier; the
-current touch-corrected digest still needs that rerun. Private source publication
+current touch-corrected, descriptor-cached digest still needs that rerun. Private source publication
 passes. Signing, install/retest, physical hardware, and public-license
 acceptance remain open.
 
@@ -206,6 +206,15 @@ still missed the target. Across 80 one-second windows reporting a 30 Hz VI rate,
 Release averaged 21.83 presents/s (4.44 minimum, 30.75 maximum), and 34 windows
 were below 20. The clean Release app then passed A/Start navigation,
 editor resize/reset/done, and Home/resume.
+
+A bounded RT64 descriptor-state cache was then measured on the same Simulator.
+Across 117 30 Hz VI windows spanning intro, menus, and rental-battle setup, it
+averaged 23.40 presents/s (12.74 minimum, 30.83 maximum); 20 windows were below
+20 and 22 were at least 28. The diagnostic-free app rebuilt, rendered the
+animated intro at full size, and accepted Start touch into Game Pak Check.
+Because the scene mix was not frame-identical and a fresh sample still showed
+changing descriptor/XPC work, treat this as directional evidence, not a final
+benchmark or performance sign-off.
 
 `MTL_HUD_ENABLED` did not expose useful Simulator metrics, and an attached Game
 Performance trace failed to finish a valid document. A five-second live process
