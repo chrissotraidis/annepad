@@ -55,5 +55,12 @@ cmake -S "$ANNEPAD_ROOT/apple/core" -B "$build_dir" -G Ninja \
     -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO \
     -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=NO
 
-cmake --build "$build_dir" --target AnnePadCore --parallel
+build_jobs=${ANNEPAD_BUILD_JOBS:-}
+if [[ -n "$build_jobs" ]]; then
+    [[ "$build_jobs" =~ ^[1-9][0-9]*$ ]] || \
+        die "ANNEPAD_BUILD_JOBS must be a positive integer"
+    cmake --build "$build_dir" --target AnnePadCore --parallel "$build_jobs"
+else
+    cmake --build "$build_dir" --target AnnePadCore --parallel
+fi
 "$script_dir/audit-ios-core.sh" "$build_dir" "$platform" "$profile"

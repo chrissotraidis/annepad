@@ -529,3 +529,19 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   speaker, lifecycle, and performance acceptance also remain open.
 - Next: build a duration-controlled Z UI test, then rebuild/reproduce the exact
   current unsigned device package and clean-checkout verifier.
+
+## 2026-08-01 16:55–17:25 CDT — Memory-bounded device core rebuild
+
+- Goal: rebuild the exact current optimized iPhoneOS core instead of packaging
+  the older source-inconsistent archive.
+- Observation: bare `cmake --build --parallel` launched eight optimizers for the
+  2.60 GiB / 1,003-file generated C set on this 16 GB Mac. The system entered
+  heavy compression and swap churn; individual compiler processes received
+  roughly 15–40% CPU while progress dropped sharply.
+- Changed: `build-ios-core.sh` now accepts a validated positive
+  `ANNEPAD_BUILD_JOBS` limit, documented in `BUILDING.md`.
+- Proof: `ANNEPAD_BUILD_JOBS=0` fails clearly, shell syntax passes, and a resumed
+  `ANNEPAD_BUILD_JOBS=2` package build runs exactly two compiler workers at
+  roughly 75–85% CPU each while preserving completed incremental objects.
+- Remaining: the long optimized build is still running; app, package, and
+  canonical-manifest evidence must not be claimed until it finishes and audits.

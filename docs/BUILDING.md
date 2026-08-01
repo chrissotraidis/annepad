@@ -123,6 +123,17 @@ build, even when an archive already exists. This is intentional: generated AOT
 sources can change while an older archive still passes static policy audits,
 and linking that stale archive would produce a source-inconsistent app.
 
+The optimized AOT compile can run several very large C translation units at
+once. On a 16 GB Mac, limit core-build concurrency if the default produces
+memory compression or swap churn:
+
+```sh
+ANNEPAD_BUILD_JOBS=2 ./scripts/package-ios.sh
+```
+
+`ANNEPAD_BUILD_JOBS` must be a positive integer and affects the static iOS core
+build only. Completed objects remain incremental when the command is rerun.
+
 The iOS bundle contains only native app resources: compiled original AnnePad
 icons, `PrivacyInfo.xcprivacy`, `ThirdPartyNotices.txt`, metadata, and the
 executable. The desktop launcher's fonts, cartridge icons, and box art are not
