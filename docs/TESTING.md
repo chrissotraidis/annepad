@@ -198,15 +198,23 @@ responsive input without sustained thermal collapse; numeric budgets are set
 after the first physical baseline.
 
 On 2026-08-01, a temporary counter immediately after RT64's Metal swap-chain
-present call measured the `-O0` validation app on iPad Pro 11-inch (M4), iOS
-18.5. The title/attract path briefly reached 28-30 presents/s but commonly
-reported 3-17 presents/s; other samples landed in the high teens and twenties.
-The process remained alive and CPU was roughly 42-55%, but survival and CPU do
-not make the uneven pacing acceptable. `MTL_HUD_ENABLED` did not expose useful
-Simulator metrics, and an attached Game Performance trace failed to finish a
-valid document, so neither is recorded as evidence. The source probe was removed
-after collection. Repeat the exact scene on the new release-optimized Simulator
-core and in an animated battle before accepting performance.
+present call measured both profiles on iPad Pro 11-inch (M4), iOS 18.5. The
+`-O0` validation title/attract path briefly reached 28-30 presents/s but commonly
+reported 3-17. The complete `-O2` Release core materially improved title/menu
+stretches to roughly 28-30, but the extended full-resolution battle/attract run
+still missed the target. Across 80 one-second windows reporting a 30 Hz VI rate,
+Release averaged 21.83 presents/s (4.44 minimum, 30.75 maximum), and 34 windows
+were below 20. The clean Release app then passed A/Start navigation,
+editor resize/reset/done, and Home/resume.
+
+`MTL_HUD_ENABLED` did not expose useful Simulator metrics, and an attached Game
+Performance trace failed to finish a valid document. A five-second live process
+sample instead identified synchronous `MTLSimDriver` descriptor/XPC work as the
+dominant non-idle sampled path. A Simulator-only half-resolution experiment was
+rejected because Computer Use showed the game surface incorrectly occupying only
+the upper-left quarter. All temporary probes were removed, full-resolution
+Release was rebuilt, and source verification passed. Do not infer physical-iPad
+performance from this Simulator driver result; repeat the heavy scene on device.
 
 ## Failure report template
 

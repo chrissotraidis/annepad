@@ -355,3 +355,24 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Remaining: finish/install the optimized candidate, repeat frame pacing in the
   same title and an animated battle, verify timed Z latch/cancellation and cold
   iPad orientation, then rebuild/package and rerun the isolated verifier.
+
+## 2026-08-01 — Optimized Simulator completed and measured
+
+- Build: completed and audited the retained `-O2` arm64 iPhoneSimulator core,
+  then built the profile-marked Release app. The clean executable hashes to
+  `e56f2415e079ad7bd5baf20db3f39c15b69506bb9670ec038e1e041546f33af8`.
+- Runtime: installed without erasing private ROM/save state and visibly proved
+  full-resolution title, menu, and battle-attract rendering. A/Start navigation,
+  editor resize/reset/done, and Home/resume passed on iPad Pro 11-inch (M4),
+  iOS 18.5.
+- Performance: title/menu stretches commonly held 28-30 presents/s, but 80
+  one-second windows with a reported 30 Hz VI rate averaged 21.83 presents/s;
+  34 were below 20. Release is improved, not accepted for heavy Simulator scenes.
+- Diagnosis: live sampling pointed to synchronous `MTLSimDriver` descriptor/XPC
+  overhead. A Simulator-only half-resolution experiment improved cadence but
+  visibly shrank the game surface to the upper-left quarter, so it was reverted.
+  The present counter and file sink were also removed; full-resolution Release
+  rebuilt successfully and exact-source verification passes.
+- Remaining: physical iPad battle/thermal measurement, cold iPad orientation,
+  timed Z latch/cancellation coverage, new device package/clean verifier, and
+  signed controller/speaker/lifecycle acceptance.

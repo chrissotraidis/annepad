@@ -84,9 +84,9 @@ Resolved entries are never deleted.
   iPhone/iPad are attached, sign/install this bundle and execute the separate
   controller, audio, orientation, lifecycle, and sustained-battle gates.
 
-## B-016 — Simulator playtest used the unoptimized validation AOT core
+## B-016 — Optimized Simulator remains slow in heavy battle scenes
 
-- Status: active performance/build gap
+- Status: active performance acceptance gap; optimized build complete
 - Evidence: `apple/core/CMakeLists.txt` intentionally compiles validation AOT at
   `-O0`, and the old Simulator script could only select that profile. A temporary
   counter at RT64's Metal present call measured the iPad title/attract path at
@@ -96,12 +96,23 @@ Resolved entries are never deleted.
   `build-ios-core-simulator-release/` tree, and the normal Simulator app command
   defaults to that `-O2` product. Validation remains available explicitly for
   fast SDK/static-policy checks and is no longer presented as a playability build.
-- Gate: finish the retained optimized build, install it without erasing private
-  ROM/save state, repeat present-rate capture on the same title and animated
-  battle scenes, and check input/audio/lifecycle stability. The build is slow
-  because 1,006 generated C files include 10-17 MB translation units; partial
-  objects are preserved. Physical iPad sustained-battle and thermal evidence
-  remains required regardless of the Simulator result.
+- Release result: the complete `-O2` arm64 Simulator core passed its static
+  audit and the ROM-free Release app built, installed over private ROM/save
+  state, rendered at full resolution, accepted A/Start touch input, kept the
+  editor functional, and resumed after Home. Title/menu stretches commonly held
+  28-30 presents/s. In the extended battle/attract run, however, the 80 windows
+  reporting a 30 Hz VI rate averaged 21.83 presents/s; 34 were below 20, with a
+  4.44 minimum and 30.75 maximum. This is improved but not performance-accepted.
+- Diagnosis: a live process sample found synchronous `MTLSimDriver` descriptor
+  encoding and XPC waits dominating the non-idle sampled work. A half-resolution
+  experiment improved cadence but incorrectly reduced the visible game surface
+  to the upper-left quarter and was rejected. Both temporary experiments were
+  removed; full-resolution source verification passes.
+- Gate: measure the same heavy scene on a physical iPad before changing shared
+  renderer behavior for a Simulator-specific driver cost. If hardware also
+  misses the 30 Hz target, capture device GPU/frame-time evidence and optimize
+  the smallest proven RT64 path. Physical sustained-battle, thermal, and audio
+  evidence remains required.
 
 ## B-015 — Touch overlay diverged from the preferred HarkinianPad reference
 

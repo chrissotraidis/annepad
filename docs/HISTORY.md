@@ -168,3 +168,14 @@
   378,173,192-byte binary hashes to `6453dac1...b27a`; two local packages share
   canonical manifest `b0f62f11...562b0`. Full isolated reproduction of this
   new candidate remains open.
+
+## 2026-08-01 — Optimized iPad Simulator profile proved
+
+- Completed and audited the separate `-O2` arm64 Simulator core and Release app.
+- Re-proved full-resolution title/menu/battle rendering, touch navigation,
+  editor operation, and Home/resume on iPad Pro 11-inch (M4), iOS 18.5.
+- Direct present measurement showed title/menu near 30 Hz but heavy battle
+  pacing averaging about 22 presents/s during 30 Hz VI windows; Simulator
+  performance remains open, with physical iPad evidence required.
+- Rejected and reverted a visually incorrect half-resolution workaround, then
+  rebuilt the clean full-resolution Release app and re-verified locked sources.

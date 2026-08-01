@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 12:25 CDT
+Updated: 2026-08-01 14:19 CDT
 
 ## Current state
 
@@ -17,10 +17,13 @@ touch overlay was a bespoke approximation rather than an adaptation of the
 preferred HarkinianPad mechanism. The corrected HarkinianPad-derived low-grip
 layout now builds, installs, accepts touch navigation, survives a short
 background/foreground cycle, and keeps the editor functional on the iPad
-Simulator. Its current executable still links the validation AOT core compiled
-at `-O0`; direct RT64 present-call measurement confirms visibly uneven title
-and attract-mode pacing. An optimized Simulator core is now supported and is
-partially built, but its runtime comparison is not yet complete. Physical-device
+Simulator. The retained `-O0` validation build was confirmed too slow for
+playability. The separate `-O2` Simulator core and Release app are now complete,
+audited, installed, and smoke-tested. They bring title/menu scenes close to the
+game's 30 Hz cadence, but an extended full-resolution attract/battle capture
+still averaged 21.83 presents/s across 80 one-second windows where the game
+reported a 30 Hz VI rate, including 34 windows below 20 presents/s. Release is
+materially better, but Simulator performance is not accepted. Physical-device
 runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
@@ -123,10 +126,26 @@ patches.
   device performance because the measured AOT core was deliberately `-O0`.
 - Simulator release builds are now first-class: `build-ios-core.sh simulator
   release` produces a separate `-O2` core, and `build-ios-simulator.sh` defaults
-  to that optimized product. The first build has 283 of 1,110 Ninja steps
-  retained locally; runtime comparison remains open because optimizing the
-  1,006 very large generated translation units is a multi-hour build on this
-  16 GB Mac.
+  to that optimized product. The complete arm64 iPhoneSimulator release core
+  passed the no-dynamic-code audit. Archive SHA-256 values are
+  `739c584e9288ab997b39e235ee138f8ed65f4b1c40a47fdc3321c4b54a0b41ca`
+  (AnnePad core),
+  `c3e38dfc6e8b454ed4ba9c70d0c4b9797da44cf789a70400e79eace04507c784`
+  (AOT game),
+  `f3f964d4006be20857d402083b94b54a7ab16dabc0bef7a7be2da5d31d575a76`
+  (`librecomp`), and
+  `2fe6acd7e4f91add2b19bd467d16138b5fabbc14609cdf9da327b3bb1589f440`
+  (`ultramodern`). The clean Release Simulator executable is arm64,
+  `platform IOSSIMULATOR`, minimum iOS 16.0, profile-marked `release`, ROM-free,
+  and hashes to
+  `e56f2415e079ad7bd5baf20db3f39c15b69506bb9670ec038e1e041546f33af8`.
+- The optimized app installed over the existing private ROM/save state and
+  visibly rendered full-resolution title, menu, and battle-attract scenes.
+  A/Start touch navigation, editor resize/reset/done, and Home/resume passed.
+  A temporary present counter was then removed and exact-source verification
+  passed. A live five-second process sample identified synchronous
+  `MTLSimDriver` descriptor/XPC work as the dominant non-idle sampled path;
+  that is Simulator evidence and does not predict physical iPad performance.
 - On an iPhone 16 Pro Simulator, a cold launch with no ROM presents an upright
   native setup screen. The document picker imported the user's local `.v64`,
   normalized and validated it to the exact 32 MiB supported image, stored it
@@ -196,8 +215,13 @@ patches.
   physical-device runtime success.
 - Real-speaker audio, lock/unlock, interruptions/routes, thermal performance,
   and a touch-only battle on physical hardware remain open.
-- Optimized iOS Simulator frame pacing is not yet measured. The current
-  validation candidate is functional but too uneven to call performance-accepted.
+- Optimized iOS Simulator frame pacing is measured and remains below acceptance
+  in heavy scenes. Across 80 one-second 30 Hz VI windows, Release averaged
+  21.83 presents/s (4.44 minimum, 30.75 maximum), with 34 windows below 20.
+  Static title/menu stretches often held 28-30, while battle/transition stretches
+  commonly fell into the teens and low twenties. Physical iPad measurement is
+  required before deciding whether this is Simulator-only overhead or a device
+  release blocker.
 - `xctrace` reports no attached physical iPhone or iPad, the keychain has zero
   valid code-signing identities, and no provisioning profile is installed.
 - App Store compatibility and redistribution of unlicensed upstream components
@@ -229,10 +253,10 @@ orientation remains untested.
 
 ## Next concrete task
 
-Finish the retained `-O2` Simulator core, install the optimized touch candidate,
-and repeat the same present-call/title plus animated battle measurement. Then
-exercise the Z latch, cold iPad orientation, and a sustained touch battle before
-publishing a new device package. When lawful signing assets and hardware are
-available, execute the signed iPhone/iPad, controller, speaker, lifecycle,
-performance, and hardware touch-battle matrix. Keep public redistribution
-blocked on license review.
+Fix the cold iPad orientation and add deterministic touch-state coverage for the
+Z latch/cancellation semantics, then rebuild the device Release package and rerun
+the fail-closed clean verifier. When lawful signing assets and hardware are
+available, measure the same heavy battle on a physical iPad before changing the
+renderer for a Simulator-specific bottleneck, and execute the signed controller,
+speaker, lifecycle, thermal, and hardware touch-battle matrix. Keep public
+redistribution blocked on license review.
