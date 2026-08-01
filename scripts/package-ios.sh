@@ -11,15 +11,18 @@ require_command mv
 require_command plutil
 require_command zip
 
-app="$ANNEPAD_ROOT/build-ios-app-device-release/Release/AnnePad.app"
+default_app="$ANNEPAD_ROOT/build-ios-app-device-release/Release/AnnePad.app"
+app="$default_app"
 output="$ANNEPAD_ROOT/artifacts/AnnePad-0.1.0-unsigned.ipa"
 allow_build=true
+custom_app=false
 
 while (( $# > 0 )); do
     case "$1" in
         --app)
             (( $# >= 2 )) || die "--app requires a path"
             app=$2
+            custom_app=true
             shift 2
             ;;
         --output)
@@ -37,12 +40,16 @@ while (( $# > 0 )); do
     esac
 done
 
+if $allow_build && ! $custom_app; then
+    "$script_dir/build-ios-device.sh" release
+fi
+
 if [[ ! -d "$app" ]] || \
    [[ "$(plutil -extract AnnePadBuildProfile raw -o - "$app/Info.plist" 2>/dev/null || true)" != release ]]; then
-    $allow_build || die "release-profile AnnePad.app is missing; omit --no-build to build it"
-    [[ "$app" == "$ANNEPAD_ROOT/build-ios-app-device-release/Release/AnnePad.app" ]] || \
-        die "refusing to replace a caller-supplied application path"
-    "$script_dir/build-ios-device.sh" release
+    if $custom_app; then
+        die "caller-supplied application is missing or not release-profile"
+    fi
+    die "release-profile AnnePad.app is missing; omit --no-build to build it"
 fi
 
 "$script_dir/audit-ios-app.sh" "$app" release

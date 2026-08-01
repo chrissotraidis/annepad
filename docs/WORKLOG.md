@@ -394,3 +394,21 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   `ca173975eb88915f4e2c3e151087d4808a731caf6ad820c8970ca77faa817b9d`.
 - Remaining: deterministic Z latch/cancellation coverage and physical-device
   orientation/ergonomics acceptance.
+
+## 2026-08-01 — Device package rebuilt and stale-app guard closed
+
+- Reproduction: the first package command audited and archived the previous
+  `6453dac1...b27a` device binary because `package-ios.sh` rebuilt only when the
+  Release app was missing or profile-invalid. Source changes alone did not
+  invalidate that existing product.
+- Fix: default packaging now always invokes the canonical device Release build.
+  `--no-build` is the explicit existing-product path, and caller-supplied apps
+  remain audit-only and are never replaced.
+- Result: the rebuilt ROM-free unsigned arm64 iPhoneOS executable is
+  378,174,464 bytes with SHA-256 `f6e5eacc...ddf2`, no UUID, signature, or
+  provisioning profile, and Apple-system-only dynamic dependencies. Its package
+  passed both app and IPA audits.
+- Reproduction: the rebuild/package pass and a separate `--no-build` pass had
+  different raw ZIP hashes but identical eight-file canonical manifest SHA-256
+  `416db7aaad51bda6b46ca78801a35ec2eb5d0150d295da02ed690e2297c4b829`.
+  A committed clean-checkout comparison remains open.

@@ -130,10 +130,13 @@ Project files use automatic/local signing settings without committing team IDs,
 profiles, entitlements containing personal identifiers, or certificates. The
 device build command accepts local overrides from ignored configuration. An
 unsigned IPA contains `Payload/AnnePad.app` and no embedded mobileprovision.
-`package-ios.sh` accepts output only under ignored `artifacts/`, audits the app,
-assembles the payload, and calls `audit-ipa.sh`. The audit emits a full text
-report plus a sorted path/size/content-SHA manifest. The SHA-256 of that manifest
-is the reproducibility gate; the raw ZIP hash is recorded but is not authoritative.
+`package-ios.sh` accepts output only under ignored `artifacts/`, rebuilds the
+canonical device Release app by default, audits it, assembles the payload, and
+calls `audit-ipa.sh`. Use `--no-build` only when deliberately repackaging the
+existing audited app; a caller-supplied `--app` is never replaced. The audit
+emits a full text report plus a sorted path/size/content-SHA manifest. The
+SHA-256 of that manifest is the reproducibility gate; the raw ZIP hash is
+recorded but is not authoritative.
 
 When a lawful local development team and attached device are available, build,
 verify, install, and launch without writing the team or device identifier into
@@ -185,13 +188,13 @@ The 2026-08-01 local release build produced:
 - `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
 - `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
   manifest SHA-256
-  `b0f62f11d11bff4f9a6f15770da65b41fea6f7efc3686eca0dc18238a3c562b0`.
+  `416db7aaad51bda6b46ca78801a35ec2eb5d0150d295da02ed690e2297c4b829`.
 
 Two local archive passes have the exact same manifest bytes/digest. The
-378,173,192-byte local unsigned executable hashes to `6453dac1...b27a` and has
+378,174,464-byte local unsigned executable hashes to `f6e5eacc...ddf2` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
-hardened source commit is `ee4f1af8...77f2`; its local packages match at
-`b0f62f11...562b0`, but the full isolated clean verifier has not yet been rerun
+touch-corrected source commit is `be25ee08...ab1b`; its local packages match at
+`416db7aa...b829`, but the full isolated clean verifier has not yet been rerun
 for this digest. The previous `915b171b...a9ae` snapshot remains valid proof
 for its predecessor (`e6b2ab11...f363`, `24dc9caa...d9e6`). Release audio,
 replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport

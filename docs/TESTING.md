@@ -108,11 +108,11 @@ worker, TCP debug-server/port, turbo, environment-autoboot, and unavailable-
 transport surfaces are compiled out. The app audit rejects their markers using
 process substitution so `pipefail` cannot turn an expected `strings` SIGPIPE
 into a false negative. Repeated local packages for source commit
-`ee4f1af8...77f2` produced identical 8-file canonical manifests with SHA-256
-`b0f62f11d11bff4f9a6f15770da65b41fea6f7efc3686eca0dc18238a3c562b0`;
-the 378,173,192-byte executable hashes to `6453dac1...b27a`. The previous
+`be25ee08...ab1b` produced identical 8-file canonical manifests with SHA-256
+`416db7aaad51bda6b46ca78801a35ec2eb5d0150d295da02ed690e2297c4b829`;
+the 378,174,464-byte executable hashes to `f6e5eacc...ddf2`. The previous
 `915b171b...a9ae` snapshot passed the full fail-closed isolated verifier; the
-current hardened digest still needs that rerun. Private source publication
+current touch-corrected digest still needs that rerun. Private source publication
 passes. Signing, install/retest, physical hardware, and public-license
 acceptance remain open.
 

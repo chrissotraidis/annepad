@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 14:19 CDT
+Updated: 2026-08-01 14:38 CDT
 
 ## Current state
 
@@ -179,9 +179,9 @@ patches.
   (AOT game), `8535ef7c...` (`librecomp`), and `8325b873...`
   (`ultramodern`).
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
-  Its arm64 iPhoneOS executable is 378,173,192 bytes, has no linker UUID, and
+  Its arm64 iPhoneOS executable is 378,174,464 bytes, has no linker UUID, and
   has SHA-256
-  `6453dac196bbda1631ce499fb019118df6f07cf6cf083ca485b9c788187eb27a`.
+  `f6e5eacc54fec661d310900cc80e2b1cdea03e4301b69b08ffb6ee4e13c9ddf2`.
   Unsigned builds deliberately link with `-reproducible,-no_uuid`; signed
   builds retain the normal UUID for symbolication. Release builds compile out
   validation-only audio capture/synthetic hooks, `aspMain` capture/replay and
@@ -191,9 +191,9 @@ patches.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `b0f62f11d11bff4f9a6f15770da65b41fea6f7efc3686eca0dc18238a3c562b0`.
-  This hardened candidate is committed at
-  `ee4f1af807d4c9f7281668a37765d1a1760e77f2`; its full isolated clean-checkout
+  `416db7aaad51bda6b46ca78801a35ec2eb5d0150d295da02ed690e2297c4b829`.
+  This touch-corrected candidate is committed at
+  `be25ee08383b35cf7bbe3623022b92b06a46ab1b`; its full isolated clean-checkout
   rerun remains open. The preceding fail-closed clean pass used temporary
   source commit `915b171bfcf666533d39b8bcece2ce2107a3a9ae` and dependency-lock SHA-256
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
@@ -203,6 +203,11 @@ patches.
   The bundle contains only the executable, compiled icons/catalog, metadata,
   privacy manifest, and notices; it has no ROM, save, desktop artwork,
   provisioning profile, signature, unexpected dylib, or local developer path.
+- Default `package-ios.sh` now rebuilds the canonical device Release app before
+  auditing and archiving. The previous missing-only condition was reproduced
+  packaging the stale pre-overlay-fix binary; `--no-build` is now the sole
+  explicit reuse path. A rebuilt pass and an independent `--no-build` pass had
+  different raw ZIP hashes but the same canonical manifest above.
 - The audited 71-file source/document baseline and later release-hardening
   checkpoint (`ee4f1af8...77f2`) are committed on `main` and backed up to the
   private GitHub repository. Local `HEAD` and `origin/main` are compared after

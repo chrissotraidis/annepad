@@ -187,3 +187,11 @@
   of relying on its initial frame and autoresizing-mask conversion.
 - Rebuilt Release and proved stable control geometry throughout a repeated cold
   boot; physical orientation acceptance remains open.
+
+## 2026-08-01 — Packaging now rejects implicit stale app reuse
+
+- Reproduced a default package pass archiving an existing pre-fix device app.
+- Made default packaging rebuild the canonical Release app; retained
+  `--no-build` as the explicit reuse path.
+- Rebuilt and audited the touch-corrected unsigned IPA, then reproduced its
+  canonical manifest in a separate no-build archive pass.
