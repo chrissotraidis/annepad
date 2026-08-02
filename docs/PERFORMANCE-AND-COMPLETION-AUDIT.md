@@ -124,10 +124,11 @@ is not yet physically proven or release-ready.
 - HarkinianPad's persistent Z latch is intentionally not retained. The original
   Stadium battle instructions document R+Pokémon inspection, and live US 1.0
   battle proof shows L Cancel / R Check with held R revealing moves, while Z is
-  a cancel/reset-style press. Decompiled input paths
-  likewise use `buttonPressed` for Z, with only generic list scrolling reading
-  held Z. Persistent Z could suppress the next press edge or leak into another
-  screen; normal finger-down/finger-up Z behavior remains.
+  a cancel/reset-style press. Decompiled normal input paths likewise use
+  `buttonPressed` for Z, with only generic list scrolling reading held Z; an
+  additional direct read toggles a debug-only state. No Z-plus-button gameplay
+  condition exists. Persistent Z could suppress the next press edge or leak
+  into another screen; normal finger-down/finger-up Z behavior remains.
 - Quick taps now have independent atomic poll lifetimes per N64 button, so a
   later shoulder/Z tap cannot extend A/B/Start or another button. Host tests
   cover exact quick-tap expiry, the longer shoulder chord window, overlapping

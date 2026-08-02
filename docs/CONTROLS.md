@@ -17,19 +17,30 @@ later Pokémon games.
 | C buttons | Choose assigned moves or Pokémon; mode-specific actions. |
 | L | Page/list navigation; cancel/back in battle selection; Gallery background selection. |
 | R | Page/list navigation; hold to reveal hidden battle assignments; use with an assigned Pokémon button to inspect its data; Gallery telephoto. |
-| Z | Cancel/reset/cycle-style press; held Z only accelerates a generic list scroll helper. |
+| Z | Not a documented battle combo button. Normal presses reset/cycle a few mode-specific states; holding it accelerates one generic list-scroll helper. |
 | Start | Start/pause or battle forfeit where the current mode allows it. |
 
-The original instruction booklet documents the R-plus-selection inspection
-chord. The running US 1.0 battle UI labels L as Cancel and R as Check; holding R
-reveals the hidden move assignments and releasing it hides them again. An
-exhaustive audit of controller-bit `0x2000` in the pinned decomp found only
-three Z reads: one
-`buttonDown` read that accelerates a generic list helper, one `buttonPressed`
-read that cycles a three-state display, and one `buttonPressed` read that resets
-mode state. No Z-plus-button gameplay chord was found. Kids Club uses the
-D-pad/stick, A/B, or alternating L/R depending on the minigame; persistent Z is
-not part of its normal controls.
+The original instruction booklet documents the actual battle chord: hold R and
+press the assigned button of a Pokémon to inspect its data. The running US 1.0
+battle UI labels L as Cancel and R as Check; holding R reveals the hidden move
+assignments and releasing it hides them again. The booklet does not assign Z a
+battle chord.
+
+An exhaustive audit of controller bit `0x2000` in the pinned decomp found four
+direct Z action sites plus one aggregate "any button" mask:
+
+- one `buttonDown` read accelerates a generic list helper;
+- one `buttonPressed` read cycles a three-state display;
+- one `buttonPressed` read resets mode state;
+- one `buttonPressed` read toggles a debug state in `miniUnkControls`; and
+- one mask includes Z with every face/shoulder button only to wake an input
+  state, not as a chord.
+
+No condition combines Z with another gameplay button. Kids Club's documented
+controls use the D-pad/stick, A/B, or alternating L/R depending on the minigame;
+persistent Z is not part of its normal controls. This means AnnePad must retain
+ordinary finger-down Z holding for the list-speed path, but a Zelda-style
+tap-to-toggle latch would add behavior Stadium does not request.
 
 Sources:
 

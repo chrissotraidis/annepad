@@ -717,9 +717,10 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   and no AnnePad crash report was present.
 - Rechecked the official instruction booklet and exhaustively searched the
   pinned decomp's controller-bit `0x2000` use. Z has one held list-acceleration
-  read and two edge-triggered cycle/reset reads; no Z-plus-button gameplay chord
-  exists. AnnePad therefore correctly permits finger-down Z hold but does not
-  retain a Zelda-style toggle after release.
+  read and two normal edge-triggered cycle/reset reads; a fourth direct read is
+  confined to a debug-state toggle. No Z-plus-button gameplay chord exists.
+  AnnePad therefore correctly permits finger-down Z hold but does not retain a
+  Zelda-style toggle after release.
 - Boundary: ordinary current-iPhone UI touch routing now passes. Quick-Z,
   held-R, R-plus-selection, physical multitouch ergonomics, speaker, signing,
   controller, thermal, and physical performance acceptance remain open.
@@ -783,3 +784,25 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Determination: descriptor batching closes a generic sustained Simulator
   battle-slowdown claim. Rare transition hitches and signed physical-iPad
   frame-time, thermal, speaker, touch, and controller acceptance remain open.
+
+## 2026-08-02 09:41–09:52 CDT — Deep control-reference correction
+
+- Re-read the original Nintendo Australia instruction booklet's controller,
+  Kids Club, Pokémon-selection, and battle-control sections and cross-checked
+  every direct controller-bit `0x2000` read in the pinned US 1.0 decomp.
+- Confirmed the user-facing battle chord is R plus an assigned Pokémon button.
+  The booklet does not assign Z a battle chord, and the running game separately
+  proves held R reveals move assignments while L cancels.
+- Corrected the earlier "three Z reads" wording: the decomp contains the held
+  list accelerator, two edge-triggered cycle/reset actions, one debug-state
+  toggle in `miniUnkControls`, and one aggregate any-button mask. None combines
+  Z with another gameplay button.
+- Decision remains deliberately narrow: Z keeps ordinary touch-down hold and
+  touch-up release plus short-tap retention. It does not get HarkinianPad's
+  Zelda-specific persistent latch. R keeps the longer bounded tap-retention
+  window for Stadium's actual inspection chord.
+- A one-pointer Simulator attempt could not prove the simultaneous R-plus-B
+  inspection panel: Computer Use serializes the two taps long enough that the
+  bounded shoulder window may expire. This is not counted as a failed physical
+  multitouch implementation or as acceptance; real two-finger device proof
+  remains open.
