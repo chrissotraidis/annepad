@@ -84,6 +84,11 @@ if [[ "$expected_profile" == release ]] &&
    rg -i -q "$release_diagnostic_markers" < <(strings -a "$binary"); then
     die "validation-only diagnostics leaked into release executable"
 fi
+defined_symbols=$(nm -gU "$binary" 2>/dev/null || true)
+if [[ "$expected_profile" == release ]] &&
+   rg -q 'recomp_ultra_trace_record|scheduler_trace_mark' <<<"$defined_symbols"; then
+    die "validation-only runtime tracing leaked into release executable"
+fi
 if rg -q '/Users/|/home/|[A-Za-z]:\\Users\\' < <(strings -a "$binary"); then
     die "absolute developer-machine path leaked into executable"
 fi

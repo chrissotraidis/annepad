@@ -201,27 +201,26 @@ added to make a verifier pass.
 
 The current 2026-08-02 local release build produced:
 
-- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,612,272 bytes, raw SHA-256
-  `c6ab08f7...efa7`. The independent `--no-build` repack has the same byte size
-  and raw SHA-256 `950add42...8255`; raw ZIP hashes vary with timestamps and are
-  not the reproducibility authority.
+- `artifacts/AnnePad-0.1.0-unsigned.ipa`: raw SHA-256 `70619ae1...5c21`.
+  The independent `--no-build` repack has raw SHA-256 `fad9b400...300e`;
+  raw ZIP hashes vary with timestamps and are not the reproducibility authority.
 - `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
 - `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
   manifest SHA-256
-  `d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
+  `63db42dda249a8c6f9df674f3e5917dcd44b7ce611902e356baecb2b215cbff7`.
 
 Two local archive passes have the exact same manifest bytes/digest. The
-378,195,736-byte local unsigned executable hashes to `86be9fe4...4689d` and has
+378,196,936-byte local unsigned executable hashes to `edb4e8c9...ad24` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
-source-consistent candidate has local packages matching at `d5c26978...c8f5`.
-The full no-hardlink isolated verifier then passed from exact published commit
+source-consistent candidate has local packages matching at `63db42dd...bff7`.
+The prior package checkpoint's full no-hardlink isolated verifier passed from exact published commit
 `f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5`. It reconstructed the US 1.0
 input, regenerated 1,006 AOT files, built native macOS plus Simulator/device
 static cores, rebuilt and audited the unsigned device app, packaged the IPA,
 and reproduced the expected canonical manifest byte-for-byte. The clean
 archive's non-authoritative raw ZIP SHA-256 is
 `4e6f99e2f7e7fa786ab376d8e8a83965659a6f0b05ce22d712f03d077fe46994`;
-the authoritative manifest SHA-256 remains
+the authoritative prior clean-checkpoint manifest SHA-256 remains
 `d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
 The dependency-lock SHA-256 is
 `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`,

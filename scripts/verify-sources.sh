@@ -25,7 +25,7 @@ verify_clean_checkout "$game/recomp-ui" recomp-ui
 verify_clean_checkout "$generator" N64Recomp-generator
 
 renderer_changes=$(git -C "$renderer" diff --name-only --ignore-submodules=dirty)
-expected_renderer_changes=$'CMakeLists.txt\nsrc/apple/rt64_apple.h\nsrc/apple/rt64_apple.mm\nsrc/common/rt64_user_paths.cpp\nsrc/hle/rt64_present_queue.cpp\nsrc/metal/rt64_metal.cpp\nsrc/metal/rt64_metal.h\nsrc/render/rt64_shader_library.cpp\nsrc/shaders/TextureSampler.hlsli'
+expected_renderer_changes=$'CMakeLists.txt\nsrc/apple/rt64_apple.h\nsrc/apple/rt64_apple.mm\nsrc/common/rt64_user_paths.cpp\nsrc/hle/rt64_present_queue.cpp\nsrc/metal/rt64_metal.cpp\nsrc/metal/rt64_metal.h\nsrc/render/rt64_render_target.cpp\nsrc/render/rt64_shader_library.cpp\nsrc/shaders/TextureSampler.hlsli'
 [[ "$renderer_changes" == "$expected_renderer_changes" ]] || \
     die "rt64 has unexpected tracked modifications"
 git -C "$renderer" apply --reverse --check \
@@ -34,6 +34,8 @@ git -C "$renderer" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/metal-descriptor-state-cache.patch"
 git -C "$renderer" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/metal-clear-state-cache.patch"
+git -C "$renderer" apply --reverse --check \
+    "$ANNEPAD_ROOT/patches/rt64/ios-render-target-limit.patch"
 
 renderer_nfd="$renderer/src/contrib/nativefiledialog-extended"
 renderer_nfd_changes=$(git -C "$renderer_nfd" status --porcelain --untracked-files=all)
@@ -44,7 +46,7 @@ git -C "$renderer_nfd" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/ios-native-file-dialog-null.patch"
 
 runtime_changes=$(git -C "$runtime" diff --name-only --ignore-submodules=dirty)
-expected_runtime_changes=$'librecomp/CMakeLists.txt\nlibrecomp/include/librecomp/audio_uaf_protect.hpp\nlibrecomp/include/librecomp/mods.hpp\nlibrecomp/src/audio_uaf_protect.cpp\nlibrecomp/src/files.cpp\nlibrecomp/src/mods.cpp\nlibrecomp/src/overlays.cpp\nlibrecomp/src/pi.cpp\nlibrecomp/src/recomp.cpp\nultramodern/include/ultramodern/ultramodern.hpp'
+expected_runtime_changes=$'librecomp/CMakeLists.txt\nlibrecomp/include/librecomp/audio_uaf_protect.hpp\nlibrecomp/include/librecomp/mods.hpp\nlibrecomp/src/audio_uaf_protect.cpp\nlibrecomp/src/files.cpp\nlibrecomp/src/mods.cpp\nlibrecomp/src/overlays.cpp\nlibrecomp/src/pi.cpp\nlibrecomp/src/recomp.cpp\nultramodern/include/ultramodern/ultra_trace.hpp\nultramodern/include/ultramodern/ultramodern.hpp\nultramodern/src/threadqueue.cpp\nultramodern/src/ultra_trace.cpp'
 [[ "$runtime_changes" == "$expected_runtime_changes" ]] || \
     die "N64ModernRuntime has unexpected tracked modifications"
 git -C "$runtime" apply --reverse --check \
@@ -53,6 +55,8 @@ git -C "$runtime" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/n64-modern-runtime/static-mobile-core-profile.patch"
 git -C "$runtime" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/n64-modern-runtime/atomic-save-lifecycle.patch"
+git -C "$runtime" apply --reverse --check \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/ios-release-trace-exclusion.patch"
 
 runtime_recompiler_changes=$(git -C "$runtime/N64Recomp" diff --name-only --ignore-submodules=dirty)
 [[ "$runtime_recompiler_changes" == "CMakeLists.txt" ]] || \

@@ -1,0 +1,147 @@
+diff --git a/ultramodern/include/ultramodern/ultra_trace.hpp b/ultramodern/include/ultramodern/ultra_trace.hpp
+--- a/ultramodern/include/ultramodern/ultra_trace.hpp
++++ b/ultramodern/include/ultramodern/ultra_trace.hpp
+@@ -162,12 +162,20 @@ int      recomp_ultra_trace_boot_get(uint32_t pos,
+ } /* extern "C" */
+ #endif
+ 
++#if defined(ANNEPAD_RELEASE_BUILD) && !defined(N64_COSIM)
++#define recomp_ultra_trace_record(...) ((void)0)
++#define recomp_runtime_set_rdram(...) ((void)0)
++#endif
++
+ #ifdef __cplusplus
+ 
+ /* C++ convenience: pass a recomp_context* and the wrapper picks up
+  * ra/a0/a1/a2/a3 itself. Defined inline so we don't need to pull
+  * the recomp_context layout into this header — the macro stays in
+  * the user's translation unit where recomp.h is already included. */
++#if defined(ANNEPAD_RELEASE_BUILD) && !defined(N64_COSIM)
++#define LIBRECOMP_ULTRA_TRACE(ctx) do { } while (0)
++#else
+ #define LIBRECOMP_ULTRA_TRACE(ctx)                                     \
+     do {                                                               \
+         ::recomp_runtime_set_rdram((unsigned char*)(rdram));           \
+@@ -180,6 +187,7 @@ int      recomp_ultra_trace_boot_get(uint32_t pos,
+             (uint32_t)(ctx)->r6,                                       \
+             (uint32_t)(ctx)->r7);                                      \
+     } while (0)
++#endif
+ 
+ #ifdef N64_COSIM
+ #define IF_N64_COSIM_ACTIVE_CONTEXT(rdram_arg, ctx_arg)                \
+diff --git a/ultramodern/include/ultramodern/ultramodern.hpp b/ultramodern/include/ultramodern/ultramodern.hpp
+--- a/ultramodern/include/ultramodern/ultramodern.hpp
++++ b/ultramodern/include/ultramodern/ultramodern.hpp
+@@ -162,7 +162,11 @@ void check_running_queue(RDRAM_ARG1);
+ void run_next_thread_and_wait(RDRAM_ARG1);
+ void resume_thread_and_wait(RDRAM_ARG OSThread* t);
+ void schedule_running_thread(RDRAM_ARG PTR(OSThread) t);
++#if defined(ANNEPAD_RELEASE_BUILD) && !defined(N64_COSIM)
++inline void scheduler_trace_mark(RDRAM_ARG uint32_t, PTR(PTR(OSThread)), PTR(OSThread)) {}
++#else
+ void scheduler_trace_mark(RDRAM_ARG uint32_t op, PTR(PTR(OSThread)) queue, PTR(OSThread) t);
++#endif
+ void cleanup_thread(UltraThreadContext* thread_context);
+ struct thread_terminated : std::exception {};
+ 
+diff --git a/ultramodern/src/threadqueue.cpp b/ultramodern/src/threadqueue.cpp
+--- a/ultramodern/src/threadqueue.cpp
++++ b/ultramodern/src/threadqueue.cpp
+@@ -87,6 +87,12 @@ namespace sched_log {
+         OP_YIELD_ANY_WAIT_RETURN = 135,
+     };
+ 
++#if defined(ANNEPAD_RELEASE_BUILD) && !defined(N64_COSIM)
++    inline void record(RDRAM_ARG uint32_t,
++                       PTR(PTR(OSThread)),
++                       PTR(OSThread),
++                       PTR(OSThread)) {}
++#else
+     struct Event {
+         uint64_t seq;
+         uint64_t ms;
+@@ -190,8 +196,26 @@ namespace sched_log {
+             }
+         }
+     }
++#endif
+ }
+ 
++#if defined(ANNEPAD_RELEASE_BUILD) && !defined(N64_COSIM)
++extern "C" void ultramodern_sched_recent_copy(
++    void*, size_t, size_t* n_written, uint64_t* next_seq_out)
++{
++    if (n_written) *n_written = 0;
++    if (next_seq_out) *next_seq_out = 0;
++}
++
++extern "C" size_t ultramodern_sched_event_size(void) { return 0; }
++extern "C" size_t ultramodern_sched_thread_state_size(void) { return 0; }
++
++extern "C" void ultramodern_sched_thread_states_copy(
++    void*, size_t, size_t* n_written)
++{
++    if (n_written) *n_written = 0;
++}
++#else
+ extern "C" void ultramodern_sched_recent_copy(
+     void* out_void, size_t cap, size_t* n_written, uint64_t* next_seq_out)
+ {
+@@ -237,6 +261,7 @@ extern "C" void ultramodern_sched_thread_states_copy(
+     }
+     if (n_written) *n_written = w;
+ }
++#endif
+ 
+ #ifdef N64_COSIM
+ extern "C" void ultramodern_cosim_thread_quiescence(
+@@ -319,11 +344,13 @@ static PTR(OSThread) queue_head_or_zero(RDRAM_ARG PTR(PTR(OSThread)) queue) {
+     return *queue_to_ptr(PASS_RDRAM queue);
+ }
+ 
++#if !defined(ANNEPAD_RELEASE_BUILD) || defined(N64_COSIM)
+ void ultramodern::scheduler_trace_mark(RDRAM_ARG uint32_t op,
+                                        PTR(PTR(OSThread)) queue_,
+                                        PTR(OSThread) thread_) {
+     sched_log::record(PASS_RDRAM op, queue_, thread_, queue_head_or_zero(PASS_RDRAM queue_));
+ }
++#endif
+ 
+ // A guest OSThread pointer is valid only if it is a 4-byte-aligned KSEG0 RDRAM
+ // address. A game that frees an OSThread while it is still linked in a runtime
+diff --git a/ultramodern/src/ultra_trace.cpp b/ultramodern/src/ultra_trace.cpp
+--- a/ultramodern/src/ultra_trace.cpp
++++ b/ultramodern/src/ultra_trace.cpp
+@@ -37,6 +37,25 @@
+ #include <chrono>
+ #include <cstring>
+ 
++#if defined(ANNEPAD_RELEASE_BUILD) && !defined(N64_COSIM)
++
++#undef recomp_ultra_trace_record
++#undef recomp_runtime_set_rdram
++
++extern "C" void recomp_ultra_trace_record(const char*, uint32_t,
++                                            uint32_t, uint32_t,
++                                            uint32_t, uint32_t) {}
++extern "C" void recomp_runtime_set_rdram(unsigned char*) {}
++extern "C" unsigned char* recomp_runtime_get_rdram(void) { return nullptr; }
++extern "C" uint64_t recomp_ultra_trace_write_idx(void) { return 0; }
++extern "C" uint32_t recomp_ultra_trace_capacity(void) { return 0; }
++extern "C" int recomp_ultra_trace_get(uint64_t, recomp_ultra_trace_event*) { return 0; }
++extern "C" uint32_t recomp_ultra_trace_boot_count(void) { return 0; }
++extern "C" uint32_t recomp_ultra_trace_boot_capacity(void) { return 0; }
++extern "C" int recomp_ultra_trace_boot_get(uint32_t, recomp_ultra_trace_event*) { return 0; }
++
++#else
++
+ namespace {
+ 
+ constexpr uint32_t kCapacity = 16384; /* power of two — sliding window */
+@@ -235,3 +253,5 @@ extern "C" int recomp_ultra_trace_boot_get(uint32_t pos,
+ 
+     return (got != UINT64_MAX) ? 1 : 0;
+ }
++
++#endif

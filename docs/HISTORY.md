@@ -1,5 +1,21 @@
 # Project history
 
+## 2026-08-02 — Final touch presentation and iOS Metal target guard
+
+- Re-audited the live overlay against HarkinianPad, then adopted its accepted
+  phone target sizes, N64 color hierarchy, shoulder pills, compact arrows,
+  protected stick, 70–150% resizing, and single right-side Z geometry while
+  preserving AnnePad's direct analog and ordinary held-Z semantics.
+- Rebuilt and visibly checked the final layout on iPhone and iPad Simulators.
+  Diagnosed one iPhone `SIGABRT` to RT64 creating an 11,098-pixel Metal texture
+  against an 8,192-pixel limit, added a maintained iOS render-target clamp, and
+  passed a rebuilt 60-second logged iPhone title/attract/battle run.
+- Compiled runtime/scheduler trace recorders out of Release, reducing zero-fill
+  static storage by 7,536,688 bytes. Simulator/device builds, source/repository
+  checks, app audit, and two-package reproduction passed. The device executable
+  is 378,196,936 bytes (`edb4e8c9...ad24`); canonical package manifest is
+  `63db42dd...bff7`.
+
 ## 2026-08-02 — Exact current package reproduces from published main
 
 - Ran the full no-hardlink verifier from published commit

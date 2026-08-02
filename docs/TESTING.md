@@ -109,6 +109,19 @@ and type data; release hid them again; L returned to strategy selection. Raw
 held/released captures are retained under ignored `logs/iphone-current/`.
 Pre-battle R-plus-selection and simultaneous chord cancellation remain open.
 
+On 2026-08-02 a screenshot-first audit compared the live iPhone overlay/editor
+with HarkinianPad's checked-in gameplay reference and implementation notes. The
+Release candidate then passed visible iPhone and iPad Simulator checks with the
+accepted phone target sizes, N64 colors, shoulder pills, compact arrows, one
+right-side Z, protected stick, and default-relative editor sizing. A subsequent
+iPhone launch produced one RT64/Metal `SIGABRT`: an 11,098-pixel color render
+target exceeded the Simulator Metal limit of 8,192. The crashing stack was
+`RenderTarget::setupColor` -> `MetalTexture` on `RT64 Workload`. The maintained
+iOS render-target clamp now uses 8,192; both Simulator and device Release builds
+pass, and the rebuilt iPhone app completed a continuous 60-second logged run
+through title/attract/battle without another crash. Longer and physical-device
+soak remain open.
+
 Gate 6 native ROM setup passed 2026-07-31 on an iPhone 16 Pro Simulator, iOS
 18.5. Remove cleared the private normalized/runtime copies and config; cold
 relaunch showed the legal setup screen upright; the native document picker

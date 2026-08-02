@@ -906,3 +906,30 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   copied to `logs/clean-checkout-latest/`. This closes exact-source/package
   reproducibility, not signing, physical installation, speaker, controller,
   thermal, physical touch-battle, or redistribution-rights gates.
+
+## 2026-08-02 15:00–15:31 CDT — Touch presentation and Metal crash hardening
+
+- Compared fresh live iPhone overlay/editor captures with HarkinianPad's source
+  and gameplay reference. Replaced the generic gray/debug-like presentation
+  with accepted phone sizes, N64 colors, shoulder pills, compact arrows,
+  unified utility/editor surfaces, protected-stick editing, and 70–150%
+  default-relative resizing. Moved the single Z into the right A/B/Z cluster on
+  both form factors while retaining ordinary press/hold/release semantics.
+- Built and visibly inspected the final layout on iPad Pro 11-inch (M4) and
+  iPhone 16 Pro Simulators. Start and relocated Z produced visible game actions;
+  the editor protection, exact 70% floor, Reset, and persistence paths passed.
+- Diagnosed one iPhone `SIGABRT` from the `.ips` stack: RT64's workload thread
+  requested an 11,098-pixel color target from a Metal Simulator device limited
+  to 8,192. Added a maintained iOS-specific RT64 sizing cap, rebuilt, and ran
+  the iPhone Release app continuously for 60 seconds through live
+  title/attract/battle output with framebuffer logging and no new crash report.
+- Compiled validation-only runtime/scheduler trace recorders out of Release and
+  extended the app audit to reject their exported symbols. Simulator `__bss`
+  fell by 7,536,688 bytes. Source verification and repository tests passed.
+- Built and audited the unsigned arm64 device Release app. Its 378,196,936-byte
+  executable SHA-256 is `edb4e8c9...ad24`. Two packaging passes have different
+  raw ZIP hashes (`70619ae1...5c21`, `fad9b400...300e`) but the same eight-file
+  canonical manifest SHA-256 `63db42dd...bff7`.
+- Remaining: publish this checkpoint, run its isolated clean verifier, complete
+  the remaining simultaneous-chord Simulator gates, and perform every signed
+  physical-device/controller/speaker/thermal/touch-battle gate.

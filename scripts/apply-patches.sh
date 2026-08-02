@@ -83,6 +83,11 @@ apply_patch_file \
     "RT64 Metal clear state cache"
 
 apply_patch_file \
+    "$ANNEPAD_SOURCES/rt64" \
+    "$ANNEPAD_ROOT/patches/rt64/ios-render-target-limit.patch" \
+    "RT64 iOS render-target limit"
+
+apply_patch_file \
     "$ANNEPAD_SOURCES/rt64/src/contrib/nativefiledialog-extended" \
     "$ANNEPAD_ROOT/patches/rt64/ios-native-file-dialog-null.patch" \
     "RT64 iOS native-file-dialog null backend"
@@ -106,6 +111,11 @@ apply_patch_file \
     "$ANNEPAD_SOURCES/N64ModernRuntime" \
     "$ANNEPAD_ROOT/patches/n64-modern-runtime/atomic-save-lifecycle.patch" \
     "atomic save and lifecycle support"
+
+apply_patch_file \
+    "$ANNEPAD_SOURCES/N64ModernRuntime" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/ios-release-trace-exclusion.patch" \
+    "iOS release trace exclusion"
 
 apply_patch_file \
     "$ANNEPAD_SOURCES/N64ModernRuntime/N64Recomp" \

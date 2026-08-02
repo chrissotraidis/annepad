@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 14:59 CDT
+Updated: 2026-08-02 15:31 CDT
 
 ## Current state
 
@@ -18,10 +18,14 @@ preferred HarkinianPad mechanism. The corrected HarkinianPad-derived low-grip
 layout now builds, installs, accepts touch navigation, survives a short
 background/foreground cycle, and keeps the editor functional on the iPad
 Simulator. A fresh visual audit nevertheless found that the shipping overlay
-still renders those mechanisms as generic gray circles, uses noisy prefixed
-direction labels, and normalizes the phone targets below HarkinianPad's accepted
-point sizes. Its input behavior is proven in Simulator; its visual and physical
-ergonomic quality is not yet accepted. The retained `-O0` validation build was
+still rendered those mechanisms as generic gray circles, used noisy prefixed
+direction labels, and normalized the phone targets below HarkinianPad's accepted
+point sizes. The corrected presentation now uses HarkinianPad's accepted phone
+target sizes and one right-side Z, N64 color hierarchy, shoulder pills, short
+arrow labels, protected analog stick, and 70–150% per-control resizing. Fresh
+iPhone and iPad Simulator captures show the complete unclipped overlay, Start
+and relocated Z route through the live game, and the editor/reset path remains
+functional. Physical ergonomic quality is not yet accepted. The retained `-O0` validation build was
 confirmed too slow for playability. The separate `-O2` Simulator core and
 Release app are now complete,
 audited, installed, and smoke-tested. They bring title/menu scenes close to the
@@ -83,6 +87,13 @@ release hid the assignments again, and L returned to the strategy screen. The
 pre-battle simultaneous R-plus-selection data chord remains open rather than
 being inferred from independent or single-held-button actions.
 Physical-device runtime acceptance remains externally gated.
+One iPhone Simulator launch then aborted on RT64's workload thread when a
+transient 11,098-pixel render target exceeded that Metal device's 8,192-pixel
+texture limit. The crash is renderer-side, not touch-side. RT64's maintained
+iOS sizing clamp now matches the 8,192 limit; the rebuilt Release app completed
+a continuous 60-second title/attract/battle run with framebuffer logging and no
+new crash report. This closes the reproduced failure mode for the Simulator
+candidate, but physical-device and longer soak acceptance remain open.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
 game save, and has completed a full rental battle through an explicit result.
@@ -186,6 +197,14 @@ patches.
   retaining normal touch-down hold and short-tap delivery. A fresh exact-source
   Simulator smoke passed; direct revised-control gestures and physical-device
   acceptance remain required.
+- A fresh touch presentation audit replaced the generic gray/debug-like layer
+  without changing AnnePad's proven direct-analog or independent-touch path.
+  iPhone targets now match the accepted 116-point stick, 52-point face,
+  44-point D/shoulder, and 40-point C sizes. Both form factors use one right-side
+  Z in the A/B/Z cluster, N64 colors, shoulder pills, compact arrows, unified
+  ROM/layout and editor surfaces, an unhideable stick, and 70–150% default-
+  relative resizing. The iPad and iPhone Release Simulator builds rendered the
+  final layouts and accepted visible touch input.
 - A temporary source-local counter at RT64's actual Metal swap-chain present
   call measured the validation candidate on the iPad Pro 11-inch (M4), iOS
   18.5. In the title/attract path it reached the scene's observed 30 Hz ceiling
@@ -296,9 +315,9 @@ patches.
   (AOT game), `8535ef7c...` (`librecomp`), and `8325b873...`
   (`ultramodern`).
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
-  Its current arm64 iPhoneOS executable is 378,195,736 bytes, has no linker UUID,
+  Its current arm64 iPhoneOS executable is 378,196,936 bytes, has no linker UUID,
   and has SHA-256
-  `86be9fe47c51abfa72203b71575638e8cc3c67f37f60cee04357b5476834689d`.
+  `edb4e8c9af6fa54633a845e7656f49b389beff62c2f4221226ccdf0b3567ad24`.
   Release pins the shipping audio bridge/smoothing values and makes the
   synthesized-PCM and legacy-queue diagnostic rings validation-only, removing
   819,200 bytes of static ring storage plus per-buffer PCM metric/mutex work.
@@ -314,14 +333,14 @@ patches.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
-  The two 84,612,272-byte archives have raw ZIP SHA-256 values
-  `c6ab08f7...efa7` and `950add42...8255`; timestamp variance makes those raw
-  hashes non-authoritative. A no-hardlink isolated clone of exact published
+  `63db42dda249a8c6f9df674f3e5917dcd44b7ce611902e356baecb2b215cbff7`.
+  Their raw ZIP SHA-256 values are `70619ae1...5c21` and
+  `fad9b400...300e`; timestamp variance makes those raw hashes
+  non-authoritative. The prior no-hardlink isolated clone of exact published
   source commit `f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5` then passed the
   complete fetch, ROM reconstruction, AOT generation, native macOS, Simulator,
   optimized device, app, package, audit, and repository verifier for this
-  candidate. It reproduced the 378,195,736-byte executable SHA-256
+  predecessor. It reproduced the 378,195,736-byte executable SHA-256
   `86be9fe47c51abfa72203b71575638e8cc3c67f37f60cee04357b5476834689d`
   and exact `d5c26978...c8f5` manifest. Its non-authoritative raw ZIP SHA-256
   was `4e6f99e2...46994`; the dependency-lock SHA-256 was
@@ -372,10 +391,10 @@ patches.
 - App Store compatibility and redistribution of unlicensed upstream components
   are not established.
 - High-cost replay, capture, oracle, debug-server, turbo, autoboot, and audio-ring
-  release surfaces are removed. Renderer configuration and lower-level trace
-  toggles remain in the upstream static core; the broader release-
-  configuration checklist remains open until those surfaces are classified or
-  compiled out.
+  release surfaces are removed. Release now also compiles out the runtime and
+  scheduler trace rings/recorders, removing 7,536,688 bytes of zero-fill static
+  storage plus per-event trace work; the app audit rejects their exported
+  symbols. Retained renderer configuration still requires final classification.
 
 ## Known regressions
 
@@ -405,13 +424,10 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Compile validation-only lower-level runtime traces out of Release, then rebuild,
-audit, and visibly compare the optimized Simulator app. Finish the AnnePad-owned
-control presentation by applying HarkinianPad's accepted target sizes, N64 color
-hierarchy, shoulder pills, and editor constraints without changing the proven
-direct-analog multitouch bridge. Re-run iPhone/iPad visible layout and touch
-checks, followed by the pre-battle R-plus-selection and simultaneous
-chord-cancellation Simulator gate.
+Run longer iPhone/iPad Simulator soak and lifecycle checks on the new Metal
+dimension guard, then complete the pre-battle R-plus-selection and simultaneous
+chord-cancellation Simulator gate with the final control geometry. Publish and
+run the isolated clean verifier for the new `63db42dd...bff7` package checkpoint.
 When lawful signing assets and hardware are available, install this reproduced
 candidate and measure the same heavy
 battle on a physical

@@ -140,7 +140,7 @@ index 4e3faee..c972c90 100644
      src/main/ares_worker.cpp
      src/main/register_overlays.cpp
      src/main/rsp_aspmain_hook.cpp
-@@ -167,9 +216,53 @@ add_executable(PokemonStadiumRecomp
+@@ -167,9 +216,55 @@ add_executable(PokemonStadiumRecomp
      # ---- Pre-boot launcher host glue ---------------------------------------
      # Wraps the shared recomp-ui C ABI (recomp_launcher_run_window); the launcher
      # itself is added to this target by recomp_target_launcher_ui() below.
@@ -163,6 +163,8 @@ index 4e3faee..c972c90 100644
 +    target_compile_definitions(PokemonStadiumRecomp PRIVATE SDL_MAIN_HANDLED=1)
 +    if(ANNEPAD_BUILD_PROFILE STREQUAL "release")
 +        target_compile_definitions(PokemonStadiumRecomp PRIVATE ANNEPAD_RELEASE_BUILD=1)
++        target_compile_definitions(librecomp PRIVATE ANNEPAD_RELEASE_BUILD=1)
++        target_compile_definitions(ultramodern PRIVATE ANNEPAD_RELEASE_BUILD=1)
 +    endif()
 +endif()
 +

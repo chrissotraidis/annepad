@@ -57,8 +57,9 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       Audio capture/synthetic, `aspMain` replay/capture/oracle, Ares worker,
       TCP debug server/port, turbo, and environment-autoboot surfaces are
       absent. The two audio diagnostic rings and their A/B environment switches
-      are now validation-only; retained renderer configuration and lower-level
-      trace toggles remain under audit.
+      are validation-only. Runtime/scheduler trace rings and recorders are also
+      compiled out of Release and rejected by audit; retained renderer
+      configuration remains under review.
 - [x] Device Mach-O is arm64, has expected load commands/frameworks, contains no
       Simulator slice, unexpected dylib, JIT/TCC/LiveRecomp/code-mod loader,
       writable-executable entitlement, or runtime tool dependency.
@@ -68,9 +69,11 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [x] IPA manifest contains only expected files and every third-party notice.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
 - [x] Canonical sorted uncompressed-content digest and full audit report are
-      recorded and reproduced locally (`d5c26978...c8f5`). Exact published
+      recorded and reproduced locally for the current candidate
+      (`63db42dd...bff7`). Exact published
       commit `f5b0048...dfd5` passed the isolated no-hardlink verifier; the
-      clean package reproduced the expected manifest byte-for-byte. Physical
+      prior clean package reproduced `d5c26978...c8f5` byte-for-byte. The new
+      checkpoint still needs its post-publish isolated verifier. Physical
       install/retest remains open.
 
 ## Documentation and handoff

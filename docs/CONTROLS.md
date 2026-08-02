@@ -90,6 +90,10 @@ iPhone/iPad geometry, safe-area-normalized layouts, per-control customization,
 multitouch ownership, visible pressed state, and cancellation on lifecycle or
 management transitions. It keeps AnnePad's direct analogue N64 snapshot bridge
 instead of HarkinianPad's synthetic-key path so stick magnitude is preserved.
+The presentation also adopts HarkinianPad's accepted phone target sizes, N64
+color hierarchy, shoulder pills, protected stick, default-relative editor
+scaling, and its single right-side Z placement. Stadium-specific code and labels
+remain AnnePad-owned; no Zelda HUD artwork is copied.
 
 The 0.5-second persistent Z toggle is the one intentionally rejected mechanism.
 It solves a Zelda-specific targeting ergonomics problem, while Stadium needs a
