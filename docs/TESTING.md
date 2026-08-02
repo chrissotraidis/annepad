@@ -93,8 +93,13 @@ UI session attached on 2026-08-02 to the dedicated iPhone 16 Pro, iOS 18.5
 Simulator and drove the clean app through title -> Game Pak Check -> main
 selection -> Battle Now one-player setup using visible START, A, and D-left
 touch controls. PID 52349 remained alive and no AnnePad crash report was found.
-This passes ordinary current-iPhone touch routing; quick-Z, held-L, and
-R-plus-selection outcomes still require an action-specific observable test.
+This passes ordinary current-iPhone touch routing. A follow-up Gallery run used
+three separate Z taps to cycle the lower Pokémon display through gold
+nameplate, blue nameplate, hidden, and back to gold; L opened the background
+selection menu; and R entered the telephoto close-up. PID 53536 remained alive
+with no crash report. Quick-Z and independent L/R routing therefore pass on the
+current iPhone Simulator build. Held-L battle inspection and the simultaneous
+R-plus-selection battle chord still require an observable battle test.
 
 Gate 6 native ROM setup passed 2026-07-31 on an iPhone 16 Pro Simulator, iOS
 18.5. Remove cleared the private normalized/runtime copies and config; cold

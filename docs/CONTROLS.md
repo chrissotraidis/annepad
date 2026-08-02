@@ -1,6 +1,6 @@
 # Pokémon Stadium controls
 
-Updated: 2026-08-02 09:08 CDT
+Updated: 2026-08-02 09:14 CDT
 
 This is the game-specific input contract for AnnePad's touch design. It covers
 Pokémon Stadium (US) 1.0, not the superficially similar controls of Zelda or
@@ -68,7 +68,9 @@ normal Z press/hold/release and practical access to its L/R inspection actions.
 
 ## Acceptance
 
-Simulator acceptance must cover quick Z cancel/reset, held L inspection,
-R-plus-selection inspection, ordinary release, cancellation, and
-background/foreground clearing. Physical iPhone/iPad acceptance must repeat
-those checks with real multitouch ergonomics before release.
+Current iPhone Simulator acceptance now directly covers quick Z's three-state
+Gallery cycle plus independent L background-selection and R telephoto actions.
+Simulator work must still cover held L battle inspection, R-plus-selection
+inspection, ordinary chord release, cancellation, and background/foreground
+clearing. Physical iPhone/iPad acceptance must repeat the full matrix with real
+multitouch ergonomics before release.

@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 09:08 CDT
+Updated: 2026-08-02 09:14 CDT
 
 ## Current state
 
@@ -58,9 +58,13 @@ UI session attached to the dedicated iPhone 16 Pro Simulator. Direct taps on
 the current clean build's START, A, and D-left controls advanced title -> Game
 Pak Check -> main selection, then moved the selection to Battle Now and entered
 its one-player setup. PID 52349 remained alive and no AnnePad crash report was
-present. This closes ordinary current-iPhone touch routing, but action-specific
-quick-Z, held-L, and R-plus-selection acceptance remains open rather than being
-inferred from control hit testing.
+present. A follow-up Gallery run then gave each disputed control an observable
+game action: three separate Z taps cycled the lower display through gold
+nameplate, blue nameplate, hidden, and back to gold; L opened the background
+selector; and R entered the telephoto close-up. PID 53536 remained alive with
+no crash report. This closes current-iPhone quick-Z and independent L/R touch
+routing. Held-L battle inspection and the simultaneous R-plus-selection battle
+chord remain open rather than being inferred from independent button actions.
 Physical-device runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its

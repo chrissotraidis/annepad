@@ -722,3 +722,22 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Boundary: ordinary current-iPhone UI touch routing now passes. Quick-Z,
   held-L, R-plus-selection, physical multitouch ergonomics, speaker, signing,
   controller, thermal, and physical performance acceptance remain open.
+
+## 2026-08-02 09:08–09:14 CDT — Observable current iPhone Z/L/R actions
+
+- Restarted the clean Release app without reinstalling or modifying its private
+  ROM/save container, returned from attract mode, and navigated entirely through
+  the visible overlay to Gallery -> Snap photo -> Rental Pokémon -> Bulbasaur.
+- Three separate Z taps visibly cycled the Gallery lower display through gold
+  nameplate, blue nameplate, hidden, and back to gold. Stable frames between
+  taps agree with the decompiled edge-triggered three-state path and do not show
+  a persistent toggle repeatedly changing the state.
+- L opened Gallery's background-selection menu. After selecting the current
+  background, R entered the telephoto close-up. These are distinct observable
+  game responses, not hit-target or source-only assertions.
+- PID 53536 remained alive, no AnnePad crash report was present, and a current
+  screenshot was retained under ignored `logs/iphone-current/`.
+- Boundary: quick-Z plus independent L/R current-iPhone touch routing now pass.
+  Held-L battle inspection, simultaneous R-plus-selection, chord release and
+  cancellation, physical multitouch ergonomics, speaker, signing, controller,
+  thermal, and physical performance remain open.

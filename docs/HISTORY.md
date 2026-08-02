@@ -1,5 +1,15 @@
 # Project history
 
+## 2026-08-02 — Current iPhone Z/L/R actions are distinct and live
+
+- Reached Gallery through the visible current iPhone overlay and selected a
+  rental Bulbasaur without controller or keyboard input.
+- Three separate Z taps cycled the lower display through gold nameplate, blue
+  nameplate, hidden, and back to gold; L opened the background selector; R
+  entered the telephoto close-up.
+- Kept held-L battle inspection, simultaneous R-plus-selection, and physical
+  multitouch acceptance open while closing quick-Z and independent L/R routing.
+
 ## 2026-08-02 — Current iPhone touch routing reaches Battle Now
 
 - Attached a sanctioned UI-control session to the dedicated iPhone 16 Pro,
