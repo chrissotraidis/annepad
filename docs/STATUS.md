@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 16:52 CDT
+Updated: 2026-08-01 20:31 CDT
 
 ## Current state
 
@@ -208,13 +208,13 @@ patches.
   executable is arm64 iPhoneOS, unsigned, ROM-free, and hashes to
   `9e89d4bd1a75a2d7b2760616cdee3bd4f10166532fe46e1f8cd6f4989b8d400d`.
 - The separate `-O2` release core passed its no-dynamic-code audit. Its four
-  archive SHA-256 values are `3c416883...` (AnnePad core), `628606e5...`
+  archive SHA-256 values are `3c416883...` (AnnePad core), `3794071a...`
   (AOT game), `8535ef7c...` (`librecomp`), and `8325b873...`
   (`ultramodern`).
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
-  Its arm64 iPhoneOS executable is 378,174,464 bytes, has no linker UUID, and
+  Its arm64 iPhoneOS executable is 378,199,272 bytes, has no linker UUID, and
   has SHA-256
-  `cd205ee85f9ee58eafdefdea9479fda2ad888c86b4a2a45dff9de815881e338a`.
+  `8d1f440fc89820b346321145382b8eb41e9fa0817a94ecc1d8054f2b32a94494`.
   Unsigned builds deliberately link with `-reproducible,-no_uuid`; signed
   builds retain the normal UUID for symbolication. Release builds compile out
   validation-only audio capture/synthetic hooks, `aspMain` capture/replay and
@@ -224,9 +224,11 @@ patches.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `ef38239ac11403538c9bb5a5ba1542c53f80b7c84c2c570ce13a68879aaa0ccd`.
-  This touch-corrected, descriptor/clear-state-cached candidate's full isolated
-  clean-checkout rerun remains open. The preceding fail-closed clean pass used temporary
+  `fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`.
+  The two 84,653,885-byte archives have raw ZIP SHA-256 values
+  `9aa5d416...6304` and `1e86e9ae...d529`; timestamp variance makes those raw
+  hashes non-authoritative. This source-consistent candidate's full isolated
+  clean-checkout rerun is in progress. The preceding fail-closed clean pass used temporary
   source commit `915b171bfcf666533d39b8bcece2ce2107a3a9ae` and dependency-lock SHA-256
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
   That predecessor passed every fetch, generation, native macOS, Simulator,

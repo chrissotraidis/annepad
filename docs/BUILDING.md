@@ -199,20 +199,21 @@ added to make a verifier pass.
 
 The 2026-08-01 local release build produced:
 
-- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,623,645 bytes. Raw ZIP hashes vary
-  between archive passes and are not the reproducibility authority.
+- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,653,885 bytes, raw SHA-256
+  `9aa5d416...6304`. The independent `--no-build` repack has the same byte size
+  and raw SHA-256 `1e86e9ae...d529`; raw ZIP hashes vary with timestamps and are
+  not the reproducibility authority.
 - `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
 - `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
   manifest SHA-256
-  `ef38239ac11403538c9bb5a5ba1542c53f80b7c84c2c570ce13a68879aaa0ccd`.
+  `fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`.
 
 Two local archive passes have the exact same manifest bytes/digest. The
-378,174,464-byte local unsigned executable hashes to `cd205ee8...338a` and has
+378,199,272-byte local unsigned executable hashes to `8d1f440f...4494` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
-touch-corrected, descriptor/clear-state-cached source candidate has local
-packages matching at `ef38239a...0ccd`, but the full isolated clean verifier has
-not yet been rerun
-for this digest. The previous `915b171b...a9ae` snapshot remains valid proof
+source-consistent candidate has local packages matching at `fcb2832e...b590`;
+its full isolated clean verifier is in progress. The previous
+`915b171b...a9ae` snapshot remains valid proof
 for its predecessor (`e6b2ab11...f363`, `24dc9caa...d9e6`). Release audio,
 replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
 surfaces are compiled out and enforced by the app audit. Signed builds retain

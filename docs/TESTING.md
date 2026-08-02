@@ -116,11 +116,10 @@ process substitution so `pipefail` cannot turn an expected `strings` SIGPIPE
 into a false negative. Repeated local packages for the current
 descriptor/clear-state-cache
 candidate produced identical 8-file canonical manifests with SHA-256
-`ef38239ac11403538c9bb5a5ba1542c53f80b7c84c2c570ce13a68879aaa0ccd`;
-the 378,174,464-byte executable hashes to `cd205ee8...338a`. The previous
+`fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`;
+the 378,199,272-byte executable hashes to `8d1f440f...4494`. The previous
 `915b171b...a9ae` snapshot passed the full fail-closed isolated verifier; the
-current touch-corrected, descriptor/clear-state-cached digest still needs that
-rerun. Private source publication
+current source-consistent digest is undergoing that rerun. Private source publication
 passes. Signing, install/retest, physical hardware, and public-license
 acceptance remain open.
 
