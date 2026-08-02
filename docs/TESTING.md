@@ -277,8 +277,18 @@ verification passed, and the official Release Simulator build produced a clean
 `4206a896...3ef2`, visibly reaches the animated title, and survived 20 seconds.
 The differing hash from the prior same-size source-verified relink means
 Simulator executable byte reproducibility is not claimed. This accepts the
-automatic title/attract cadence only; a controlled rental battle and physical
-iPad remain required.
+automatic title/attract cadence.
+
+The same temporary probe was reintroduced after the current touch-control proof
+and measured from the first selected move through two complete animated Battle
+Now turns and the return to the third decision. The 154 one-second windows
+averaged 29.47 presents/s (29.96 median, 4.32 minimum, 31.94 maximum); two were
+below 20, ten were below 28, and 144 were at least 28. The two severe windows
+are retained as transition hitches rather than averaged away. The probe was
+removed, maintained-source verification passed, and the diagnostic-free Release
+app rebuilt to the prior 380,988,632-byte `4206a896...3ef2` executable, with no
+probe marker, then visibly relaunched. This accepts sustained controlled
+Simulator battle cadence, not physical-iPad performance or thermals.
 
 A fresh internal-resolution test used RT64's actual manual resolution
 multiplier rather than shrinking the Metal drawable. The 1x run remained

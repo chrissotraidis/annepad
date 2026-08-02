@@ -1,6 +1,6 @@
 # Performance and completion audit
 
-Updated: 2026-08-02 08:47 CDT
+Updated: 2026-08-02 09:39 CDT
 
 ## Bottom line
 
@@ -10,8 +10,8 @@ separates four different concerns:
 1. The iPad Simulator previously missed the game's 30 Hz presentation cadence,
    with synchronous Simulator Metal argument-buffer/XPC work dominating sampled
    non-idle time. After descriptor batching, a 90-window automatic title/attract
-   run averaged 29.96 presents/s; controlled battle and physical-device cadence
-   remain open.
+   run averaged 29.96 presents/s. A later 154-window, two-turn controlled battle
+   averaged 29.47 presents/s; physical-device cadence remains open.
 2. Release previously executed several upstream reverse-engineering probes.
    Ninety-six diagnostic hook sites are now compiled out while the six
    separately classified correctness hooks remain active.
@@ -45,8 +45,15 @@ is not yet physically proven or release-ready.
   startup automatic title/attract windows at 29.96 presents/s mean (27.66
   minimum, 31.09 maximum): zero were below 20, one was below 28, and 89 were at
   least 28. This accepts that Simulator path and is a material improvement over
-  the earlier 23.31 title/attract mean; it is not controlled rental-battle or
-  physical-iPad acceptance.
+  the earlier 23.31 title/attract mean.
+- The same environment-gated present call was then measured from the first
+  selected move through two complete animated Battle Now turns and the return
+  to a third decision. Across 154 one-second windows, mean cadence was 29.47
+  presents/s, median 29.96, minimum 4.32, and maximum 31.94; two windows were
+  below 20, ten were below 28, and 144 were at least 28. This rejects a generic
+  sustained heavy-scene slowdown after batching, while retaining two real
+  transition hitches for future diagnosis and leaving physical-iPad acceptance
+  open.
 - The counter was removed, maintained-source verification passed, and the
   official clean Release Simulator app rebuilt and visibly launched. The clean
   380,988,632-byte relink hashes to `4206a896...3ef2` and contains no probe

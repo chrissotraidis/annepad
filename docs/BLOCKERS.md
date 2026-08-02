@@ -143,8 +143,11 @@ Resolved entries are never deleted.
   startup automatic title/attract windows at 29.96 presents/s mean (27.66
   minimum, 31.09 maximum), with none below 20 and only one below 28. The probe
   was removed and the clean official Simulator build, source verifier, and
-  20-second launch smoke passed. This closes the automatic title/attract cadence
-  symptom, not the controlled rental-battle or physical-device gate.
+  20-second launch smoke passed. A controlled two-turn Battle Now run then
+  measured 154 one-second windows at 29.47 presents/s mean and 29.96 median;
+  two were below 20, ten below 28, and 144 at least 28. This closes a generic
+  sustained Simulator battle-slowdown symptom while retaining two transition
+  hitches and the physical-device gate.
 - Gate: measure the same heavy scene on a physical iPad before changing shared
   renderer behavior for a Simulator-specific driver cost. If hardware also
   misses the 30 Hz target, capture device GPU/frame-time evidence and optimize

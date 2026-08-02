@@ -1,5 +1,15 @@
 # Project history
 
+## 2026-08-02 — Controlled battle reaches near-30 Hz cadence
+
+- Measured 154 one-second windows from the first selected move through two
+  complete animated Battle Now turns and the return to a third decision.
+- Recorded 29.47 presents/s mean, 29.96 median, 4.32 minimum, and 31.94 maximum;
+  two windows were below 20, ten below 28, and 144 at least 28.
+- Removed the temporary probe, passed source verification, rebuilt the clean
+  `4206a896...3ef2` Release app, and visibly relaunched it. Rare transition
+  hitches and physical-iPad performance remain open.
+
 ## 2026-08-02 — Held-R battle inspection and L cancel pass
 
 - Used touch only to select Pikachu/Squirtle/Bulbasaur and reach a Battle Now
@@ -55,7 +65,8 @@
 - Removed the temporary present probe, passed maintained-source verification,
   rebuilt the official clean Release Simulator app, and visibly relaunched it.
 - Accepted the automatic Simulator title/attract cadence while keeping a
-  controlled rental-battle measurement and physical-iPad acceptance open.
+  controlled rental-battle measurement and physical-iPad acceptance open at
+  that checkpoint; the controlled measurement passed later the same day.
 
 ## 2026-08-02 — Current optimized package reproduced from clean source
 

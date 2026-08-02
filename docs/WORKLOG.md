@@ -760,3 +760,26 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   L. The running US 1.0 game is authoritative here: L cancels and held R checks.
 - Boundary: pre-battle R-plus-selection, simultaneous chord cancellation, and
   physical-device multitouch ergonomics remain open.
+
+## 2026-08-02 09:23–09:39 CDT — Controlled battle cadence measured
+
+- Reintroduced the narrow environment-gated counter immediately after RT64's
+  actual Metal present submission, incrementally rebuilt the Release Simulator
+  app, installed it over the preserved private ROM/save container, and launched
+  with the probe enabled only for this run.
+- Used the current iPhone overlay to enter Battle Now, choose
+  Pikachu/Squirtle/Bulbasaur, and begin Pikachu versus Magnemite. The controlled
+  measurement starts with the first selected C-up move and ends after two full
+  animated turns at the third strategy decision.
+- Machine aggregation of 154 one-second windows produced 29.47 presents/s mean,
+  29.96 median, 4.32 minimum, and 31.94 maximum. Two windows were below 20, ten
+  below 28, and 144 at least 28. The two severe stalls occurred within battle
+  transition work and remain real even though sustained cadence is near target.
+- Terminated the probed app, removed the counter, rebuilt through the official
+  Release script, passed maintained-source verification, confirmed no probe
+  marker, and reproduced the prior clean 380,988,632-byte Simulator executable
+  SHA-256 `4206a896f85a74fa6eb50112acc0d6a93fda3185d5e61e524360ac457cad3ef2`.
+  The clean app visibly relaunched to the animated title path as PID 56708.
+- Determination: descriptor batching closes a generic sustained Simulator
+  battle-slowdown claim. Rare transition hitches and signed physical-iPad
+  frame-time, thermal, speaker, touch, and controller acceptance remain open.

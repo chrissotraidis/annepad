@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 09:23 CDT
+Updated: 2026-08-02 09:39 CDT
 
 ## Current state
 
@@ -38,8 +38,13 @@ title/attract sample still averaged 23.31 presents/s. This confirms that logging
 was not the leading FPS cause. The subsequent descriptor-batched source measured
 90 post-startup automatic title/attract windows at 29.96 presents/s mean (27.66
 minimum, 31.09 maximum), with none below 20 and only one below 28. That accepts
-this Simulator path's cadence while leaving a controlled rental-battle run and
-physical-iPad performance open. Simulator/device app builds now always invoke the
+this Simulator path's cadence. A subsequent controlled Battle Now sample began
+with the first selected move and spanned two complete animated turns through
+the third decision: 154 one-second windows averaged 29.47 presents/s with a
+29.96 median, 4.32 minimum, and 31.94 maximum; two were below 20, ten below 28,
+and 144 at least 28. This closes the generic sustained Simulator battle-slowdown
+claim while retaining rare transition hitches and physical-iPad performance.
+Simulator/device app builds now always invoke the
 incremental AOT core build so regenerated source cannot link a stale archive.
 Touch quick-tap retention now uses independent atomic lifetimes per button;
 deterministic tests cover overlap, expiry, Z clearing, and lifecycle clearing,
@@ -220,8 +225,11 @@ patches.
   title/attract windows at 29.96 presents/s mean (27.66 minimum, 31.09 maximum),
   with zero below 20, one below 28, and 89 at or above 28. The probe was removed,
   maintained-source verification passed, and the official Release Simulator
-  build and launch passed. This accepts that automatic Simulator path, not a
-  controlled rental battle or physical iPad.
+  build and launch passed. A later controlled two-turn Battle Now sample used
+  the same actual present call for 154 windows: 29.47 mean, 29.96 median, 4.32
+  minimum, 31.94 maximum, two below 20, ten below 28, and 144 at or above 28.
+  This accepts sustained Simulator battle cadence while preserving two real
+  transition hitches and the physical-iPad gate.
 - On 2026-08-02 the exact 380,988,632-byte Release Simulator executable
   `19bcd1cf...b540` relaunched on the iPad Pro 11-inch (M4), advanced from its
   transient launch card to the animated title path, and remained alive for 45
@@ -327,8 +335,10 @@ patches.
   VI windows, with 34 below 20. Descriptor-state caching improved a follow-up
   path to 23.40 across 117 windows, with 20 below 20. Descriptor batching removed
   the repeated single-entry setter hotspot and a later 90-window automatic
-  title/attract run averaged 29.96 with no window below 20. A controlled heavy
-  rental-battle run and physical-device measurement have not accepted performance.
+  title/attract run averaged 29.96 with no window below 20. The later controlled
+  two-turn battle averaged 29.47 across 154 windows, with two below 20 and 144
+  at or above 28. Sustained Simulator battle cadence is accepted, but rare
+  transition hitches and physical-device measurement remain open.
   Physical iPad evidence is still required before treating any remaining
   Simulator Metal/XPC overhead as a device release blocker.
 - A 2026-08-02 refresh found no attached physical iPhone or iPad, zero valid
