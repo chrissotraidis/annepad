@@ -59,6 +59,17 @@
 - Closed current iPhone background/foreground continuity while keeping touch,
   real-speaker, signing, and physical-hardware acceptance open.
 
+## 2026-08-02 — iPhone Simulator lock/unlock preserves live state
+
+- Locked the current clean iPhone 16 Pro Simulator through its visible Device
+  menu and observed UIKit deactivate/background events without losing AnnePad's
+  PID.
+- Unlock returned to the same process and upright live surface with identical
+  primary/backup save hashes. A fresh Start reached Game Pak Check and did not
+  repeat, closing current Simulator lock/unlock and stuck-input recovery.
+- Kept physical-device lock/unlock, audio interruption/route, speaker, signing,
+  and hardware acceptance open.
+
 ## 2026-08-02 — Current iPhone install and relaunch preserve state
 
 - Installed the clean Release app over the dedicated iPhone 16 Pro Simulator's

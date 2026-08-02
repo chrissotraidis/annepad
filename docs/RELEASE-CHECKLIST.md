@@ -36,9 +36,11 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       Current iPhone install/render/termination/relaunch persistence and iPad
       import/touch/background/relaunch have separate passing evidence. Current
       iPhone background/foreground also passes with same-PID render/save
-      continuity, and visible START/A/D-left input reaches Battle Now setup.
-      Gallery visibly proves quick-Z cycling plus independent L and R actions.
-      Battle visibly proves held-R reveal/release and L cancel. Pre-battle
+      continuity; current iPhone Simulator lock/unlock also returns to the same
+      PID, preserves matching saves, and accepts a fresh Start without repeated
+      input. Visible START/A/D-left input reaches Battle Now setup. Gallery
+      visibly proves quick-Z cycling plus independent L and R actions. Battle
+      visibly proves held-R reveal/release and L cancel. Pre-battle
       R-plus-selection and the remaining per-form-factor matrix stay open.
 - [ ] Signed physical iPhone and iPad builds install and run.
 - [ ] Physical controllers pass on iPhone and iPad.

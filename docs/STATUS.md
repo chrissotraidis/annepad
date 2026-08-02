@@ -264,6 +264,11 @@ patches.
   AnnePad reactivated the same PID, restored the live rendered title and phone
   overlay, and preserved the exact save hash. The save modification time advanced
   during the transition, directly confirming the background flush path ran.
+- A later current-build lock/unlock smoke sent PID 60409 through recorded UIKit
+  deactivation/background and reactivation events. Unlock returned to the same
+  process and an upright live title. The matching 131,072-byte primary/backup
+  saves retained SHA-256 `85781ca6...c7a`; Start then reached Game Pak Check and
+  remained there four seconds later, with no repeated or stuck input.
 - Save commits now serialize snapshots, rotate a backup, atomically replace the
   primary, flush on background/termination and before file swaps, validate exact
   sizes, quarantine corrupt primaries, and restore valid backups. Simulator

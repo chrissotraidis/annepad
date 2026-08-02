@@ -845,3 +845,19 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Determination: the old Simulator 180-degree and stale-overlay warnings are not
   reproducible on the current clean build. No orientation code change is
   justified. Signed physical-iPad orientation and ergonomics remain open.
+
+## 2026-08-02 10:19–10:22 CDT — Current lock/unlock continuity passed
+
+- Locked the dedicated iPhone 16 Pro Simulator through its visible Device menu.
+  The lock screen appeared in portrait while unified logs recorded AnnePad UIKit
+  deactivation/background work; process 60409 remained alive.
+- Woke and opened the Simulator through the visible Home control. AnnePad
+  returned automatically to an upright landscape title in the same PID, and
+  logs recorded removal of the deactivation reasons.
+- The primary and backup saves remained matching 131,072-byte files with
+  SHA-256 `85781ca635c5483c41ff413c36235a0acec7ec82f167891999cf7f4405872c7a`.
+  Start then reached Game Pak Check; a four-second delayed capture stayed on
+  that screen, proving the input did not remain latched or repeat.
+- Determination: current iPhone Simulator lock/unlock, render continuity, save
+  continuity, and post-unlock touch recovery pass. Physical lock/unlock, audio
+  interruption/route, speaker, signing, and hardware acceptance remain open.

@@ -125,8 +125,13 @@ backup recovery, restored identical valid primary/backup hashes, and quarantined
 the injected input as `.corrupt`. Durable visible evidence is
 `evidence/m7-ios-resume-after-background.png`. The source also handles low-memory
 events without discarding game state. An actual Simulator memory-warning command
-was not exposed by the installed Xcode UI, and physical audio route,
-interruption, lock/unlock, termination, and real-speaker acceptance remain open.
+was not exposed by the installed Xcode UI. On 2026-08-02, Device > Lock produced
+real UIKit deactivation/background events on the current clean iPhone 16 Pro
+Simulator build. Unlock returned to the same PID 60409 and an upright live
+surface; both 131,072-byte save copies retained SHA-256
+`85781ca6...c7a`; and one Start press reached Game Pak Check with no repeated or
+stuck input four seconds later. Physical audio route, interruption, lock/unlock,
+termination, and real-speaker acceptance remain open.
 
 Gate 9's local unsigned-package sub-gate and the isolated verifier's internal
 checks passed 2026-08-02. The release app is arm64 iPhoneOS 16.0, links only
