@@ -431,12 +431,13 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Finish the isolated clean verifier for the published `63db42dd...bff7` package
-checkpoint, then publish the side-rail utility-menu refinement. Run longer
-iPhone/iPad Simulator soak and lifecycle checks on the new Metal dimension
-guard. Deterministic overlap/cancellation coverage passes, but accept the real
-pre-battle R-plus-selection gesture only with physical multitouch rather than
-inferring it from serialized Simulator clicks.
+Finish the in-flight isolated clean verifier for published commit `6ca62d3` and
+its `63db42dd...bff7` package, then run the same verifier against the current
+side-rail candidate published at `5534784` with manifest
+`4b7ef2d7...af21fd`. Run longer iPhone/iPad Simulator soak and lifecycle checks
+on the new Metal dimension guard. Deterministic overlap/cancellation coverage
+passes, but accept the real pre-battle R-plus-selection gesture only with
+physical multitouch rather than inferring it from serialized Simulator clicks.
 When lawful signing assets and hardware are available, install this reproduced
 candidate and measure the same heavy
 battle on a physical

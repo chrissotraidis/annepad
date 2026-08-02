@@ -962,3 +962,7 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   passes produced timestamp-different ZIPs (`4591e3f7...826c3` and
   `c88b9428...e68bc`) but the same canonical manifest
   `4b7ef2d7...af21fd`.
+- Committed the implementation and linked documentation as `5534784` and
+  pushed it directly to private GitHub `main`; local `HEAD` and `origin/main`
+  matched exactly afterward. The isolated verifier for preceding published
+  commit `6ca62d3` remained in progress and was not reported as passing.
