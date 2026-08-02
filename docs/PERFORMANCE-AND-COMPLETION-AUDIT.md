@@ -1,6 +1,6 @@
 # Performance and completion audit
 
-Updated: 2026-08-02 09:39 CDT
+Updated: 2026-08-02 10:07 CDT
 
 ## Bottom line
 
@@ -51,9 +51,21 @@ is not yet physically proven or release-ready.
   to a third decision. Across 154 one-second windows, mean cadence was 29.47
   presents/s, median 29.96, minimum 4.32, and maximum 31.94; two windows were
   below 20, ten were below 28, and 144 were at least 28. This rejects a generic
-  sustained heavy-scene slowdown after batching, while retaining two real
-  transition hitches for future diagnosis and leaving physical-iPad acceptance
-  open.
+  sustained heavy-scene slowdown after batching. A later visible-frame audit
+  resolved the two low-present windows as transition holds rather than a
+  sustained rendering stall; physical-iPad acceptance remains open.
+- Matched 20-second, 1 ms process samples around battle entry and at the steady
+  strategy screen found the same ongoing descriptor/window-query paths. Entry
+  added a bounded burst of new Metal pipeline and texture creation on RT64's
+  existing shader/texture workers, but the sampled work was tens of
+  milliseconds rather than evidence for a one-second CPU stall.
+- A 38.625-second Simulator recording of a complete attack/faint/switch segment
+  contained 1,151 frames, or 29.799 recorded frames/s. The reproducible
+  pixel-difference analyzer found only three near-unchanged runs of 0.268,
+  0.260, and 0.267 seconds. Inspection places them on the game's intentional
+  black scene cuts and fainted-Pokémon hold. No quarter-second-or-longer moving
+  scene freeze was found. Run:
+  `swift scripts/analyze-simulator-video.swift VIDEO.mov`.
 - The counter was removed, maintained-source verification passed, and the
   official clean Release Simulator app rebuilt and visibly launched. The clean
   380,988,632-byte relink hashes to `4206a896...3ef2` and contains no probe

@@ -283,12 +283,23 @@ The same temporary probe was reintroduced after the current touch-control proof
 and measured from the first selected move through two complete animated Battle
 Now turns and the return to the third decision. The 154 one-second windows
 averaged 29.47 presents/s (29.96 median, 4.32 minimum, 31.94 maximum); two were
-below 20, ten were below 28, and 144 were at least 28. The two severe windows
-are retained as transition hitches rather than averaged away. The probe was
+below 20, ten were below 28, and 144 were at least 28. The probe was
 removed, maintained-source verification passed, and the diagnostic-free Release
 app rebuilt to the prior 380,988,632-byte `4206a896...3ef2` executable, with no
 probe marker, then visibly relaunched. This accepts sustained controlled
 Simulator battle cadence, not physical-iPad performance or thermals.
+
+A follow-up tested whether those two low-present windows were visible stalls.
+Matched 20-second, 1 ms `sample` captures covered battle entry and the steady
+strategy screen. Entry added bounded RT64 shader-pipeline and texture creation,
+but not a sampled one-second CPU hotspot. A raw Simulator recording then covered
+38.625 seconds of attack, faint, and replacement activity. The committed
+`scripts/analyze-simulator-video.swift` decoded 1,151 frames (29.799 recorded
+frames/s) and found three near-unchanged runs: 0.268, 0.260, and 0.267 seconds.
+Frames extracted at those timestamps show two black scene cuts and the
+fainted-Pokémon hold. No quarter-second-or-longer moving-scene freeze was found.
+This resolves the low-present windows as transition pacing, not an additional
+shared-renderer optimization target.
 
 A fresh internal-resolution test used RT64's actual manual resolution
 multiplier rather than shrinking the Metal drawable. The 1x run remained

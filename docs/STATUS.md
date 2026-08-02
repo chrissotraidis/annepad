@@ -43,7 +43,10 @@ with the first selected move and spanned two complete animated turns through
 the third decision: 154 one-second windows averaged 29.47 presents/s with a
 29.96 median, 4.32 minimum, and 31.94 maximum; two were below 20, ten below 28,
 and 144 at least 28. This closes the generic sustained Simulator battle-slowdown
-claim while retaining rare transition hitches and physical-iPad performance.
+claim. A matched entry/steady CPU sample and a 38.625-second, 1,151-frame video
+audit then found only three 0.260–0.268-second near-unchanged runs, all at black
+scene cuts or the fainted-Pokémon hold rather than a moving-scene freeze.
+Physical-iPad performance remains open.
 Simulator/device app builds now always invoke the
 incremental AOT core build so regenerated source cannot link a stale archive.
 Touch quick-tap retention now uses independent atomic lifetimes per button;

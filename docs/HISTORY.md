@@ -1,5 +1,15 @@
 # Project history
 
+## 2026-08-02 — Visible battle-transition audit closes the Simulator hitch
+
+- Compared matched battle-entry and steady-state 20-second CPU samples; entry
+  adds bounded pipeline/texture creation but no one-second CPU hotspot.
+- Recorded a 38.625-second attack/faint/switch segment at 1,151 frames
+  (29.799 recorded frames/s) and added a reproducible pixel-difference analyzer.
+- The only three 0.260–0.268-second near-unchanged runs were intentional black
+  cuts or the fainted-Pokémon hold. No moving-scene freeze was found; physical
+  iPad performance remains the honest open gate.
+
 ## 2026-08-02 — Controlled battle reaches near-30 Hz cadence
 
 - Measured 154 one-second windows from the first selected move through two
@@ -7,8 +17,9 @@
 - Recorded 29.47 presents/s mean, 29.96 median, 4.32 minimum, and 31.94 maximum;
   two windows were below 20, ten below 28, and 144 at least 28.
 - Removed the temporary probe, passed source verification, rebuilt the clean
-  `4206a896...3ef2` Release app, and visibly relaunched it. Rare transition
-  hitches and physical-iPad performance remain open.
+  `4206a896...3ef2` Release app, and visibly relaunched it. A later visible-frame
+  audit resolved the low-present transition windows; physical-iPad performance
+  remains open.
 
 ## 2026-08-02 — Held-R battle inspection and L cancel pass
 

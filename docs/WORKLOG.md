@@ -806,3 +806,23 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   bounded shoulder window may expire. This is not counted as a failed physical
   multitouch implementation or as acceptance; real two-finger device proof
   remains open.
+
+## 2026-08-02 09:56–10:07 CDT — Battle-transition hitch attribution
+
+- Captured matched 20-second, 1 ms process samples while confirming the current
+  team and after battle reached its steady strategy screen. The transition adds
+  new Metal pipelines and textures on RT64's existing shader/texture workers;
+  the sampled burst is tens of milliseconds, not a one-second CPU hotspot.
+- Recorded a complete Squirtle attack, Cubone faint, and Magnemite replacement
+  segment from the clean Release iPhone Simulator app. The 38.625-second file
+  contains 1,151 frames, equivalent to 29.799 recorded frames/s.
+- Added `scripts/analyze-simulator-video.swift`, which decodes the video and
+  reports near-unchanged frame runs using a stated pixel-difference threshold.
+  It found only 0.268-, 0.260-, and 0.267-second runs.
+- Extracted and inspected each detected run. Two are intentional black scene
+  cuts and one holds the fainted Pokémon/status display; no moving-scene freeze
+  of at least 0.25 seconds appears in the recorded turn.
+- Determination: the earlier 4.32-present/s one-second buckets were counting
+  transition pacing, not proving a new sustained renderer stall. No speculative
+  renderer change is justified. Physical iPad frame-time and thermal proof
+  remain open.
