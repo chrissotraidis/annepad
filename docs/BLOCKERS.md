@@ -84,9 +84,10 @@ Resolved entries are never deleted.
   iPhone/iPad are attached, sign/install this bundle and execute the separate
   controller, audio, orientation, lifecycle, and sustained-battle gates.
 
-## B-016 — Optimized Simulator remains slow in heavy battle scenes
+## B-016 — Controlled battle and physical-device performance remain open
 
-- Status: active performance acceptance gap; optimized build complete
+- Status: active battle/device acceptance gap; automatic title/attract cadence
+  accepted
 - Evidence: `apple/core/CMakeLists.txt` intentionally compiles validation AOT at
   `-O0`, and the old Simulator script could only select that profile. A temporary
   counter at RT64's Metal present call measured the iPad title/attract path at
@@ -138,7 +139,12 @@ Resolved entries are never deleted.
   return without scanning. In the exact-source 12-second attract sample, the
   workload thread spent 3,928 of 6,849 samples waiting on its command fence and
   265 waiting on its mutex; the old repeated single-entry setter hotspot was no
-  longer present. This is not a frame-identical FPS or physical-device sign-off.
+  longer present. A temporary present counter subsequently measured 90 post-
+  startup automatic title/attract windows at 29.96 presents/s mean (27.66
+  minimum, 31.09 maximum), with none below 20 and only one below 28. The probe
+  was removed and the clean official Simulator build, source verifier, and
+  20-second launch smoke passed. This closes the automatic title/attract cadence
+  symptom, not the controlled rental-battle or physical-device gate.
 - Gate: measure the same heavy scene on a physical iPad before changing shared
   renderer behavior for a Simulator-specific driver cost. If hardware also
   misses the 30 Hz target, capture device GPU/frame-time evidence and optimize

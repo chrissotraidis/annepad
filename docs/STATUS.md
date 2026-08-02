@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 03:40 CDT
+Updated: 2026-08-02 08:47 CDT
 
 ## Current state
 
@@ -35,7 +35,11 @@ depth-state allocation/leak. The clear-state cache now builds and renders.
 Ninety-six diagnostic hook sites now compile out of Release while six
 correctness hooks remain; targeted runtime lines fell to zero, but a 29-window
 title/attract sample still averaged 23.31 presents/s. This confirms that logging
-was not the leading FPS cause. Simulator/device app builds now always invoke the
+was not the leading FPS cause. The subsequent descriptor-batched source measured
+90 post-startup automatic title/attract windows at 29.96 presents/s mean (27.66
+minimum, 31.09 maximum), with none below 20 and only one below 28. That accepts
+this Simulator path's cadence while leaving a controlled rental-battle run and
+physical-iPad performance open. Simulator/device app builds now always invoke the
 incremental AOT core build so regenerated source cannot link a stale archive.
 Touch quick-tap retention now uses independent atomic lifetimes per button;
 deterministic tests cover overlap, expiry, Z clearing, and lifecycle clearing,
@@ -198,14 +202,24 @@ patches.
   attract sample, the RT64 workload thread spent 3,928 of 6,849 samples waiting
   on its command fence and 265 waiting on its mutex; the prior repeated
   single-entry setter hotspot was replaced by bulk `setBuffers`/`setTextures`
-  calls. This is a directional Simulator throughput result, not FPS or physical
-  iPad acceptance.
+  calls. A temporary present probe then measured 90 post-startup automatic
+  title/attract windows at 29.96 presents/s mean (27.66 minimum, 31.09 maximum),
+  with zero below 20, one below 28, and 89 at or above 28. The probe was removed,
+  maintained-source verification passed, and the official Release Simulator
+  build and launch passed. This accepts that automatic Simulator path, not a
+  controlled rental battle or physical iPad.
 - On 2026-08-02 the exact 380,988,632-byte Release Simulator executable
   `19bcd1cf...b540` relaunched on the iPad Pro 11-inch (M4), advanced from its
   transient launch card to the animated title path, and remained alive for 45
   seconds. The captures differ, no AnnePad crash report exists in the preceding
   three days, and current logs show active Metal/audio initialization rather
   than termination. This is a crash/freeze smoke, not FPS acceptance.
+- The post-probe clean relink is also 380,988,632 bytes, has SHA-256
+  `4206a896...3ef2`, contains no probe marker, visibly reaches the animated title,
+  and stayed alive for a 20-second smoke. Its byte hash differs from the earlier
+  source-verified relink despite identical verified source and size; Simulator
+  executable byte reproducibility is therefore not claimed. The UUID-free device
+  executable and canonical IPA manifest remain the package reproducibility gate.
 - On an iPhone 16 Pro Simulator, a cold launch with no ROM presents an upright
   native setup screen. The document picker imported the user's local `.v64`,
   normalized and validated it to the exact 32 MiB supported image, stored it
@@ -282,14 +296,15 @@ patches.
   physical-device runtime success.
 - Real-speaker audio, lock/unlock, interruptions/routes, thermal performance,
   and a touch-only battle on physical hardware remain open.
-- Optimized iOS Simulator frame pacing is measured and remains below acceptance
-  in heavy scenes. The pre-cache run averaged 21.83 presents/s across 80 30 Hz
+- Optimized iOS Simulator frame pacing previously remained below acceptance in
+  heavy scenes. The pre-cache run averaged 21.83 presents/s across 80 30 Hz
   VI windows, with 34 below 20. Descriptor-state caching improved a follow-up
-  path to 23.40 across 117 windows, with 20 below 20. Descriptor batching then
-  removed the repeated single-entry setter hotspot from an exact-source live
-  sample, but no frame-identical FPS capture or physical-device measurement has
-  accepted performance. Physical iPad evidence is still required before
-  deciding whether remaining Metal/XPC overhead is a device release blocker.
+  path to 23.40 across 117 windows, with 20 below 20. Descriptor batching removed
+  the repeated single-entry setter hotspot and a later 90-window automatic
+  title/attract run averaged 29.96 with no window below 20. A controlled heavy
+  rental-battle run and physical-device measurement have not accepted performance.
+  Physical iPad evidence is still required before treating any remaining
+  Simulator Metal/XPC overhead as a device release blocker.
 - A 2026-08-02 refresh found no attached physical iPhone or iPad, zero valid
   code-signing identities, and no installed provisioning profile.
 - Release now compiles 96 upstream diagnostic hook sites and their argument

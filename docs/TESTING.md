@@ -237,7 +237,20 @@ seconds; start/end screenshots differed and no AnnePad crash report was present
 in the preceding three days. The Metal HUD environment did not render a usable
 overlay in this Simulator, and a 15-second Game Performance Overview trace hung
 during finalization and was discarded. The present-window measurements above
-remain the current Simulator FPS evidence.
+were the current Simulator FPS evidence before the source probe below.
+
+A narrow environment-gated counter was then placed immediately after RT64's
+actual Metal present submission in the descriptor-batched source. After eight
+startup windows were discarded, 90 automatic title/attract windows averaged
+29.96 presents/s (27.66 minimum, 31.09 maximum); zero were below 20, one was
+below 28, and 89 were at least 28. The probe was removed, maintained-source
+verification passed, and the official Release Simulator build produced a clean
+380,988,632-byte executable with no probe marker. That relink hashes to
+`4206a896...3ef2`, visibly reaches the animated title, and survived 20 seconds.
+The differing hash from the prior same-size source-verified relink means
+Simulator executable byte reproducibility is not claimed. This accepts the
+automatic title/attract cadence only; a controlled rental battle and physical
+iPad remain required.
 
 A fresh internal-resolution test used RT64's actual manual resolution
 multiplier rather than shrinking the Metal drawable. The 1x run remained

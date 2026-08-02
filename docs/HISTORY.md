@@ -1,5 +1,14 @@
 # Project history
 
+## 2026-08-02 — Descriptor-batched Simulator path reaches target cadence
+
+- Measured 90 post-startup automatic title/attract windows at 29.96 presents/s
+  mean, 27.66 minimum, and 31.09 maximum; none were below 20 and one was below 28.
+- Removed the temporary present probe, passed maintained-source verification,
+  rebuilt the official clean Release Simulator app, and visibly relaunched it.
+- Accepted the automatic Simulator title/attract cadence while keeping a
+  controlled rental-battle measurement and physical-iPad acceptance open.
+
 ## 2026-08-02 — Current optimized package reproduced from clean source
 
 - Rebuilt the current descriptor-batched, Stadium-specific-control source in a

@@ -1,15 +1,17 @@
 # Performance and completion audit
 
-Updated: 2026-08-02 03:40 CDT
+Updated: 2026-08-02 08:47 CDT
 
 ## Bottom line
 
 AnnePad does not have one generic “slow game” problem. The current evidence
 separates four different concerns:
 
-1. The iPad Simulator misses the game's 30 Hz presentation cadence in some
-   scenes, with synchronous Simulator Metal argument-buffer/XPC work dominating
-   sampled non-idle time.
+1. The iPad Simulator previously missed the game's 30 Hz presentation cadence,
+   with synchronous Simulator Metal argument-buffer/XPC work dominating sampled
+   non-idle time. After descriptor batching, a 90-window automatic title/attract
+   run averaged 29.96 presents/s; controlled battle and physical-device cadence
+   remain open.
 2. Release previously executed several upstream reverse-engineering probes.
    Ninety-six diagnostic hook sites are now compiled out while the six
    separately classified correctness hooks remain active.
@@ -38,9 +40,19 @@ is not yet physically proven or release-ready.
   The exact-source 12-second attract sample recorded 6,849 samples on the RT64
   workload thread, including 3,928 waiting on its command fence and 265 waiting
   on its mutex. Bulk `setBuffers`/`setTextures` calls replaced the old repeated
-  single-entry setter hotspot. Because the scene is not frame-identical and no
-  present counter was retained, this is directional throughput evidence rather
-  than FPS acceptance.
+  single-entry setter hotspot.
+- A temporary counter at the same Metal present call then measured 90 post-
+  startup automatic title/attract windows at 29.96 presents/s mean (27.66
+  minimum, 31.09 maximum): zero were below 20, one was below 28, and 89 were at
+  least 28. This accepts that Simulator path and is a material improvement over
+  the earlier 23.31 title/attract mean; it is not controlled rental-battle or
+  physical-iPad acceptance.
+- The counter was removed, maintained-source verification passed, and the
+  official clean Release Simulator app rebuilt and visibly launched. The clean
+  380,988,632-byte relink hashes to `4206a896...3ef2` and contains no probe
+  marker. Its byte hash differs from the prior source-verified relink, so
+  Simulator executable byte reproducibility is not claimed; the UUID-free
+  device package remains the reproducibility gate.
 - A five-second process sample repeatedly found synchronous
   `MTLSimArgumentEncoder` calls and `MTLSimDriver` XPC replies in the RT64
   workload thread.

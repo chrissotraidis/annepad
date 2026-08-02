@@ -648,3 +648,26 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   injection, `idb`, Maestro, and AppleSimulatorUtils are absent, and the
   sanctioned UI-control bridge had already timed out three times. Direct revised
   Z/L/R UIKit acceptance remains open rather than inferred.
+
+## 2026-08-02 08:36–08:47 CDT — Post-batching Simulator cadence measured
+
+- Added a temporary environment-gated counter immediately after RT64's actual
+  Metal present submission, rebuilt only `rt64_metal.cpp` plus the final Release
+  Simulator link, and installed over the preserved private ROM/save container.
+- After discarding eight startup windows, a machine-aggregated 90-window
+  automatic title/attract run averaged 29.96 presents/s (27.66 minimum, 31.09
+  maximum); zero windows were below 20, one was below 28, and 89 were at least
+  28. This materially improves the earlier 23.31 title/attract mean.
+- Removed the temporary probe and rebuilt through the official Release
+  Simulator script. Maintained-source verification passed, the binary contains
+  no probe marker, and the clean app visibly reached the animated title and kept
+  PID 48916 alive for 20 seconds.
+- The clean relink remains 380,988,632 bytes but hashes to
+  `4206a896f85a74fa6eb50112acc0d6a93fda3185d5e61e524360ac457cad3ef2`
+  rather than the prior same-size source-verified relink. Simulator executable
+  byte reproducibility is not claimed; the UUID-free device executable and
+  canonical IPA manifest remain the reproducibility authority.
+- Determination: descriptor batching closes the automatic title/attract
+  Simulator cadence symptom. A controlled rental-battle measurement and signed
+  physical-iPad performance, thermal, audio, touch, and controller acceptance
+  remain open.
