@@ -17,7 +17,12 @@ cmake -S "$source_dir" -B "$build_dir" -G Ninja \
     -DWITH_ARES_BRIDGE=OFF \
     -DCMAKE_OSX_ARCHITECTURES=arm64 \
     -DCMAKE_CXX_FLAGS=-DFMT_USE_CONSTEVAL=0
-cmake --build "$build_dir" --target N64RecompCLI RSPRecomp --parallel
+build_jobs=$(configured_build_jobs)
+if [[ -n "$build_jobs" ]]; then
+    cmake --build "$build_dir" --target N64RecompCLI RSPRecomp --parallel "$build_jobs"
+else
+    cmake --build "$build_dir" --target N64RecompCLI RSPRecomp --parallel
+fi
 
 for tool in "$build_dir/N64Recomp" "$build_dir/RSPRecomp"; do
     [[ -x "$tool" ]] || die "host tool was not produced: $tool"

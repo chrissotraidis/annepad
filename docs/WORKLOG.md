@@ -602,3 +602,27 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Three sanctioned Computer Use attachment attempts timed out. Direct UIKit Z
   press/release, held-L, and R-plus-selection acceptance therefore remains open
   rather than being inferred from the passing host test or visible overlay.
+
+## 2026-08-02 03:40–08:24 CDT — Current package clean-checkout proof
+
+- Ran the full fail-closed verifier from committed source
+  `0cc91b6166126fc2156d30bba4114ffc3beb142b` in a no-hardlink clone with the
+  private ROM supplied outside the clone and a four-job build limit.
+- Passed fresh locked-source fetch, 1,006-file AOT generation, native macOS,
+  Simulator validation core/app, optimized iPhoneOS core/app, app and IPA
+  audits, repository tests, and exact expected-manifest comparison.
+- Reproduced the 378,198,984-byte device executable SHA-256
+  `1c2bd2e923f60f84127b97cb05a7b536f5acb245784233ebdb92de99421d6850`
+  and eight-file canonical IPA manifest SHA-256
+  `bd6f14bea0db2342903a91448c8bfc24cc020879a446415ee145c3eb2dfd51fa`.
+  The isolated raw ZIP SHA-256 was
+  `90fa70bf59264240365477fc443513d1ece7baafadc682b1054ebffb378b9f70`;
+  timestamp-dependent raw ZIP bytes are not the reproducibility authority.
+- The first native build still launched Ninja's default ten workers despite the
+  requested package job cap, creating avoidable memory compression and swap.
+  Centralized positive-integer validation and extended `ANNEPAD_BUILD_JOBS` to
+  host-tool, native macOS, and iOS core builds; focused repository tests cover
+  valid, zero, and non-numeric values.
+- Boundary: this proves the current source and unsigned package, not signed
+  installation, physical iPad performance, controller, touch, speaker,
+  lifecycle, thermal, or orientation acceptance.

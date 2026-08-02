@@ -131,8 +131,9 @@ memory compression or swap churn:
 ANNEPAD_BUILD_JOBS=2 ./scripts/package-ios.sh
 ```
 
-`ANNEPAD_BUILD_JOBS` must be a positive integer and affects the static iOS core
-build only. Completed objects remain incremental when the command is rerun.
+`ANNEPAD_BUILD_JOBS` must be a positive integer and bounds the native host-tool,
+macOS, and static iOS core builds. Completed objects remain incremental when the
+command is rerun.
 
 The iOS bundle contains only native app resources: compiled original AnnePad
 icons, `PrivacyInfo.xcprivacy`, `ThirdPartyNotices.txt`, metadata, and the
@@ -197,24 +198,25 @@ added to make a verifier pass.
 
 ## Passing local unsigned candidate
 
-The 2026-08-01 local release build and 2026-08-02 isolated rebuild produced:
+The 2026-08-02 local release build and isolated rebuild produced:
 
-- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,653,885 bytes, raw SHA-256
-  `9aa5d416...6304`. The independent `--no-build` repack has the same byte size
-  and raw SHA-256 `1e86e9ae...d529`; raw ZIP hashes vary with timestamps and are
+- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,621,652 bytes, raw SHA-256
+  `f6005b8d...69ce`. The independent `--no-build` repack has the same byte size
+  and raw SHA-256 `6933eecd...f7af`; raw ZIP hashes vary with timestamps and are
   not the reproducibility authority.
 - `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
 - `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
   manifest SHA-256
-  `fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`.
+  `bd6f14bea0db2342903a91448c8bfc24cc020879a446415ee145c3eb2dfd51fa`.
 
 Two local archive passes have the exact same manifest bytes/digest. The
-378,199,272-byte local unsigned executable hashes to `8d1f440f...4494` and has
+378,198,984-byte local unsigned executable hashes to `1c2bd2e9...6850` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
-source-consistent candidate has local packages matching at `fcb2832e...b590`;
-the full no-hardlink isolated verifier at source commit `15a79de...8979`
-reproduced the same executable and manifest. Its dependency-lock digest is
-`aff563c4...ca4e`, and sanitized ignored evidence is under
+source-consistent candidate has local packages matching at `bd6f14be...51fa`;
+the full no-hardlink isolated verifier at source commit `0cc91b61...142b`
+reproduced the same executable and manifest. Its raw ZIP SHA-256 was
+`90fa70bf...9f70`; its dependency-lock digest is `aff563c4...ca4e`, and
+sanitized ignored evidence is under
 `logs/clean-checkout-latest/`. Release audio,
 replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
 surfaces are compiled out and enforced by the app audit. Signed builds retain

@@ -55,10 +55,8 @@ cmake -S "$ANNEPAD_ROOT/apple/core" -B "$build_dir" -G Ninja \
     -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO \
     -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=NO
 
-build_jobs=${ANNEPAD_BUILD_JOBS:-}
+build_jobs=$(configured_build_jobs)
 if [[ -n "$build_jobs" ]]; then
-    [[ "$build_jobs" =~ ^[1-9][0-9]*$ ]] || \
-        die "ANNEPAD_BUILD_JOBS must be a positive integer"
     cmake --build "$build_dir" --target AnnePadCore --parallel "$build_jobs"
 else
     cmake --build "$build_dir" --target AnnePadCore --parallel

@@ -1,5 +1,16 @@
 # Project history
 
+## 2026-08-02 — Current optimized package reproduced from clean source
+
+- Rebuilt the current descriptor-batched, Stadium-specific-control source in a
+  no-hardlink clone at `0cc91b61...142b`.
+- Passed fresh fetch, AOT generation, native macOS, Simulator validation,
+  optimized iPhoneOS, app/package audits, and repository tests.
+- Reproduced the 378,198,984-byte device executable SHA-256 `1c2bd2e9...6850`
+  and canonical eight-file IPA manifest `bd6f14be...51fa` exactly.
+- Extended `ANNEPAD_BUILD_JOBS` to host-tool and native macOS builds after the
+  clean verifier exposed ten-worker memory pressure on the 16 GB build Mac.
+
 ## 2026-08-02 — Stadium-specific controls and Metal descriptor batching
 
 - Audited the original Stadium manual and decompiled controller paths instead

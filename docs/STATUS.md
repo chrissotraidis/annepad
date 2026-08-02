@@ -228,9 +228,9 @@ patches.
   (AOT game), `8535ef7c...` (`librecomp`), and `8325b873...`
   (`ultramodern`).
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
-  Its arm64 iPhoneOS executable is 378,199,272 bytes, has no linker UUID, and
+  Its arm64 iPhoneOS executable is 378,198,984 bytes, has no linker UUID, and
   has SHA-256
-  `8d1f440fc89820b346321145382b8eb41e9fa0817a94ecc1d8054f2b32a94494`.
+  `1c2bd2e923f60f84127b97cb05a7b536f5acb245784233ebdb92de99421d6850`.
   Unsigned builds deliberately link with `-reproducible,-no_uuid`; signed
   builds retain the normal UUID for symbolication. Release builds compile out
   validation-only audio capture/synthetic hooks, `aspMain` capture/replay and
@@ -240,14 +240,15 @@ patches.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`.
-  The two 84,653,885-byte archives have raw ZIP SHA-256 values
-  `9aa5d416...6304` and `1e86e9ae...d529`; timestamp variance makes those raw
+  `bd6f14bea0db2342903a91448c8bfc24cc020879a446415ee145c3eb2dfd51fa`.
+  The two 84,621,652-byte archives have raw ZIP SHA-256 values
+  `f6005b8d...69ce` and `6933eecd...f7af`; timestamp variance makes those raw
   hashes non-authoritative. A no-hardlink isolated clone of source commit
-  `15a79de423458683370c6fb9bd0a7fa18288979d` then passed the complete fetch,
+  `0cc91b6166126fc2156d30bba4114ffc3beb142b` then passed the complete fetch,
   generation, native macOS, Simulator, optimized device, app, package, and
-  repository verifier. It reproduced the exact 378,199,272-byte executable
-  hash and canonical manifest above. The dependency-lock SHA-256 was
+  repository verifier. It reproduced the exact 378,198,984-byte executable
+  hash and canonical manifest above. Its raw ZIP SHA-256 was
+  `90fa70bf...9f70`; the dependency-lock SHA-256 was
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
   Sanitized ignored evidence is retained at `logs/clean-checkout-latest/`.
   The bundle contains only the executable, compiled icons/catalog, metadata,

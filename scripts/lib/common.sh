@@ -19,6 +19,15 @@ require_command() {
     command -v "$1" >/dev/null 2>&1 || die "required command not found: $1"
 }
 
+configured_build_jobs() {
+    local build_jobs=${ANNEPAD_BUILD_JOBS:-}
+    if [[ -n "$build_jobs" ]]; then
+        [[ "$build_jobs" =~ ^[1-9][0-9]*$ ]] || \
+            die "ANNEPAD_BUILD_JOBS must be a positive integer"
+    fi
+    printf '%s\n' "$build_jobs"
+}
+
 sha256_file() {
     shasum -a 256 "$1" | awk '{print $1}'
 }

@@ -120,12 +120,12 @@ validation-only audio capture/synthetic, `aspMain` replay/capture/oracle, Ares
 worker, TCP debug-server/port, turbo, environment-autoboot, and unavailable-
 transport surfaces are compiled out. The app audit rejects their markers using
 process substitution so `pipefail` cannot turn an expected `strings` SIGPIPE
-into a false negative. Repeated local packages for the current
-descriptor/clear-state-cache
-candidate produced identical 8-file canonical manifests with SHA-256
-`fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`;
-the 378,199,272-byte executable hashes to `8d1f440f...4494`. A no-hardlink
-isolated clone of source commit `15a79de...8979` passed the full fail-closed
+into a false negative. Repeated local packages for the current descriptor-
+batched/clear-state-cache candidate produced identical 8-file canonical
+manifests with SHA-256
+`bd6f14bea0db2342903a91448c8bfc24cc020879a446415ee145c3eb2dfd51fa`;
+the 378,198,984-byte executable hashes to `1c2bd2e9...6850`. A no-hardlink
+isolated clone of source commit `0cc91b61...142b` passed the full fail-closed
 verifier and reproduced both values exactly. Private source publication passes.
 Signing, install/retest, physical hardware, and public-license
 acceptance remain open.

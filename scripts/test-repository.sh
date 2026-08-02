@@ -11,6 +11,14 @@ jq empty "$ANNEPAD_LOCK"
 for script in "$ANNEPAD_ROOT"/scripts/*.sh "$ANNEPAD_ROOT"/scripts/lib/*.sh; do
     bash -n "$script"
 done
+[[ "$(ANNEPAD_BUILD_JOBS=2 configured_build_jobs)" == "2" ]] || \
+    die "valid ANNEPAD_BUILD_JOBS value was not preserved"
+if (ANNEPAD_BUILD_JOBS=0 configured_build_jobs >/dev/null 2>&1); then
+    die "zero ANNEPAD_BUILD_JOBS value was accepted"
+fi
+if (ANNEPAD_BUILD_JOBS=two configured_build_jobs >/dev/null 2>&1); then
+    die "non-numeric ANNEPAD_BUILD_JOBS value was accepted"
+fi
 "$ANNEPAD_ROOT/scripts/test-touch-tap-latch.sh"
 
 required_docs=(

@@ -19,7 +19,12 @@ build_dir="$ANNEPAD_ROOT/build-macos"
 cmake -S "$game" -B "$build_dir" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_OSX_ARCHITECTURES=arm64
-cmake --build "$build_dir" --parallel
+build_jobs=$(configured_build_jobs)
+if [[ -n "$build_jobs" ]]; then
+    cmake --build "$build_dir" --parallel "$build_jobs"
+else
+    cmake --build "$build_dir" --parallel
+fi
 
 runner="$build_dir/AnnePad.app/Contents/MacOS/AnnePad"
 [[ -x "$runner" ]] || die "macOS runner was not produced: $runner"
