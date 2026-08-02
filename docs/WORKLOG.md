@@ -933,3 +933,32 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Remaining: publish this checkpoint, run its isolated clean verifier, complete
   the remaining simultaneous-chord Simulator gates, and perform every signed
   physical-device/controller/speaker/thermal/touch-battle gate.
+
+## 2026-08-02 15:37–16:45 CDT — Side-rail controls and utility-menu refinement
+
+- Re-opened the live iPhone and iPad Simulator presentation with fresh eyes.
+  The Harkinian-derived geometry and mechanics were present, but the phone face
+  cluster still crowded gameplay and the 148-point ROM/LAYOUT strip read as a
+  developer toolbar.
+- Moved the phone stick and right-hand controls into the black landscape side
+  rails, retained the accepted target sizes and one right-side Z, and bumped the
+  phone layout preference key so existing defaults adopt the correction.
+- Replaced the persistent strip with one 44-point utility button and a native
+  action sheet. Edit Touch Layout, Done, Manage Game ROM, and the ROM manager's
+  visible Replace/Remove surface passed on both form-factor Simulators. UIKit
+  initially dropped the second presentation while dismissing the action sheet;
+  a bounded 0.75-second main-queue handoff fixed and re-proved that route.
+- Rebuilt the Release Simulator app after the final change, installed it over
+  the preserved private ROM/save containers, and navigated the final phone
+  layout from title through Game Pak Check, Battle Now, 1P Battle, and the
+  pre-battle roster without a crash.
+- Repeated serialized R-plus-selection attempts. Deterministic host tests cover
+  overlap and cancellation, but single-pointer UI automation cannot provide
+  honest two-finger acceptance because its taps outlive the bounded shoulder
+  grace window. Physical multitouch remains open.
+- Maintained-source verification, repository policy/document tests, touch-latch
+  regressions, and `git diff --check` passed. The audited unsigned arm64 device
+  executable is 378,197,336 bytes with SHA-256 `a97b8642...fc6cf`. Two package
+  passes produced timestamp-different ZIPs (`4591e3f7...826c3` and
+  `c88b9428...e68bc`) but the same canonical manifest
+  `4b7ef2d7...af21fd`.

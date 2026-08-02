@@ -1,5 +1,21 @@
 # Project history
 
+## 2026-08-02 — Side-rail touch layout and native utility menu
+
+- Moved the iPhone stick and right-hand N64 clusters into the black landscape
+  side rails so the touch surface no longer crowds the 4:3 gameplay image.
+- Replaced the always-visible ROM/LAYOUT strip with one 44-point utility button
+  and a native action sheet for ROM management or layout editing. Added a short
+  presentation delay so UIKit reliably opens the ROM manager after dismissing
+  the action sheet.
+- Rebuilt and visibly exercised the Release app on iPhone and iPad Simulators.
+  Gameplay input, the utility actions, editor, Done transition, and ROM manager
+  all passed without a crash. Physical ergonomics and true multitouch remain
+  explicit release gates.
+- The audited 378,197,336-byte unsigned device executable hashes to
+  `a97b8642...fc6cf`; two package passes reproduced the same eight-file
+  canonical manifest `4b7ef2d7...af21fd`.
+
 ## 2026-08-02 — Final touch presentation and iOS Metal target guard
 
 - Re-audited the live overlay against HarkinianPad, then adopted its accepted

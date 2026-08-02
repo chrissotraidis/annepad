@@ -69,28 +69,28 @@ std::array<TouchControl, kControlCount> defaultControls() {
     // 52-point face, 44-point D/shoulder, and 40-point C-button targets. Its
     // single Z stays in the right face cluster so the left thumb can move.
     return {{
-        {"stick", "", ControlKind::Stick, 0x0000, 0.214, 0.722, 0.148, 0.38, true},
+        {"stick", "", ControlKind::Stick, 0x0000, 0.125, 0.722, 0.148, 0.38, true},
         {"d_up", "\u2191", ControlKind::Button, 0x0800, 0.131, 0.365, 0.056, 0.38, true},
         {"d_down", "\u2193", ControlKind::Button, 0x0400, 0.131, 0.502, 0.056, 0.38, true},
         {"d_left", "\u2190", ControlKind::Button, 0x0200, 0.080, 0.434, 0.056, 0.38, true},
         {"d_right", "\u2192", ControlKind::Button, 0x0100, 0.182, 0.434, 0.056, 0.38, true},
-        {"c_up", "\u2191", ControlKind::Button, 0x0008, 0.867, 0.398, 0.051, 0.52, true},
-        {"c_down", "\u2193", ControlKind::Button, 0x0004, 0.867, 0.570, 0.051, 0.52, true},
-        {"c_left", "\u2190", ControlKind::Button, 0x0002, 0.824, 0.485, 0.051, 0.52, true},
-        {"c_right", "\u2192", ControlKind::Button, 0x0001, 0.911, 0.486, 0.051, 0.52, true},
-        {"a", "A", ControlKind::Button, 0x8000, 0.876, 0.738, 0.066, 0.58, true},
-        {"b", "B", ControlKind::Button, 0x4000, 0.806, 0.665, 0.066, 0.58, true},
-        {"z", "Z", ControlKind::Button, 0x2000, 0.934, 0.640, 0.066, 0.40, true},
-        {"l", "L", ControlKind::Button, 0x0020, 0.895, 0.270, 0.050, 0.36, true},
-        {"r", "R", ControlKind::Button, 0x0010, 0.895, 0.170, 0.050, 0.36, true},
-        {"start", "START", ControlKind::Button, 0x1000, 0.810, 0.170, 0.050, 0.54, true},
+        {"c_up", "\u2191", ControlKind::Button, 0x0008, 0.914, 0.340, 0.051, 0.52, true},
+        {"c_down", "\u2193", ControlKind::Button, 0x0004, 0.914, 0.500, 0.051, 0.52, true},
+        {"c_left", "\u2190", ControlKind::Button, 0x0002, 0.871, 0.420, 0.051, 0.52, true},
+        {"c_right", "\u2192", ControlKind::Button, 0x0001, 0.957, 0.420, 0.051, 0.52, true},
+        {"a", "A", ControlKind::Button, 0x8000, 0.925, 0.780, 0.066, 0.58, true},
+        {"b", "B", ControlKind::Button, 0x4000, 0.835, 0.700, 0.066, 0.58, true},
+        {"z", "Z", ControlKind::Button, 0x2000, 0.920, 0.625, 0.066, 0.40, true},
+        {"l", "L", ControlKind::Button, 0x0020, 0.940, 0.270, 0.050, 0.36, true},
+        {"r", "R", ControlKind::Button, 0x0010, 0.940, 0.170, 0.050, 0.36, true},
+        {"start", "START", ControlKind::Button, 0x1000, 0.850, 0.170, 0.050, 0.54, true},
     }};
 }
 
 NSString* layoutDefaultsKey() {
     return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad
         ? @"annepad.touch.layout.ipad.v3"
-        : @"annepad.touch.layout.iphone.v4";
+        : @"annepad.touch.layout.iphone.v5";
 }
 
 } // namespace
@@ -243,14 +243,10 @@ NSString* layoutDefaultsKey() {
              !selectedHideable ? @"FIXED" : (selectedVisible ? @"HIDE" : @"SHOW")];
 }
 
-- (CGRect)editButtonRect {
+- (CGRect)utilityButtonRect {
     CGRect usable = [self usableBounds];
-    return CGRectMake(CGRectGetMidX(usable) - 4.0, CGRectGetMinY(usable) + 6.0, 72.0, 32.0);
-}
-
-- (CGRect)romButtonRect {
-    CGRect edit = [self editButtonRect];
-    return CGRectOffset(edit, -76.0, 0.0);
+    return CGRectMake(CGRectGetMidX(usable) - 22.0,
+                      CGRectGetMinY(usable) + 4.0, 44.0, 44.0);
 }
 
 - (CGRect)toolbarRectAtIndex:(NSInteger)index {
@@ -359,25 +355,16 @@ NSString* layoutDefaultsKey() {
             [self drawLabel:labels[i] inRect:item color:UIColor.whiteColor size:10.0];
         }
     } else {
-        CGRect rom = [self romButtonRect];
-        CGRect edit = [self editButtonRect];
-        CGRect utility = CGRectUnion(rom, edit);
+        CGRect utility = [self utilityButtonRect];
         UIBezierPath* utilityPath = [UIBezierPath bezierPathWithRoundedRect:utility
-                                                              cornerRadius:10.0];
+                                                              cornerRadius:22.0];
         [[UIColor colorWithWhite:0.02 alpha:0.64] setFill];
         [utilityPath fill];
         [[UIColor colorWithWhite:1.0 alpha:0.34] setStroke];
         utilityPath.lineWidth = 1.0;
         [utilityPath stroke];
-        CGFloat dividerX = CGRectGetMaxX(rom) + 2.0;
-        UIBezierPath* divider = [UIBezierPath bezierPath];
-        [divider moveToPoint:CGPointMake(dividerX, CGRectGetMinY(utility) + 7.0)];
-        [divider addLineToPoint:CGPointMake(dividerX, CGRectGetMaxY(utility) - 7.0)];
-        [[UIColor colorWithWhite:1.0 alpha:0.20] setStroke];
-        divider.lineWidth = 1.0;
-        [divider stroke];
-        [self drawLabel:@"ROM" inRect:rom color:[UIColor colorWithWhite:1 alpha:0.86] size:10.0];
-        [self drawLabel:@"LAYOUT" inRect:edit color:[UIColor colorWithWhite:1 alpha:0.86] size:10.0];
+        [self drawLabel:@"\u2022\u2022\u2022" inRect:utility
+                  color:[UIColor colorWithWhite:1 alpha:0.88] size:16.0];
     }
 }
 
@@ -401,17 +388,53 @@ NSString* layoutDefaultsKey() {
     return nearest;
 }
 
+- (void)presentUtilityMenu {
+    [self clearInput];
+    UIViewController* presenter = self.window.rootViewController;
+    while (presenter.presentedViewController != nil) {
+        presenter = presenter.presentedViewController;
+    }
+    if (presenter == nil) return;
+
+    UIAlertController* menu =
+        [UIAlertController alertControllerWithTitle:@"AnnePad"
+                                            message:nil
+                                     preferredStyle:UIAlertControllerStyleActionSheet];
+    AnnePadTouchOverlayView* overlay = self;
+    [menu addAction:[UIAlertAction actionWithTitle:@"Manage Game ROM"
+                                             style:UIAlertActionStyleDefault
+                                           handler:^(__unused UIAlertAction* action) {
+        // Let the action sheet finish dismissing before presenting the ROM
+        // manager. UIKit drops a second presentation during the first one's
+        // animated teardown.
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.75 * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{
+            annepad_present_rom_manager((__bridge void*)overlay.window.rootViewController);
+        });
+    }]];
+    [menu addAction:[UIAlertAction actionWithTitle:@"Edit Touch Layout"
+                                             style:UIAlertActionStyleDefault
+                                           handler:^(__unused UIAlertAction* action) {
+        overlay->_editing = YES;
+        [overlay clearInput];
+        [overlay setNeedsDisplay];
+    }]];
+    [menu addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                             style:UIAlertActionStyleCancel
+                                           handler:nil]];
+    UIPopoverPresentationController* popover = menu.popoverPresentationController;
+    if (popover != nil) {
+        popover.sourceView = self;
+        popover.sourceRect = [self utilityButtonRect];
+        popover.permittedArrowDirections = UIPopoverArrowDirectionUp;
+    }
+    [presenter presentViewController:menu animated:YES completion:nil];
+}
+
 - (BOOL)handleToolbarPoint:(CGPoint)point {
     if (!_editing) {
-        if (CGRectContainsPoint([self romButtonRect], point)) {
-            [self clearInput];
-            annepad_present_rom_manager((__bridge void*)self.window.rootViewController);
-            return YES;
-        }
-        if (CGRectContainsPoint([self editButtonRect], point)) {
-            _editing = YES;
-            [self clearInput];
-            [self setNeedsDisplay];
+        if (CGRectContainsPoint([self utilityButtonRect], point)) {
+            [self presentUtilityMenu];
             return YES;
         }
         return NO;

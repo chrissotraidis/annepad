@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 15:31 CDT
+Updated: 2026-08-02 16:26 CDT
 
 ## Current state
 
@@ -25,7 +25,11 @@ target sizes and one right-side Z, N64 color hierarchy, shoulder pills, short
 arrow labels, protected analog stick, and 70–150% per-control resizing. Fresh
 iPhone and iPad Simulator captures show the complete unclipped overlay, Start
 and relocated Z route through the live game, and the editor/reset path remains
-functional. Physical ergonomic quality is not yet accepted. The retained `-O0` validation build was
+functional. A follow-up phone audit moved the stick and right-hand controls
+into the black landscape side rails and replaced the wide always-visible
+ROM/layout strip with one 44-point utility button. Its native action sheet,
+layout editor, and delayed ROM-manager route all passed visibly on iPhone and
+iPad Simulators. Physical ergonomic quality is not yet accepted. The retained `-O0` validation build was
 confirmed too slow for playability. The separate `-O2` Simulator core and
 Release app are now complete,
 audited, installed, and smoke-tested. They bring title/menu scenes close to the
@@ -202,9 +206,12 @@ patches.
   iPhone targets now match the accepted 116-point stick, 52-point face,
   44-point D/shoulder, and 40-point C sizes. Both form factors use one right-side
   Z in the A/B/Z cluster, N64 colors, shoulder pills, compact arrows, unified
-  ROM/layout and editor surfaces, an unhideable stick, and 70–150% default-
+  native utility and editor surfaces, an unhideable stick, and 70–150% default-
   relative resizing. The iPad and iPhone Release Simulator builds rendered the
-  final layouts and accepted visible touch input.
+  final layouts and accepted visible touch input. Phone defaults now place the
+  stick and face clusters primarily in the black landscape side rails; the
+  single utility button opens native ROM-management or layout-editing actions
+  without leaving a debug-like strip over gameplay.
 - A temporary source-local counter at RT64's actual Metal swap-chain present
   call measured the validation candidate on the iPad Pro 11-inch (M4), iOS
   18.5. In the title/attract path it reached the scene's observed 30 Hz ceiling
@@ -315,9 +322,9 @@ patches.
   (AOT game), `8535ef7c...` (`librecomp`), and `8325b873...`
   (`ultramodern`).
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
-  Its current arm64 iPhoneOS executable is 378,196,936 bytes, has no linker UUID,
+  Its current arm64 iPhoneOS executable is 378,197,336 bytes, has no linker UUID,
   and has SHA-256
-  `edb4e8c9af6fa54633a845e7656f49b389beff62c2f4221226ccdf0b3567ad24`.
+  `a97b86428340bb5b3350ef60a2ce7e7cdb8ee5e571d2a1fb7fbf312fcbafc6cf`.
   Release pins the shipping audio bridge/smoothing values and makes the
   synthesized-PCM and legacy-queue diagnostic rings validation-only, removing
   819,200 bytes of static ring storage plus per-buffer PCM metric/mutex work.
@@ -333,9 +340,9 @@ patches.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `63db42dda249a8c6f9df674f3e5917dcd44b7ce611902e356baecb2b215cbff7`.
-  Their raw ZIP SHA-256 values are `70619ae1...5c21` and
-  `fad9b400...300e`; timestamp variance makes those raw hashes
+  `4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
+  Their raw ZIP SHA-256 values are `4591e3f7...826c3` and
+  `c88b9428...e68bc`; timestamp variance makes those raw hashes
   non-authoritative. The prior no-hardlink isolated clone of exact published
   source commit `f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5` then passed the
   complete fetch, ROM reconstruction, AOT generation, native macOS, Simulator,
@@ -424,10 +431,12 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Run longer iPhone/iPad Simulator soak and lifecycle checks on the new Metal
-dimension guard, then complete the pre-battle R-plus-selection and simultaneous
-chord-cancellation Simulator gate with the final control geometry. Publish and
-run the isolated clean verifier for the new `63db42dd...bff7` package checkpoint.
+Finish the isolated clean verifier for the published `63db42dd...bff7` package
+checkpoint, then publish the side-rail utility-menu refinement. Run longer
+iPhone/iPad Simulator soak and lifecycle checks on the new Metal dimension
+guard. Deterministic overlap/cancellation coverage passes, but accept the real
+pre-battle R-plus-selection gesture only with physical multitouch rather than
+inferring it from serialized Simulator clicks.
 When lawful signing assets and hardware are available, install this reproduced
 candidate and measure the same heavy
 battle on a physical

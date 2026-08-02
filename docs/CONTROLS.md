@@ -1,6 +1,6 @@
 # Pokémon Stadium controls
 
-Updated: 2026-08-02 10:54 CDT
+Updated: 2026-08-02 16:26 CDT
 
 This is the game-specific input contract for AnnePad's touch design. It covers
 Pokémon Stadium (US) 1.0, not the superficially similar controls of Zelda or
@@ -92,8 +92,11 @@ management transitions. It keeps AnnePad's direct analogue N64 snapshot bridge
 instead of HarkinianPad's synthetic-key path so stick magnitude is preserved.
 The presentation also adopts HarkinianPad's accepted phone target sizes, N64
 color hierarchy, shoulder pills, protected stick, default-relative editor
-scaling, and its single right-side Z placement. Stadium-specific code and labels
-remain AnnePad-owned; no Zelda HUD artwork is copied.
+scaling, and its single right-side Z placement. The phone defaults keep the
+stick and face clusters in the landscape side rails instead of covering the
+4:3 game surface, and one 44-point utility button opens native ROM-management
+or layout-editing actions. Stadium-specific code and labels remain AnnePad-owned;
+no Zelda HUD artwork is copied.
 
 The 0.5-second persistent Z toggle is the one intentionally rejected mechanism.
 It solves a Zelda-specific targeting ergonomics problem, while Stadium needs a
@@ -119,7 +122,9 @@ inspection actions.
 
 Current iPhone Simulator acceptance directly covers quick Z's three-state
 Gallery cycle, L background selection, R telephoto, held-R battle move reveal,
-R release hiding the assignments again, and L battle cancel. Simulator work
-must still cover the pre-battle R-plus-selection data chord and cancellation of
-a simultaneous chord. Physical iPhone/iPad acceptance must repeat the full
+R release hiding the assignments again, L battle cancel, final side-rail
+placement, utility-menu routing, and layout editing. Deterministic host tests
+cover overlapping A+R retention and cancellation, but single-pointer Simulator
+automation serializes taps too slowly to accept the real pre-battle
+R-plus-selection gesture. Physical iPhone/iPad acceptance must repeat the full
 matrix with real multitouch ergonomics before release.

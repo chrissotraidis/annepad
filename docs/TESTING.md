@@ -107,7 +107,18 @@ Pikachu/Squirtle/Bulbasaur and reached Pikachu versus Meowth. On move selection,
 a held R visibly revealed Thunderbolt/Quick Attack/Swift/Thunder Wave with PP
 and type data; release hid them again; L returned to strategy selection. Raw
 held/released captures are retained under ignored `logs/iphone-current/`.
-Pre-battle R-plus-selection and simultaneous chord cancellation remain open.
+Pre-battle R-plus-selection remains unaccepted: deterministic host tests cover
+overlap and cancellation, but the Simulator's serialized single-pointer input
+does not constitute a real two-finger gesture.
+
+The final 2026-08-02 presentation pass then moved the phone stick and face
+controls into the landscape side rails and replaced the wide ROM/layout strip
+with a single 44-point utility button. Release builds were installed on the
+iPhone 16 Pro and iPad Pro 11-inch (M4), iOS 18.5 Simulators. Visible checks
+passed normal gameplay input, the native utility action sheet, Edit Touch
+Layout and Done, and the delayed Manage Game ROM presentation on both form
+factors. This accepts routing and presentation, not physical ergonomics,
+accessibility, or real simultaneous multitouch.
 
 On 2026-08-02 a screenshot-first audit compared the live iPhone overlay/editor
 with HarkinianPad's checked-in gameplay reference and implementation notes. The

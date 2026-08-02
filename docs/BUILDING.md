@@ -201,18 +201,19 @@ added to make a verifier pass.
 
 The current 2026-08-02 local release build produced:
 
-- `artifacts/AnnePad-0.1.0-unsigned.ipa`: raw SHA-256 `70619ae1...5c21`.
-  The independent `--no-build` repack has raw SHA-256 `fad9b400...300e`;
+- `artifacts/AnnePad-0.1.0-unsigned.ipa`: latest raw SHA-256
+  `c88b9428...e68bc`. The preceding independent pass has raw SHA-256
+  `4591e3f7...826c3`;
   raw ZIP hashes vary with timestamps and are not the reproducibility authority.
 - `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
 - `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
   manifest SHA-256
-  `63db42dda249a8c6f9df674f3e5917dcd44b7ce611902e356baecb2b215cbff7`.
+  `4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
 
 Two local archive passes have the exact same manifest bytes/digest. The
-378,196,936-byte local unsigned executable hashes to `edb4e8c9...ad24` and has
+378,197,336-byte local unsigned executable hashes to `a97b8642...fc6cf` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
-source-consistent candidate has local packages matching at `63db42dd...bff7`.
+source-consistent candidate has local packages matching at `4b7ef2d7...af21fd`.
 The prior package checkpoint's full no-hardlink isolated verifier passed from exact published commit
 `f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5`. It reconstructed the US 1.0
 input, regenerated 1,006 AOT files, built native macOS plus Simulator/device

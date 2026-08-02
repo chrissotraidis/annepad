@@ -1,6 +1,6 @@
 # Performance and completion audit
 
-Updated: 2026-08-02 10:07 CDT
+Updated: 2026-08-02 16:26 CDT
 
 ## Bottom line
 
@@ -191,8 +191,10 @@ is not yet physically proven or release-ready.
 
 In priority order:
 
-1. Complete the pre-battle R-plus-selection inspection and chord-cancellation
-   smoke; quick Z, held-R reveal/release, and L battle cancel now pass.
+1. Repeat the pre-battle R-plus-selection inspection on physical multitouch;
+   deterministic chord overlap/cancellation, quick Z, held-R reveal/release,
+   and L battle cancel already pass. The final side-rail controls and native
+   utility/editor routes also pass visibly on both form-factor Simulators.
 2. On an attached signed iPad, resolve cold orientation and run the same heavy
    scene while collecting frame-time,
    memory, thermal, audio, lifecycle, and controller evidence.

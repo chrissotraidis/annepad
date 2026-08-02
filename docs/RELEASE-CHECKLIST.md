@@ -40,7 +40,9 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       PID, preserves matching saves, and accepts a fresh Start without repeated
       input. Visible START/A/D-left input reaches Battle Now setup. Gallery
       visibly proves quick-Z cycling plus independent L and R actions. Battle
-      visibly proves held-R reveal/release and L cancel. Pre-battle
+      visibly proves held-R reveal/release and L cancel. The final side-rail
+      controls, native utility menu, editor, and ROM-manager route pass on both
+      form-factor Simulators. Pre-battle
       R-plus-selection and the remaining per-form-factor matrix stay open.
 - [ ] Signed physical iPhone and iPad builds install and run.
 - [ ] Physical controllers pass on iPhone and iPad.
@@ -70,7 +72,7 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
 - [x] Canonical sorted uncompressed-content digest and full audit report are
       recorded and reproduced locally for the current candidate
-      (`63db42dd...bff7`). Exact published
+      (`4b7ef2d7...af21fd`). Exact published
       commit `f5b0048...dfd5` passed the isolated no-hardlink verifier; the
       prior clean package reproduced `d5c26978...c8f5` byte-for-byte. The new
       checkpoint still needs its post-publish isolated verifier. Physical

@@ -204,9 +204,11 @@ Resolved entries are never deleted.
 - Current local proof: the sanctioned UI-control path now drives the current
   clean iPhone Simulator build. Quick Z, independent L/R actions, held-R battle
   reveal, R release, and L battle cancel all have visible game responses.
-- Gate: smoke pre-battle R-plus-selection and simultaneous chord cancellation,
-  then repeat the full ergonomics and stuck-input matrix on physical iPhone and
-  iPad before resolving this blocker.
+- Gate: deterministic overlap, expiry, and cancellation tests pass, but the
+  serialized single-pointer Simulator path cannot honestly accept the real
+  pre-battle R-plus-selection gesture. Repeat that chord plus the full
+  ergonomics and stuck-input matrix with physical multitouch on iPhone and iPad
+  before resolving this blocker.
 
 ## B-014 — iOS platform and dynamic-code separation is not yet compiled
 
