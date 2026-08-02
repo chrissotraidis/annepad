@@ -671,3 +671,20 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   Simulator cadence symptom. A controlled rental-battle measurement and signed
   physical-iPad performance, thermal, audio, touch, and controller acceptance
   remain open.
+
+## 2026-08-02 08:47–08:55 CDT — Current iPhone install and relaunch proof
+
+- Booted the dedicated AnnePad iPhone 16 Pro, iOS 18.5 Simulator used for the
+  earlier native setup gate. Before installation it retained the private 32 MiB
+  ROM plus matching 131,072-byte primary and backup saves.
+- Installed the current ROM-free Release app. CoreSimulator migrated the data-
+  container UUID, but the private ROM and save contents remained intact. The app
+  visibly advanced from a battle-attract scene at 10 seconds to the title at 45
+  seconds while PID 50928 stayed alive.
+- Explicitly terminated and relaunched the app. PID 51134 reached the rendered
+  title and stayed alive for 25 seconds; the migrated container UUID remained
+  stable, the private ROM remained 33,554,432 bytes, and both save SHA-256 values
+  remained `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+- No AnnePad crash report was present. This proves current iPhone
+  install/render/termination/relaunch persistence, not touch input,
+  background/foreground, real-speaker audio, signing, or physical hardware.

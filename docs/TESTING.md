@@ -169,6 +169,16 @@ touch cancellation, safe areas, high DPI, background/foreground, termination,
 relaunch, and save/config persistence. Simulator audio is functional evidence,
 not real-speaker acceptance.
 
+On 2026-08-02, the current clean Release app was installed over the dedicated
+iPhone 16 Pro, iOS 18.5 Simulator used for native ROM setup. The installation
+migrated its data-container UUID but retained the private 32 MiB ROM and matching
+131,072-byte primary/backup saves. The app visibly advanced from a battle-attract
+scene to the title, stayed alive for 45 seconds, then passed explicit termination
+and a 25-second title relaunch. The post-migration container stayed stable and
+both save SHA-256 values remained `b5a41c37...2260`. This passes current iPhone
+install/render/termination/relaunch persistence, not touch input,
+background/foreground, real-speaker audio, or physical-device acceptance.
+
 ## Physical-device matrix
 
 Record model identifier and OS without publishing device UDID.

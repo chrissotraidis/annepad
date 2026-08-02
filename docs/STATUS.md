@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 08:47 CDT
+Updated: 2026-08-02 08:55 CDT
 
 ## Current state
 
@@ -227,6 +227,13 @@ patches.
   Remove and replacement flows were also exercised. Evidence:
   `evidence/m6-ios-native-rom-setup.png` (SHA-256
   `7cd68193c5849d0d4f60631f35d0a9554bf51f9682c57a22dc60e930350ac01f`).
+- The current clean Release app was then installed over that preserved iPhone
+  Simulator state. The install migrated the container UUID while retaining the
+  private 32 MiB ROM and matching 131,072-byte primary/backup saves. The app
+  visibly advanced from a battle-attract scene to the title screen, remained
+  alive for 45 seconds, terminated, relaunched to the title, and stayed alive
+  for another 25 seconds. The migrated container remained stable across relaunch,
+  both save hashes stayed `b5a41c37...2260`, and no AnnePad crash report appeared.
 - Save commits now serialize snapshots, rotate a backup, atomically replace the
   primary, flush on background/termination and before file swaps, validate exact
   sizes, quarantine corrupt primaries, and restore valid backups. Simulator

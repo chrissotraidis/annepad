@@ -1,5 +1,15 @@
 # Project history
 
+## 2026-08-02 — Current iPhone install and relaunch preserve state
+
+- Installed the clean Release app over the dedicated iPhone 16 Pro Simulator's
+  existing private ROM/save container and visibly advanced from battle attract
+  to the title screen.
+- Terminated and relaunched the app; the migrated container, private ROM size,
+  and exact primary/backup save hashes remained intact with no crash report.
+- Kept touch, background/foreground, real-speaker, and physical-device iPhone
+  acceptance open rather than inferring them from launch/relaunch persistence.
+
 ## 2026-08-02 — Descriptor-batched Simulator path reaches target cadence
 
 - Measured 90 post-startup automatic title/attract windows at 29.96 presents/s
