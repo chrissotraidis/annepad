@@ -190,6 +190,12 @@ Resolved entries are never deleted.
   transient stale overlay bounds; replacing frame/autoresizing attachment with
   four host-edge constraints kept every control in place across three timed
   startup screenshots.
+- Current orientation proof: a clean iPhone 16 Pro Simulator matrix passed from
+  portrait and both supported landscape origins. The surface and overlay were
+  upright, complete, and touch-responsive after each relaunch. A saved Z-size
+  change also survived rotation to the opposite landscape without drift, and
+  the default layout was restored afterward. Physical-device orientation and
+  ergonomics remain open.
 - Follow-up proof: the corrected overlay completed a full touch-only rental
   battle using Squirtle/Pikachu/Bulbasaur against Psyduck/Oddish/Meowth, reached
   the explicit `LOSE`, and returned to the main selection menu without a crash.

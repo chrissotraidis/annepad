@@ -163,10 +163,16 @@ is not yet physically proven or release-ready.
   scheduling symptom under the measured Simulator load, not evidence of a
   process crash. Real-speaker/audio-underrun acceptance remains a physical-iPad
   gate.
-- The current live Simulator window is correctly landscape with the complete
-  overlay visible. Cold orientation still needs the planned repeated-boot
-  matrix; a raw framebuffer whose pixels are stored in portrait order is not
-  itself evidence that the visible app is sideways.
+- The 2026-08-02 iPhone 16 Pro Simulator matrix passed from portrait and both
+  supported landscape origins. The portrait-origin launch selected landscape
+  before its first inspected frame; captures after approximately 0.5, 2.3, and
+  8.3 seconds showed an upright Metal surface and complete overlay. Both
+  landscape-origin relaunches stayed upright at their early captures and Start
+  produced a visible game response. A saved Z-size edit also survived rotation
+  through portrait into the opposite landscape without position drift, after
+  which the default layout was restored. A raw framebuffer whose pixels are
+  stored in portrait order is not itself evidence that the visible app is
+  sideways. Physical-iPad orientation remains untested.
 - The 2026-08-02 source-consistent Release app built and installed cleanly,
   rendered two visibly different attract frames, and retained PID 69075 through
   a 12-second live sample. The executable hash is

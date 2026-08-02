@@ -49,9 +49,13 @@ Gate 3 passed 2026-07-31 on an iPad Pro 11-inch (M4) Simulator running iOS
 18.5. The ROM-free arm64 app installed and launched with the private normalized
 ROM only in its writable data container, initialized Metal, and rendered live
 opening/title frames. Durable Computer Use evidence is
-`evidence/m3-ios-simulator-first-frame.png`. Cold-launch orientation is not yet
-accepted: the first landscape can be 180° from the Simulator chrome until the
-device rotates to the opposite supported landscape.
+`evidence/m3-ios-simulator-first-frame.png`. The original 180° Simulator warning
+is no longer reproducible. On 2026-08-02, a clean iPhone 16 Pro Simulator passed
+relaunches from portrait and both supported landscape origins. The portrait
+origin selected landscape automatically; the Metal surface and overlay stayed
+upright and aligned; Start responded after each relaunch; and one saved control
+resize survived rotation into the opposite landscape before reset. This closes
+the local Simulator orientation gate, not physical-iPad acceptance.
 
 The Simulator Home/background and icon relaunch smoke also returned to an
 upright live frame. It proves a basic app transition only; the full lifecycle

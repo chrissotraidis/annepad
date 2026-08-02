@@ -359,11 +359,16 @@ patches.
 
 ## Known regressions
 
-An upright cold-launch/setup flow is proven on iPhone Simulator. On iPad, two
+An upright cold-launch/setup flow is proven on iPhone Simulator. A 2026-08-02
+iPhone 16 Pro Simulator matrix passed from portrait and both supported landscape
+origins: the portrait-origin launch selected landscape before the first
+inspected frame, both landscape origins remained upright, Start responded after
+each relaunch, and a saved Z-size edit survived rotation into the opposite
+landscape before the defaults were restored. On iPad, two earlier
 portrait-origin cold boots rotated to landscape without manual intervention;
 the second exposed transient stale overlay bounds during startup. Constraining
 all four overlay edges to the live UIKit host removed that clipping across three
-timed startup screenshots. The prior manual-rotate Simulator regression is not
+timed startup screenshots. The prior Simulator orientation regressions are not
 currently reproducible, but physical-device orientation remains untested. The
 desktop window close action returns from gameplay to the launcher by design;
 App-menu Quit exits cleanly.

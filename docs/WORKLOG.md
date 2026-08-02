@@ -826,3 +826,22 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   transition pacing, not proving a new sustained renderer stall. No speculative
   renderer change is justified. Physical iPad frame-time and thermal proof
   remain open.
+
+## 2026-08-02 10:11–10:17 CDT — Simulator orientation matrix closed
+
+- Used the dedicated iPhone 16 Pro, iOS 18.5 Simulator and the sanctioned
+  Computer Use path to inspect relaunches from portrait and both supported
+  landscape origins. Private ROM/save data remained in place.
+- From portrait, AnnePad selected landscape before the first inspected frame.
+  Captures approximately 0.5, 2.3, and 8.3 seconds after the launch command
+  returned showed an upright Metal surface and complete, aligned overlay.
+- Relaunches from each landscape direction remained upright at their early
+  captures. Start produced a visible game response after every relaunch; the
+  opposite-landscape run showed the complete overlay during initial black game
+  frames and then the title surface, without clipping or 180-degree mismatch.
+- In Edit mode, increased Z by one size step, saved it, rotated through portrait
+  into the opposite landscape, and confirmed the customized size remained
+  aligned. Reset and Done then restored the default layout.
+- Determination: the old Simulator 180-degree and stale-overlay warnings are not
+  reproducible on the current clean build. No orientation code change is
+  justified. Signed physical-iPad orientation and ergonomics remain open.
