@@ -104,7 +104,7 @@ was not exposed by the installed Xcode UI, and physical audio route,
 interruption, lock/unlock, termination, and real-speaker acceptance remain open.
 
 Gate 9's local unsigned-package sub-gate and the isolated verifier's internal
-checks passed 2026-08-01. The release app is arm64 iPhoneOS 16.0, links only
+checks passed 2026-08-02. The release app is arm64 iPhoneOS 16.0, links only
 Apple system libraries, and passed profile,
 privacy, metadata, icon, forbidden-runtime, local-path, ROM/save/artwork,
 signature, provisioning, and targeted release-diagnostic audits. Unsigned
@@ -117,10 +117,10 @@ into a false negative. Repeated local packages for the current
 descriptor/clear-state-cache
 candidate produced identical 8-file canonical manifests with SHA-256
 `fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`;
-the 378,199,272-byte executable hashes to `8d1f440f...4494`. The previous
-`915b171b...a9ae` snapshot passed the full fail-closed isolated verifier; the
-current source-consistent digest is undergoing that rerun. Private source publication
-passes. Signing, install/retest, physical hardware, and public-license
+the 378,199,272-byte executable hashes to `8d1f440f...4494`. A no-hardlink
+isolated clone of source commit `15a79de...8979` passed the full fail-closed
+verifier and reproduced both values exactly. Private source publication passes.
+Signing, install/retest, physical hardware, and public-license
 acceptance remain open.
 
 ### Runtime smoke automation

@@ -545,3 +545,23 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   roughly 75–85% CPU each while preserving completed incremental objects.
 - Remaining: the long optimized build is still running; app, package, and
   canonical-manifest evidence must not be claimed until it finishes and audits.
+
+## 2026-08-01 17:25–2026-08-02 01:18 CDT — Reproducible unsigned device package
+
+- Goal: finish the exact current device build, audit and reproduce its unsigned
+  IPA, then prove that pushed source can rebuild the same candidate elsewhere.
+- Local result: the optimized arm64 iPhoneOS app passed audit at 378,199,272
+  bytes with executable SHA-256 `8d1f440fc89820b346321145382b8eb41e9fa0817a94ecc1d8054f2b32a94494`.
+  Two package passes had timestamp-dependent raw ZIP hashes but the exact same
+  eight-file canonical manifest SHA-256
+  `fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`.
+- Clean proof: with `ANNEPAD_BUILD_JOBS=2`, a no-hardlink isolated clone of
+  source commit `15a79de423458683370c6fb9bd0a7fa18288979d` fetched locked dependencies,
+  regenerated AOT, built native macOS, Simulator, optimized iPhoneOS, audited
+  the app/IPA, ran touch-latch/repository tests, and reproduced the executable
+  and canonical manifest exactly. Dependency-lock SHA-256 was
+  `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`;
+  sanitized ignored evidence is under `logs/clean-checkout-latest/`.
+- Boundary: this proves source/package reproducibility, not signed installation
+  or physical iPad FPS, controller, touch, speaker, lifecycle, or thermal
+  acceptance. Timed UIKit Z-latch acceptance also remains open.

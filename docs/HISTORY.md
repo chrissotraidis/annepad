@@ -1,5 +1,15 @@
 # Project history
 
+## 2026-08-02 — Exact-source unsigned package reproduced
+
+- Rebuilt the complete locked source graph from a no-hardlink isolated clone of
+  source commit `15a79de423458683370c6fb9bd0a7fa18288979d`.
+- Passed fresh fetch, AOT generation, native macOS, Simulator, optimized
+  iPhoneOS, app, package, touch-latch, and repository verification.
+- Reproduced the 378,199,272-byte unsigned executable SHA-256
+  `8d1f440f...4494` and canonical eight-file IPA manifest
+  `fcb2832e...b590` exactly. Physical signing and iPad acceptance remain open.
+
 ## 2026-08-01 — Fresh completion audit and Metal clear-state leak fix
 
 - Ruled out RT64 internal resolution as the leading Simulator slowdown with a

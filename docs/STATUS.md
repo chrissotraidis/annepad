@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-01 20:31 CDT
+Updated: 2026-08-02 01:18 CDT
 
 ## Current state
 
@@ -227,13 +227,13 @@ patches.
   `fcb2832e27b0a082268c9838b4edf8b9dc1ece80c16b5755d7c68186c6b7b590`.
   The two 84,653,885-byte archives have raw ZIP SHA-256 values
   `9aa5d416...6304` and `1e86e9ae...d529`; timestamp variance makes those raw
-  hashes non-authoritative. This source-consistent candidate's full isolated
-  clean-checkout rerun is in progress. The preceding fail-closed clean pass used temporary
-  source commit `915b171bfcf666533d39b8bcece2ce2107a3a9ae` and dependency-lock SHA-256
+  hashes non-authoritative. A no-hardlink isolated clone of source commit
+  `15a79de423458683370c6fb9bd0a7fa18288979d` then passed the complete fetch,
+  generation, native macOS, Simulator, optimized device, app, package, and
+  repository verifier. It reproduced the exact 378,199,272-byte executable
+  hash and canonical manifest above. The dependency-lock SHA-256 was
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
-  That predecessor passed every fetch, generation, native macOS, Simulator,
-  optimized device, app, package, and repository audit, then matched its
-  retained expected manifest (`24dc9caa...d9e6`) byte-for-byte.
+  Sanitized ignored evidence is retained at `logs/clean-checkout-latest/`.
   The bundle contains only the executable, compiled icons/catalog, metadata,
   privacy manifest, and notices; it has no ROM, save, desktop artwork,
   provisioning profile, signature, unexpected dylib, or local developer path.
@@ -301,9 +301,8 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Complete the timed Z-latch UIKit gate, then rebuild the device Release package
-and rerun the fail-closed clean verifier.
-When lawful signing assets and hardware are available, measure the same heavy
+Complete the timed Z-latch UIKit gate. When lawful signing assets and hardware
+are available, install this reproduced candidate and measure the same heavy
 battle on a physical
 iPad before changing the renderer for a Simulator-specific bottleneck, and
 execute the signed controller, speaker, lifecycle, thermal, and hardware

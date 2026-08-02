@@ -197,7 +197,7 @@ added to make a verifier pass.
 
 ## Passing local unsigned candidate
 
-The 2026-08-01 local release build produced:
+The 2026-08-01 local release build and 2026-08-02 isolated rebuild produced:
 
 - `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,653,885 bytes, raw SHA-256
   `9aa5d416...6304`. The independent `--no-build` repack has the same byte size
@@ -212,9 +212,10 @@ Two local archive passes have the exact same manifest bytes/digest. The
 378,199,272-byte local unsigned executable hashes to `8d1f440f...4494` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
 source-consistent candidate has local packages matching at `fcb2832e...b590`;
-its full isolated clean verifier is in progress. The previous
-`915b171b...a9ae` snapshot remains valid proof
-for its predecessor (`e6b2ab11...f363`, `24dc9caa...d9e6`). Release audio,
+the full no-hardlink isolated verifier at source commit `15a79de...8979`
+reproduced the same executable and manifest. Its dependency-lock digest is
+`aff563c4...ca4e`, and sanitized ignored evidence is under
+`logs/clean-checkout-latest/`. Release audio,
 replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
 surfaces are compiled out and enforced by the app audit. Signed builds retain
 the normal linker UUID for crash symbolication. These are local ignored
