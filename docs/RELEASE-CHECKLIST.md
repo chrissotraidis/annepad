@@ -60,7 +60,7 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
 - [x] Canonical sorted uncompressed-content digest and full audit report are
       recorded and reproduced from an isolated no-hardlink checkout
-      (`fcb2832e...b590`); physical install/retest remains open.
+      (`bd6f14be...51fa`); physical install/retest remains open.
 
 ## Documentation and handoff
 
