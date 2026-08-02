@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 08:55 CDT
+Updated: 2026-08-02 08:59 CDT
 
 ## Current state
 
@@ -234,6 +234,11 @@ patches.
   alive for 45 seconds, terminated, relaunched to the title, and stayed alive
   for another 25 seconds. The migrated container remained stable across relaunch,
   both save hashes stayed `b5a41c37...2260`, and no AnnePad crash report appeared.
+- Foregrounding the Simulator Settings app then sent AnnePad through recorded
+  UIKit deactivation/background events without killing PID 51134. Returning to
+  AnnePad reactivated the same PID, restored the live rendered title and phone
+  overlay, and preserved the exact save hash. The save modification time advanced
+  during the transition, directly confirming the background flush path ran.
 - Save commits now serialize snapshots, rotate a backup, atomically replace the
   primary, flush on background/termination and before file swaps, validate exact
   sizes, quarantine corrupt primaries, and restore valid backups. Simulator

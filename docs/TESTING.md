@@ -176,8 +176,12 @@ migrated its data-container UUID but retained the private 32 MiB ROM and matchin
 scene to the title, stayed alive for 45 seconds, then passed explicit termination
 and a 25-second title relaunch. The post-migration container stayed stable and
 both save SHA-256 values remained `b5a41c37...2260`. This passes current iPhone
-install/render/termination/relaunch persistence, not touch input,
-background/foreground, real-speaker audio, or physical-device acceptance.
+install/render/termination/relaunch persistence. A subsequent real app switch to
+Simulator Settings emitted UIKit deactivation/background events while AnnePad
+kept PID 51134. Foregrounding AnnePad returned the same PID to a live rendered
+title; the primary save modification time advanced while its exact hash remained
+unchanged, proving background flush plus foreground continuity. Touch input,
+real-speaker audio, and physical-device acceptance remain open.
 
 ## Physical-device matrix
 

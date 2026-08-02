@@ -688,3 +688,19 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - No AnnePad crash report was present. This proves current iPhone
   install/render/termination/relaunch persistence, not touch input,
   background/foreground, real-speaker audio, signing, or physical hardware.
+
+## 2026-08-02 08:55–08:59 CDT — iPhone background/foreground continuity
+
+- Attached to the running clean iPhone Simulator app, then foregrounded the
+  built-in Settings app. Unified logs recorded AnnePad UIKit deactivation and
+  background work while PID 51134 remained alive.
+- After eight seconds, foregrounded AnnePad. CoreSimulator returned the same PID
+  and UIKit recorded activation; a 20-second capture showed the live title with
+  the complete phone overlay.
+- The primary save modification time advanced from 1785547069 to 1785679073
+  during the transition while SHA-256 remained
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`,
+  directly proving the background flush preserved content.
+- This closes current iPhone Simulator background/foreground render/save
+  continuity. Touch input, speaker/audio route, lock/unlock, memory warning,
+  signing, and physical hardware remain separate gates.

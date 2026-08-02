@@ -1,5 +1,14 @@
 # Project history
 
+## 2026-08-02 — iPhone background/foreground preserves process and save
+
+- Backgrounded AnnePad by foregrounding Simulator Settings and recorded real
+  UIKit deactivation/background events while the AnnePad PID stayed alive.
+- Returned to the same PID and a live rendered title/phone overlay; the save
+  modification time advanced while its exact content hash remained unchanged.
+- Closed current iPhone background/foreground continuity while keeping touch,
+  real-speaker, signing, and physical-hardware acceptance open.
+
 ## 2026-08-02 — Current iPhone install and relaunch preserve state
 
 - Installed the clean Release app over the dedicated iPhone 16 Pro Simulator's

@@ -34,8 +34,9 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [ ] iPhone and iPad Simulator launch, import, render, accept input, persist,
       background/foreground, and relaunch.
       Current iPhone install/render/termination/relaunch persistence and iPad
-      import/touch/background/relaunch have separate passing evidence; the full
-      per-form-factor matrix remains open.
+      import/touch/background/relaunch have separate passing evidence. Current
+      iPhone background/foreground also passes with same-PID render/save
+      continuity; the remaining per-form-factor input matrix stays open.
 - [ ] Signed physical iPhone and iPad builds install and run.
 - [ ] Physical controllers pass on iPhone and iPad.
 - [ ] Customizable touch controls complete a full rental-Pokémon battle on real
