@@ -36,7 +36,8 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       Current iPhone install/render/termination/relaunch persistence and iPad
       import/touch/background/relaunch have separate passing evidence. Current
       iPhone background/foreground also passes with same-PID render/save
-      continuity; the remaining per-form-factor input matrix stays open.
+      continuity, and visible START/A/D-left input reaches Battle Now setup.
+      Action-specific Z/L/R and the remaining per-form-factor matrix stay open.
 - [ ] Signed physical iPhone and iPad builds install and run.
 - [ ] Physical controllers pass on iPhone and iPad.
 - [ ] Customizable touch controls complete a full rental-Pokémon battle on real

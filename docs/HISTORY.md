@@ -1,5 +1,15 @@
 # Project history
 
+## 2026-08-02 — Current iPhone touch routing reaches Battle Now
+
+- Attached a sanctioned UI-control session to the dedicated iPhone 16 Pro,
+  iOS 18.5 Simulator after three earlier bridge timeouts.
+- Used the visible START, A, and D-left overlay controls to advance from title
+  through Game Pak Check and the main selection into Battle Now one-player
+  setup; PID 52349 stayed alive and no AnnePad crash report was present.
+- Closed ordinary current-iPhone touch routing while keeping action-specific
+  quick-Z, held-L, R-plus-selection, and physical-device acceptance open.
+
 ## 2026-08-02 — iPhone background/foreground preserves process and save
 
 - Backgrounded AnnePad by foregrounding Simulator Settings and recorded real

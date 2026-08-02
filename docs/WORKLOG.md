@@ -704,3 +704,21 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - This closes current iPhone Simulator background/foreground render/save
   continuity. Touch input, speaker/audio route, lock/unlock, memory warning,
   signing, and physical hardware remain separate gates.
+
+## 2026-08-02 09:00–09:08 CDT — Current iPhone touch routing and Z audit
+
+- Attached a sanctioned UI-control session to the dedicated iPhone 16 Pro,
+  iOS 18.5 Simulator after three earlier attachment timeouts.
+- Directly tapped the clean app's visible START control to advance title ->
+  Game Pak Check, A to reach the main selection, D-left to select Battle Now,
+  and A twice to enter its one-player setup. PID 52349 remained alive, the
+  current Simulator capture was retained under ignored `logs/iphone-current/`,
+  and no AnnePad crash report was present.
+- Rechecked the official instruction booklet and exhaustively searched the
+  pinned decomp's controller-bit `0x2000` use. Z has one held list-acceleration
+  read and two edge-triggered cycle/reset reads; no Z-plus-button gameplay chord
+  exists. AnnePad therefore correctly permits finger-down Z hold but does not
+  retain a Zelda-style toggle after release.
+- Boundary: ordinary current-iPhone UI touch routing now passes. Quick-Z,
+  held-L, R-plus-selection, physical multitouch ergonomics, speaker, signing,
+  controller, thermal, and physical performance acceptance remain open.

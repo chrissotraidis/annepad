@@ -88,8 +88,13 @@ the iPad Pro 11-inch (M4), iOS 18.5 Simulator on 2026-08-02. It rendered two
 advancing attract frames and retained PID 69075 through a 12-second live sample;
 the 380,988,632-byte executable SHA-256 is
 `19bcd1cfef6f0fbaaac31acb046128baa748f87e5e231853de4a4c960b57b540`.
-Three Computer Use attachment attempts timed out, so direct UIKit Z/L/R gesture
-acceptance is not claimed.
+Three initial Computer Use attachment attempts timed out. A later sanctioned
+UI session attached on 2026-08-02 to the dedicated iPhone 16 Pro, iOS 18.5
+Simulator and drove the clean app through title -> Game Pak Check -> main
+selection -> Battle Now one-player setup using visible START, A, and D-left
+touch controls. PID 52349 remained alive and no AnnePad crash report was found.
+This passes ordinary current-iPhone touch routing; quick-Z, held-L, and
+R-plus-selection outcomes still require an action-specific observable test.
 
 Gate 6 native ROM setup passed 2026-07-31 on an iPhone 16 Pro Simulator, iOS
 18.5. Remove cleared the private normalized/runtime copies and config; cold

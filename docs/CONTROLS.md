@@ -1,6 +1,6 @@
 # Pokémon Stadium controls
 
-Updated: 2026-08-02 02:16 CDT
+Updated: 2026-08-02 09:08 CDT
 
 This is the game-specific input contract for AnnePad's touch design. It covers
 Pokémon Stadium (US) 1.0, not the superficially similar controls of Zelda or
@@ -21,10 +21,13 @@ later Pokémon games.
 | Start | Start/pause or battle forfeit where the current mode allows it. |
 
 The original instruction booklet documents the R-plus-selection inspection
-chord and holding L to check hidden battle assignments. The decompiled game
-uses `buttonPressed` for the identified Z actions. No Z-plus-button gameplay
-chord was found. Kids Club uses the D-pad/stick, A/B, or alternating L/R
-depending on the minigame; persistent Z is not part of its normal controls.
+chord and holding L to check hidden battle assignments. An exhaustive audit of
+controller-bit `0x2000` in the pinned decomp found only three Z reads: one
+`buttonDown` read that accelerates a generic list helper, one `buttonPressed`
+read that cycles a three-state display, and one `buttonPressed` read that resets
+mode state. No Z-plus-button gameplay chord was found. Kids Club uses the
+D-pad/stick, A/B, or alternating L/R depending on the minigame; persistent Z is
+not part of its normal controls.
 
 Sources:
 
@@ -56,8 +59,8 @@ normal Z press/hold/release and practical access to its L/R inspection actions.
   touchscreen user can enter an inspection chord sequentially without making
   the shoulder remain toggled indefinitely.
 - Z follows normal finger-down/finger-up semantics. A very short tap is retained
-  for several runtime polls, but a long press does not toggle a persistent
-  latch.
+  for several runtime polls. A finger may keep Z held for the one list-speed
+  path, but release clears it instead of toggling a persistent latch.
 - Clear every held and retained input when editing controls, opening ROM
   management, cancelling touches, or leaving the foreground.
 - Keep the full N64 surface available because menus, battle, Kids Club, GB

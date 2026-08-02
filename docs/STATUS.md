@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 08:59 CDT
+Updated: 2026-08-02 09:08 CDT
 
 ## Current state
 
@@ -53,8 +53,14 @@ source-consistent Release app then built, installed, rendered two advancing
 attract scenes, and remained alive through a 12-second live sample. Its
 380,988,632-byte executable hashes to
 `19bcd1cfef6f0fbaaac31acb046128baa748f87e5e231853de4a4c960b57b540`.
-The local Simulator UI-control bridge timed out on three attachment attempts,
-so revised Z/L/R UIKit gesture acceptance remains open rather than inferred.
+After three earlier Simulator UI-control attachment timeouts, a fresh sanctioned
+UI session attached to the dedicated iPhone 16 Pro Simulator. Direct taps on
+the current clean build's START, A, and D-left controls advanced title -> Game
+Pak Check -> main selection, then moved the selection to Battle Now and entered
+its one-player setup. PID 52349 remained alive and no AnnePad crash report was
+present. This closes ordinary current-iPhone touch routing, but action-specific
+quick-Z, held-L, and R-plus-selection acceptance remains open rather than being
+inferred from control hit testing.
 Physical-device runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
