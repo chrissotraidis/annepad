@@ -230,6 +230,15 @@ Because the scene mix was not frame-identical and a fresh sample still showed
 changing descriptor/XPC work, treat this as directional evidence, not a final
 benchmark or performance sign-off.
 
+On 2026-08-02, the exact diagnostic-free Release Simulator executable
+`19bcd1cf...b540` was relaunched on the iPad Pro 11-inch (M4). It advanced from
+the transient launch card to the animated title path and stayed alive for 45
+seconds; start/end screenshots differed and no AnnePad crash report was present
+in the preceding three days. The Metal HUD environment did not render a usable
+overlay in this Simulator, and a 15-second Game Performance Overview trace hung
+during finalization and was discarded. The present-window measurements above
+remain the current Simulator FPS evidence.
+
 A fresh internal-resolution test used RT64's actual manual resolution
 multiplier rather than shrinking the Metal drawable. The 1x run remained
 full-screen but visibly pixelated and did not improve cadence over the default

@@ -152,8 +152,9 @@ patches.
   `evidence/m5-ios-touch-rental-battle-corrected-result.png` (SHA-256
   `1b931d2d684884fdac983086a4ddb4a439c7d868d1ba1e4a7da9d07bb449b0f3`).
   Game-specific research subsequently removed persistent Z latching while
-  retaining normal touch-down hold and short-tap delivery. A fresh Simulator
-  smoke and physical-device acceptance remain required.
+  retaining normal touch-down hold and short-tap delivery. A fresh exact-source
+  Simulator smoke passed; direct revised-control gestures and physical-device
+  acceptance remain required.
 - A temporary source-local counter at RT64's actual Metal swap-chain present
   call measured the validation candidate on the iPad Pro 11-inch (M4), iOS
   18.5. In the title/attract path it reached the scene's observed 30 Hz ceiling
@@ -199,6 +200,12 @@ patches.
   single-entry setter hotspot was replaced by bulk `setBuffers`/`setTextures`
   calls. This is a directional Simulator throughput result, not FPS or physical
   iPad acceptance.
+- On 2026-08-02 the exact 380,988,632-byte Release Simulator executable
+  `19bcd1cf...b540` relaunched on the iPad Pro 11-inch (M4), advanced from its
+  transient launch card to the animated title path, and remained alive for 45
+  seconds. The captures differ, no AnnePad crash report exists in the preceding
+  three days, and current logs show active Metal/audio initialization rather
+  than termination. This is a crash/freeze smoke, not FPS acceptance.
 - On an iPhone 16 Pro Simulator, a cold launch with no ROM presents an upright
   native setup screen. The document picker imported the user's local `.v64`,
   normalized and validated it to the exact 32 MiB supported image, stored it
@@ -283,8 +290,8 @@ patches.
   sample, but no frame-identical FPS capture or physical-device measurement has
   accepted performance. Physical iPad evidence is still required before
   deciding whether remaining Metal/XPC overhead is a device release blocker.
-- `xctrace` reports no attached physical iPhone or iPad, the keychain has zero
-  valid code-signing identities, and no provisioning profile is installed.
+- A 2026-08-02 refresh found no attached physical iPhone or iPad, zero valid
+  code-signing identities, and no installed provisioning profile.
 - Release now compiles 96 upstream diagnostic hook sites and their argument
   evaluation out while retaining six correctness hooks. Targeted probe output
   is zero; the wider release-configuration classification remains open.
@@ -320,7 +327,9 @@ App-menu Quit exits cleanly.
 ## Next concrete task
 
 Complete the revised Z press/release, held-L, and R-plus-selection Simulator
-gate when the local UI-control bridge is available.
+gate when a supported UI-control bridge is available. `simctl io` exposes only
+display capture/configuration here, the external gesture tools are absent, and
+three sanctioned UI-control bridge attachments timed out.
 When lawful signing assets and hardware are available, install this reproduced
 candidate and measure the same heavy
 battle on a physical

@@ -626,3 +626,25 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Boundary: this proves the current source and unsigned package, not signed
   installation, physical iPad performance, controller, touch, speaker,
   lifecycle, thermal, or orientation acceptance.
+
+## 2026-08-02 08:24–08:36 CDT — Current runtime and external-gate refresh
+
+- Confirmed local `HEAD` and `origin/main` at `cf73caa...869f`, with the bounded
+  build and exact package evidence published to private GitHub `main`.
+- Refreshed physical deployment prerequisites: `xctrace` listed only the Mac and
+  Simulators, `devicectl` found no device, the keychain contained zero valid
+  signing identities, and neither provisioning-profile location contained a
+  profile.
+- Relaunched the exact 380,988,632-byte Release Simulator executable
+  `19bcd1cf...b540`. PID 46549 remained alive for 45 seconds and two captures
+  advanced from the transient launch card to the Pokémon Stadium title path;
+  no AnnePad crash report was found from the preceding three days.
+- Attempted external frame measurement without changing source. The Metal HUD
+  did not appear in the Simulator capture, and an attached 15-second Game
+  Performance Overview trace hung during finalization and was discarded. The
+  prior in-app present-window measurements remain the honest Simulator FPS
+  evidence.
+- Re-audited direct gesture options. This Xcode's `simctl io` has no touch
+  injection, `idb`, Maestro, and AppleSimulatorUtils are absent, and the
+  sanctioned UI-control bridge had already timed out three times. Direct revised
+  Z/L/R UIKit acceptance remains open rather than inferred.

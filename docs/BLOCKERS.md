@@ -187,7 +187,9 @@ Resolved entries are never deleted.
   on physical iPhone and iPad before resolving this blocker.
 - Local limitation: the Simulator UI-control bridge timed out on three
   attachment attempts after the exact app launched, so this gesture gate was
-  not inferred from screenshots or process survival.
+  not inferred from screenshots or process survival. A 2026-08-02 refresh also
+  confirmed that this Xcode's `simctl io` supports display capture/configuration
+  but no touch injection, and `idb`, Maestro, and AppleSimulatorUtils are absent.
 
 ## B-014 — iOS platform and dynamic-code separation is not yet compiled
 
