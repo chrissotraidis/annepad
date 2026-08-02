@@ -94,7 +94,9 @@ replacement.
   preserving analog stick values and normalized N64 button masks. A later
   game-specific control audit rejected HarkinianPad's persistent Z latch:
   Stadium's identified Z actions are edge-triggered except for generic held-Z
-  scroll acceleration, while its documented battle chords hold L/R.
+  scroll acceleration. Live US 1.0 battle proof identifies L as cancel and
+  held R as the assignment-reveal action; the manual also documents R plus a
+  Pokémon's assigned button for pre-battle data inspection.
 
 ## D-010 — Public redistribution remains gated
 

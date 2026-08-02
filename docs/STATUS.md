@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 09:14 CDT
+Updated: 2026-08-02 09:23 CDT
 
 ## Current state
 
@@ -63,8 +63,12 @@ game action: three separate Z taps cycled the lower display through gold
 nameplate, blue nameplate, hidden, and back to gold; L opened the background
 selector; and R entered the telephoto close-up. PID 53536 remained alive with
 no crash report. This closes current-iPhone quick-Z and independent L/R touch
-routing. Held-L battle inspection and the simultaneous R-plus-selection battle
-chord remain open rather than being inferred from independent button actions.
+routing. A touch-only Battle Now run then selected Pikachu/Squirtle/Bulbasaur,
+reached Pikachu versus Meowth, opened move selection, and captured held R
+revealing Thunderbolt/Quick Attack/Swift/Thunder Wave plus PP/type data. R
+release hid the assignments again, and L returned to the strategy screen. The
+pre-battle simultaneous R-plus-selection data chord remains open rather than
+being inferred from independent or single-held-button actions.
 Physical-device runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
@@ -363,10 +367,10 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Complete the revised Z press/release, held-L, and R-plus-selection Simulator
-gate when a supported UI-control bridge is available. `simctl io` exposes only
-display capture/configuration here, the external gesture tools are absent, and
-three sanctioned UI-control bridge attachments timed out.
+Complete the pre-battle R-plus-selection and simultaneous chord-cancellation
+Simulator gate. The sanctioned UI-control path now passes quick Z, held-R
+reveal/release, and L battle cancel on the current clean iPhone build despite
+three earlier attachment timeouts.
 When lawful signing assets and hardware are available, install this reproduced
 candidate and measure the same heavy
 battle on a physical

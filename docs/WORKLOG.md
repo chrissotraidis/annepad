@@ -572,7 +572,8 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   useful for Pokémon Stadium holds or combinations rather than inheriting it
   solely from a Zelda-oriented reference port.
 - Evidence: the original Stadium battle instructions use R plus a Pokémon
-  button to inspect data and held L to reveal hidden Pokémon/move assignments.
+  button to inspect data. The earlier OCR-based reading assigned hidden move
+  reveal to L; later live US 1.0 proof corrected this to L Cancel / held R Check.
   Z is a cancel/reset-style press. The decompiled game checks `buttonPressed`
   for its identified Z actions; only a generic list-navigation helper reads
   held Z to accelerate scrolling. No Z-plus-button gameplay chord was found.
@@ -600,7 +601,7 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   repeated single-entry setter hotspot; this is directional Simulator evidence,
   not measured FPS or physical-iPad acceptance.
 - Three sanctioned Computer Use attachment attempts timed out. Direct UIKit Z
-  press/release, held-L, and R-plus-selection acceptance therefore remains open
+  press/release, held-R, and R-plus-selection acceptance therefore remained open
   rather than being inferred from the passing host test or visible overlay.
 
 ## 2026-08-02 03:40–08:24 CDT — Current package clean-checkout proof
@@ -720,7 +721,7 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   exists. AnnePad therefore correctly permits finger-down Z hold but does not
   retain a Zelda-style toggle after release.
 - Boundary: ordinary current-iPhone UI touch routing now passes. Quick-Z,
-  held-L, R-plus-selection, physical multitouch ergonomics, speaker, signing,
+  held-R, R-plus-selection, physical multitouch ergonomics, speaker, signing,
   controller, thermal, and physical performance acceptance remain open.
 
 ## 2026-08-02 09:08–09:14 CDT — Observable current iPhone Z/L/R actions
@@ -738,6 +739,24 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - PID 53536 remained alive, no AnnePad crash report was present, and a current
   screenshot was retained under ignored `logs/iphone-current/`.
 - Boundary: quick-Z plus independent L/R current-iPhone touch routing now pass.
-  Held-L battle inspection, simultaneous R-plus-selection, chord release and
+  Held-R battle inspection, simultaneous R-plus-selection, chord release and
   cancellation, physical multitouch ergonomics, speaker, signing, controller,
   thermal, and physical performance remain open.
+
+## 2026-08-02 09:14–09:23 CDT — Held-R battle reveal and L cancel
+
+- Returned from Gallery and used only the current iPhone overlay to enter
+  Battle Now, choose Pikachu/Squirtle/Bulbasaur through their assigned buttons,
+  confirm the team, and reach Pikachu versus Meowth.
+- Move selection initially showed only `L Cancel` and `R Check`. A true held-R
+  gesture visibly revealed Thunderbolt, Quick Attack, Swift, and Thunder Wave
+  with PP/type data. Releasing R hid the assignments again; tapping L returned
+  to the strategy screen.
+- Captured raw held/released Simulator frames at ignored
+  `logs/iphone-current/battle-held-r-moves.png` and
+  `logs/iphone-current/battle-after-r-release.png`. PID 53536 remained alive
+  and no crash report was present.
+- Correction: the earlier manual-OCR interpretation assigned the move reveal to
+  L. The running US 1.0 game is authoritative here: L cancels and held R checks.
+- Boundary: pre-battle R-plus-selection, simultaneous chord cancellation, and
+  physical-device multitouch ergonomics remain open.

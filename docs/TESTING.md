@@ -98,8 +98,12 @@ three separate Z taps to cycle the lower Pokémon display through gold
 nameplate, blue nameplate, hidden, and back to gold; L opened the background
 selection menu; and R entered the telephoto close-up. PID 53536 remained alive
 with no crash report. Quick-Z and independent L/R routing therefore pass on the
-current iPhone Simulator build. Held-L battle inspection and the simultaneous
-R-plus-selection battle chord still require an observable battle test.
+current iPhone Simulator build. A subsequent touch-only Battle Now run selected
+Pikachu/Squirtle/Bulbasaur and reached Pikachu versus Meowth. On move selection,
+a held R visibly revealed Thunderbolt/Quick Attack/Swift/Thunder Wave with PP
+and type data; release hid them again; L returned to strategy selection. Raw
+held/released captures are retained under ignored `logs/iphone-current/`.
+Pre-battle R-plus-selection and simultaneous chord cancellation remain open.
 
 Gate 6 native ROM setup passed 2026-07-31 on an iPhone 16 Pro Simulator, iOS
 18.5. Remove cleared the private normalized/runtime copies and config; cold

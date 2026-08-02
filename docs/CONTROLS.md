@@ -1,6 +1,6 @@
 # Pokémon Stadium controls
 
-Updated: 2026-08-02 09:14 CDT
+Updated: 2026-08-02 09:23 CDT
 
 This is the game-specific input contract for AnnePad's touch design. It covers
 Pokémon Stadium (US) 1.0, not the superficially similar controls of Zelda or
@@ -15,14 +15,16 @@ later Pokémon games.
 | A | Confirm; battle; select assigned Pokémon; several minigame actions. |
 | B | Cancel; choose/change an assigned Pokémon in battle. |
 | C buttons | Choose assigned moves or Pokémon; mode-specific actions. |
-| L | Page/list navigation; hold during battle to reveal hidden Pokémon and move assignments. |
-| R | Page/list navigation; hold R while pressing a Pokémon's assigned button to inspect its data. |
+| L | Page/list navigation; cancel/back in battle selection; Gallery background selection. |
+| R | Page/list navigation; hold to reveal hidden battle assignments; use with an assigned Pokémon button to inspect its data; Gallery telephoto. |
 | Z | Cancel/reset/cycle-style press; held Z only accelerates a generic list scroll helper. |
 | Start | Start/pause or battle forfeit where the current mode allows it. |
 
 The original instruction booklet documents the R-plus-selection inspection
-chord and holding L to check hidden battle assignments. An exhaustive audit of
-controller-bit `0x2000` in the pinned decomp found only three Z reads: one
+chord. The running US 1.0 battle UI labels L as Cancel and R as Check; holding R
+reveals the hidden move assignments and releasing it hides them again. An
+exhaustive audit of controller-bit `0x2000` in the pinned decomp found only
+three Z reads: one
 `buttonDown` read that accelerates a generic list helper, one `buttonPressed`
 read that cycles a three-state display, and one `buttonPressed` read that resets
 mode state. No Z-plus-button gameplay chord was found. Kids Club uses the
@@ -49,7 +51,8 @@ instead of HarkinianPad's synthetic-key path so stick magnitude is preserved.
 
 The 0.5-second persistent Z toggle is the one intentionally rejected mechanism.
 It solves a Zelda-specific targeting ergonomics problem, while Stadium needs a
-normal Z press/hold/release and practical access to its L/R inspection actions.
+normal Z press/hold/release and practical access to Stadium's L cancel and R
+inspection actions.
 
 ## AnnePad touch consequences
 
@@ -68,9 +71,9 @@ normal Z press/hold/release and practical access to its L/R inspection actions.
 
 ## Acceptance
 
-Current iPhone Simulator acceptance now directly covers quick Z's three-state
-Gallery cycle plus independent L background-selection and R telephoto actions.
-Simulator work must still cover held L battle inspection, R-plus-selection
-inspection, ordinary chord release, cancellation, and background/foreground
-clearing. Physical iPhone/iPad acceptance must repeat the full matrix with real
-multitouch ergonomics before release.
+Current iPhone Simulator acceptance directly covers quick Z's three-state
+Gallery cycle, L background selection, R telephoto, held-R battle move reveal,
+R release hiding the assignments again, and L battle cancel. Simulator work
+must still cover the pre-battle R-plus-selection data chord and cancellation of
+a simultaneous chord. Physical iPhone/iPad acceptance must repeat the full
+matrix with real multitouch ergonomics before release.

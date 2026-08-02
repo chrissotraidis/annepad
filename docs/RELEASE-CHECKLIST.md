@@ -38,7 +38,8 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       iPhone background/foreground also passes with same-PID render/save
       continuity, and visible START/A/D-left input reaches Battle Now setup.
       Gallery visibly proves quick-Z cycling plus independent L and R actions.
-      Held-L/R battle chords and the remaining per-form-factor matrix stay open.
+      Battle visibly proves held-R reveal/release and L cancel. Pre-battle
+      R-plus-selection and the remaining per-form-factor matrix stay open.
 - [ ] Signed physical iPhone and iPad builds install and run.
 - [ ] Physical controllers pass on iPhone and iPad.
 - [ ] Customizable touch controls complete a full rental-Pokémon battle on real

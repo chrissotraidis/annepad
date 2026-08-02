@@ -1,5 +1,14 @@
 # Project history
 
+## 2026-08-02 — Held-R battle inspection and L cancel pass
+
+- Used touch only to select Pikachu/Squirtle/Bulbasaur and reach a Battle Now
+  Pikachu-versus-Meowth decision screen on the current iPhone Simulator build.
+- Held R revealed Pikachu's four moves with PP/type data; releasing R hid the
+  assignments again; L returned from move selection to strategy selection.
+- Corrected the earlier control interpretation: live US 1.0 labels L Cancel and
+  R Check. Pre-battle R-plus-selection and physical multitouch remain open.
+
 ## 2026-08-02 — Current iPhone Z/L/R actions are distinct and live
 
 - Reached Gallery through the visible current iPhone overlay and selected a
@@ -7,7 +16,7 @@
 - Three separate Z taps cycled the lower display through gold nameplate, blue
   nameplate, hidden, and back to gold; L opened the background selector; R
   entered the telephoto close-up.
-- Kept held-L battle inspection, simultaneous R-plus-selection, and physical
+- Kept held-R battle inspection, simultaneous R-plus-selection, and physical
   multitouch acceptance open while closing quick-Z and independent L/R routing.
 
 ## 2026-08-02 — Current iPhone touch routing reaches Battle Now
@@ -18,7 +27,7 @@
   through Game Pak Check and the main selection into Battle Now one-player
   setup; PID 52349 stayed alive and no AnnePad crash report was present.
 - Closed ordinary current-iPhone touch routing while keeping action-specific
-  quick-Z, held-L, R-plus-selection, and physical-device acceptance open.
+  quick-Z, held-R, R-plus-selection, and physical-device acceptance open.
 
 ## 2026-08-02 — iPhone background/foreground preserves process and save
 
@@ -63,7 +72,7 @@
 
 - Audited the original Stadium manual and decompiled controller paths instead
   of carrying over HarkinianPad's Zelda-specific Z toggle. The documented
-  battle chords hold L or R; Z remains held only while touched, with brief tap
+  battle inspection holds R while L cancels; Z remains held only while touched, with brief tap
   retention for reliable runtime polling and no persistent latch.
 - Added a bounded RT64 Metal descriptor cache that coalesces contiguous dirty
   resource bindings immediately before draw or dispatch. A matched Simulator

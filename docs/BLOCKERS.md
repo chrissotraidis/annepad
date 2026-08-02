@@ -167,8 +167,9 @@ Resolved entries are never deleted.
   cancellation on editor/ROM/lifecycle changes.
   AnnePad keeps its direct analog N64 snapshot bridge because the reference's
   synthetic keyboard path would discard analog magnitude.
-- Game-specific correction: the official battle instructions and decompiled
-  input reads show held L/R inspection chords but edge-triggered Z actions.
+- Game-specific correction: the official battle instructions, live US 1.0 UI,
+  and decompiled input reads show L cancel, held-R assignment inspection, and
+  edge-triggered Z actions.
   HarkinianPad's Zelda-oriented persistent Z latch was therefore removed;
   touching Z still holds it normally until release and retains very short taps
   across runtime polls.
@@ -188,14 +189,12 @@ Resolved entries are never deleted.
   the explicit `LOSE`, and returned to the main selection menu without a crash.
   Evidence SHA-256 is
   `1b931d2d684884fdac983086a4ddb4a439c7d868d1ba1e4a7da9d07bb449b0f3`.
-- Gate: smoke the non-latching Z path in UIKit, then repeat ergonomics,
-  held-L inspection, R-plus-selection inspection, and stuck-input acceptance
-  on physical iPhone and iPad before resolving this blocker.
-- Local limitation: the Simulator UI-control bridge timed out on three
-  attachment attempts after the exact app launched, so this gesture gate was
-  not inferred from screenshots or process survival. A 2026-08-02 refresh also
-  confirmed that this Xcode's `simctl io` supports display capture/configuration
-  but no touch injection, and `idb`, Maestro, and AppleSimulatorUtils are absent.
+- Current local proof: the sanctioned UI-control path now drives the current
+  clean iPhone Simulator build. Quick Z, independent L/R actions, held-R battle
+  reveal, R release, and L battle cancel all have visible game responses.
+- Gate: smoke pre-battle R-plus-selection and simultaneous chord cancellation,
+  then repeat the full ergonomics and stuck-input matrix on physical iPhone and
+  iPad before resolving this blocker.
 
 ## B-014 — iOS platform and dynamic-code separation is not yet compiled
 
