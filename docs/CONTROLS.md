@@ -1,6 +1,6 @@
 # Pokémon Stadium controls
 
-Updated: 2026-08-02 09:23 CDT
+Updated: 2026-08-02 10:54 CDT
 
 This is the game-specific input contract for AnnePad's touch design. It covers
 Pokémon Stadium (US) 1.0, not the superficially similar controls of Zelda or
@@ -42,10 +42,41 @@ persistent Z is not part of its normal controls. This means AnnePad must retain
 ordinary finger-down Z holding for the list-speed path, but a Zelda-style
 tap-to-toggle latch would add behavior Stadium does not request.
 
+### The reported Z + C-Up + C-Right cheat
+
+One player-written 2000 GameFAQs guide claims that pressing Z, C-Up, and
+C-Right together after an attack makes it miss. That claim is not in the
+official instruction booklet, is absent from GameFAQs' curated Stadium cheat
+list, and is not implemented by the pinned US 1.0 program:
+
+- the exact combination is controller mask `0x2009`, which does not occur in
+  the matching decompilation;
+- `BTN_Z` is never combined with another named button in a condition;
+- every raw controller sample is normalized into `buttonDown` and
+  `buttonPressed` in `controller.c`; no alternate raw-button reader bypasses
+  the audited sites; and
+- each actual Z read has the independent behavior listed above, none of which
+  changes attack accuracy or battle RNG.
+
+The old claim is therefore treated as uncorroborated folklore, not a control
+requirement. AnnePad nevertheless preserves simultaneous Z + C-Up + C-Right
+input through ordinary multitouch, so a future reproducible discovery would
+not require a persistent Z toggle.
+
+The real documented holds and chords are different: hold R and press an
+assigned Pokémon button to inspect it; hold L and R while pressing Start to
+re-center an N64 stick; and some Kids Club games require holding A or
+alternating L/R. AnnePad keeps normal hold semantics for every button and adds
+only bounded shoulder-tap grace to make the R inspection chord practical on a
+touchscreen.
+
 Sources:
 
 - [Pokémon Stadium instruction booklet](https://manualzz.com/doc/24022192/nintendo-64-game-pak-pok%C3%A9mon-stadium-instruction-booklet)
+- [GameFAQs player guide containing the uncorroborated Z claim](https://gamefaqs.gamespot.com/n64/198312-pokemon-stadium/faqs/7083)
+- [GameFAQs curated Pokémon Stadium cheats](https://gamefaqs.gamespot.com/n64/198312-pokemon-stadium/cheats)
 - `ref/harkinianpad/docs/customizable-touch-controls.md`
+- `external/sources/PokemonStadiumRecomp/disasm/src/controller.c`
 - `external/sources/PokemonStadiumRecomp/disasm/src/controller.h`
 - `external/sources/PokemonStadiumRecomp/disasm/src/2E460.c`
 - `external/sources/PokemonStadiumRecomp/disasm/src/fragments/15/fragment15_14CA70.c`

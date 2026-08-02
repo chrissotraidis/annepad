@@ -1,5 +1,18 @@
 # Project history
 
+## 2026-08-02 — Re-audited Z and Stadium's real button chords
+
+- Investigated a 2000 player-guide claim that Z + C-Up + C-Right can force an
+  attack to miss. The official manual and curated cheat list do not corroborate
+  it, and the exact US 1.0 decompilation has no `0x2009` combination or gameplay
+  condition combining Z with another button.
+- Confirmed the real holds/chords are R + assigned Pokémon button for data,
+  Start while holding L + R for stick recentering, held A in Rock Harden, and
+  alternating L/R in Dig! Dig! Dig! Normal press/hold and bounded shoulder grace
+  cover these without persistent Z state.
+- Added a host regression proving independent retained touches can still
+  deliver simultaneous Z + C-Up + C-Right if needed.
+
 ## 2026-08-02 — Release audio observability removed from the hot path
 
 - Found that Release still computed validation-only synthesized-PCM metrics and

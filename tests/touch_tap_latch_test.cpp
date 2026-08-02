@@ -18,6 +18,8 @@ int main() {
     constexpr uint16_t A = 0x8000;
     constexpr uint16_t Z = 0x2000;
     constexpr uint16_t R = 0x0010;
+    constexpr uint16_t C_UP = 0x0008;
+    constexpr uint16_t C_RIGHT = 0x0001;
 
     AnnePadTouchTapLatch taps;
     taps.extend(A, 6);
@@ -38,6 +40,15 @@ int main() {
     expect(taps.consume(), Z, "Z tap");
     taps.clear(Z);
     expect(taps.consume(), 0, "selective Z clear");
+
+    // Z is not persistently toggled, but independent touches may still form
+    // any N64 combination while they overlap.
+    taps.extend(Z, 6);
+    taps.extend(C_UP, 6);
+    taps.extend(C_RIGHT, 6);
+    expect(taps.consume(), static_cast<uint16_t>(Z | C_UP | C_RIGHT),
+           "simultaneous Z and C buttons");
+    taps.clearAll();
 
     taps.extend(static_cast<uint16_t>(A | R | Z), 6);
     taps.clearAll();
