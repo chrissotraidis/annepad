@@ -1,5 +1,17 @@
 # Project history
 
+## 2026-08-02 — Exact current package reproduces from published main
+
+- Ran the full no-hardlink verifier from published commit
+  `f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5` with the legal external US 1.0
+  ROM path and the expected release manifest.
+- Reconstructed the matching ROM, regenerated 1,006 AOT files, built native
+  macOS plus Simulator/device static cores, built and audited the unsigned
+  device app, packaged the IPA, and passed repository checks in isolation.
+- The clean 378,195,736-byte executable reproduced SHA-256 `86be9fe4...4689d`;
+  the clean package reproduced canonical manifest SHA-256
+  `d5c26978...c8f5` byte-for-byte. Physical signed-device gates remain open.
+
 ## 2026-08-02 — Re-audited Z and Stadium's real button chords
 
 - Investigated a 2000 player-guide claim that Z + C-Up + C-Right can force an

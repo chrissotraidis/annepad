@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 09:39 CDT
+Updated: 2026-08-02 14:59 CDT
 
 ## Current state
 
@@ -17,8 +17,13 @@ touch overlay was a bespoke approximation rather than an adaptation of the
 preferred HarkinianPad mechanism. The corrected HarkinianPad-derived low-grip
 layout now builds, installs, accepts touch navigation, survives a short
 background/foreground cycle, and keeps the editor functional on the iPad
-Simulator. The retained `-O0` validation build was confirmed too slow for
-playability. The separate `-O2` Simulator core and Release app are now complete,
+Simulator. A fresh visual audit nevertheless found that the shipping overlay
+still renders those mechanisms as generic gray circles, uses noisy prefixed
+direction labels, and normalizes the phone targets below HarkinianPad's accepted
+point sizes. Its input behavior is proven in Simulator; its visual and physical
+ergonomic quality is not yet accepted. The retained `-O0` validation build was
+confirmed too slow for playability. The separate `-O2` Simulator core and
+Release app are now complete,
 audited, installed, and smoke-tested. They bring title/menu scenes close to the
 game's 30 Hz cadence, but an extended full-resolution attract/battle capture
 still averaged 21.83 presents/s across 80 one-second windows where the game
@@ -312,14 +317,14 @@ patches.
   `d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
   The two 84,612,272-byte archives have raw ZIP SHA-256 values
   `c6ab08f7...efa7` and `950add42...8255`; timestamp variance makes those raw
-  hashes non-authoritative. An earlier no-hardlink isolated clone of source
-  commit
-  `0cc91b6166126fc2156d30bba4114ffc3beb142b` then passed the complete fetch,
-  generation, native macOS, Simulator, optimized device, app, package, and
-  repository verifier for the preceding candidate. It reproduced that
-  378,198,984-byte executable and `bd6f14be...51fa` manifest. Its raw ZIP
-  SHA-256 was
-  `90fa70bf...9f70`; the dependency-lock SHA-256 was
+  hashes non-authoritative. A no-hardlink isolated clone of exact published
+  source commit `f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5` then passed the
+  complete fetch, ROM reconstruction, AOT generation, native macOS, Simulator,
+  optimized device, app, package, audit, and repository verifier for this
+  candidate. It reproduced the 378,195,736-byte executable SHA-256
+  `86be9fe47c51abfa72203b71575638e8cc3c67f37f60cee04357b5476834689d`
+  and exact `d5c26978...c8f5` manifest. Its non-authoritative raw ZIP SHA-256
+  was `4e6f99e2...46994`; the dependency-lock SHA-256 was
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
   Sanitized ignored evidence is retained at `logs/clean-checkout-latest/`.
   The bundle contains only the executable, compiled icons/catalog, metadata,
@@ -400,10 +405,13 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Complete the pre-battle R-plus-selection and simultaneous chord-cancellation
-Simulator gate. The sanctioned UI-control path now passes quick Z, held-R
-reveal/release, and L battle cancel on the current clean iPhone build despite
-three earlier attachment timeouts.
+Compile validation-only lower-level runtime traces out of Release, then rebuild,
+audit, and visibly compare the optimized Simulator app. Finish the AnnePad-owned
+control presentation by applying HarkinianPad's accepted target sizes, N64 color
+hierarchy, shoulder pills, and editor constraints without changing the proven
+direct-analog multitouch bridge. Re-run iPhone/iPad visible layout and touch
+checks, followed by the pre-battle R-plus-selection and simultaneous
+chord-cancellation Simulator gate.
 When lawful signing assets and hardware are available, install this reproduced
 candidate and measure the same heavy
 battle on a physical

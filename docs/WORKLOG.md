@@ -886,3 +886,23 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   `d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
 - Remaining: renderer/lower-level trace configuration classification, a fresh
   isolated rebuild for this exact commit, and all signed physical-device gates.
+
+## 2026-08-02 10:41–14:58 CDT — Exact published-main clean verifier passes
+
+- Ran `scripts/verify-clean-checkout.sh` from clean published commit
+  `f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5` in its no-hardlink isolated clone,
+  with the legal external US 1.0 ROM and expected `d5c26978...c8f5` manifest.
+- Every source pin and maintained patch passed forward/reverse verification.
+  The ROM normalized to MD5 `ed1378bc12115f71209a77844965ba50`, host tools
+  passed their exact hashes, and the 1,006-file AOT manifest was regenerated.
+- Native macOS, Simulator/device static cores, pinned SDL dependencies, the
+  unsigned device app, the app audit, IPA audit, package, touch-latch tests, and
+  repository tests all passed from that isolated source state.
+- The clean 378,195,736-byte executable SHA-256 is
+  `86be9fe47c51abfa72203b71575638e8cc3c67f37f60cee04357b5476834689d`.
+  The raw clean ZIP SHA-256 is `4e6f99e2...46994`; as expected, the authoritative
+  eight-file canonical manifest reproduced exactly at `d5c26978...c8f5`.
+- Dependency-lock SHA-256 is `aff563c4...ca4e`; sanitized ignored evidence was
+  copied to `logs/clean-checkout-latest/`. This closes exact-source/package
+  reproducibility, not signing, physical installation, speaker, controller,
+  thermal, physical touch-battle, or redistribution-rights gates.

@@ -68,9 +68,10 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [x] IPA manifest contains only expected files and every third-party notice.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
 - [x] Canonical sorted uncompressed-content digest and full audit report are
-      recorded and reproduced locally (`d5c26978...c8f5`). The prior candidate
-      passed an isolated no-hardlink checkout; rerun that full verifier for this
-      exact commit. Physical install/retest remains open.
+      recorded and reproduced locally (`d5c26978...c8f5`). Exact published
+      commit `f5b0048...dfd5` passed the isolated no-hardlink verifier; the
+      clean package reproduced the expected manifest byte-for-byte. Physical
+      install/retest remains open.
 
 ## Documentation and handoff
 

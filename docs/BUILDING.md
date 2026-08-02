@@ -124,8 +124,7 @@ sources can change while an older archive still passes static policy audits,
 and linking that stale archive would produce a source-inconsistent app.
 
 The optimized AOT compile can run several very large C translation units at
-once. On a 16 GB Mac, limit core-build concurrency if the default produces
-memory compression or swap churn:
+once. On an 8 GB Mac, limit core-build concurrency:
 
 ```sh
 ANNEPAD_BUILD_JOBS=2 ./scripts/package-ios.sh
@@ -133,7 +132,9 @@ ANNEPAD_BUILD_JOBS=2 ./scripts/package-ios.sh
 
 `ANNEPAD_BUILD_JOBS` must be a positive integer and bounds the native host-tool,
 macOS, and static iOS core builds. Completed objects remain incremental when the
-command is rerun.
+command is rerun. An unrestricted ten-worker clean build on that hardware
+reached roughly 12 GB of swap and completed the largest generated units much
+more slowly; this is build throughput, not game FPS.
 
 The iOS bundle contains only native app resources: compiled original AnnePad
 icons, `PrivacyInfo.xcprivacy`, `ThirdPartyNotices.txt`, metadata, and the
@@ -213,10 +214,19 @@ Two local archive passes have the exact same manifest bytes/digest. The
 378,195,736-byte local unsigned executable hashes to `86be9fe4...4689d` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
 source-consistent candidate has local packages matching at `d5c26978...c8f5`.
-The earlier full no-hardlink isolated verifier at source commit
-`0cc91b61...142b` proved the workflow for the preceding `bd6f14be...51fa`
-candidate; rerun it from the new published commit before calling this exact
-binary clean-checkout-reproduced. Release audio,
+The full no-hardlink isolated verifier then passed from exact published commit
+`f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5`. It reconstructed the US 1.0
+input, regenerated 1,006 AOT files, built native macOS plus Simulator/device
+static cores, rebuilt and audited the unsigned device app, packaged the IPA,
+and reproduced the expected canonical manifest byte-for-byte. The clean
+archive's non-authoritative raw ZIP SHA-256 is
+`4e6f99e2f7e7fa786ab376d8e8a83965659a6f0b05ce22d712f03d077fe46994`;
+the authoritative manifest SHA-256 remains
+`d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
+The dependency-lock SHA-256 is
+`aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`,
+and sanitized evidence is retained under `logs/clean-checkout-latest/`.
+Release audio,
 replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
 surfaces are compiled out and enforced by the app audit. Signed builds retain
 the normal linker UUID for crash symbolication. These are local ignored
