@@ -143,15 +143,15 @@ validation-only audio capture/synthetic, `aspMain` replay/capture/oracle, Ares
 worker, TCP debug-server/port, turbo, environment-autoboot, and unavailable-
 transport surfaces are compiled out. The app audit rejects their markers using
 process substitution so `pipefail` cannot turn an expected `strings` SIGPIPE
-into a false negative. Repeated local packages for the current descriptor-
-batched/clear-state-cache candidate produced identical 8-file canonical
-manifests with SHA-256
-`bd6f14bea0db2342903a91448c8bfc24cc020879a446415ee145c3eb2dfd51fa`;
-the 378,198,984-byte executable hashes to `1c2bd2e9...6850`. A no-hardlink
-isolated clone of source commit `0cc91b61...142b` passed the full fail-closed
-verifier and reproduced both values exactly. Private source publication passes.
-Signing, install/retest, physical hardware, and public-license
-acceptance remain open.
+into a false negative. Repeated local packages for the current audio-ring-free
+candidate produced identical 8-file canonical manifests with SHA-256
+`d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`;
+the 378,195,736-byte executable hashes to `86be9fe4...4689d`. The app audit now
+also rejects release audio-ring and A/B-switch markers. The earlier no-hardlink
+clone of source commit `0cc91b61...142b` passed the full fail-closed verifier for
+the preceding `bd6f14be...51fa` candidate; this exact new source commit still
+needs that isolated rerun. Signing, install/retest, physical hardware, and
+public-license acceptance remain open.
 
 ### Runtime smoke automation
 

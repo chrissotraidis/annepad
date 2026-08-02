@@ -861,3 +861,28 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Determination: current iPhone Simulator lock/unlock, render continuity, save
   continuity, and post-unlock touch recovery pass. Physical lock/unlock, audio
   interruption/route, speaker, signing, and hardware acceptance remain open.
+
+## 2026-08-02 10:23–10:40 CDT — Release audio diagnostic hot path removed
+
+- The release-binary inventory still contained the synthesized-PCM and legacy
+  queue diagnostic rings plus seven A/B environment switches. The shipping
+  bridge bypassed the legacy queue recorder, but `apcm_record` still scanned the
+  complete source buffer and took a mutex for every game audio submission.
+- Kept validation behavior intact while making both recorders no-ops in Release,
+  pinning the proven bridge/target/correction/lead/smoothing values, and extending
+  the app audit to reject those validation markers in a shipping executable.
+- This removes 819,200 bytes of static ring arrays plus the per-buffer PCM
+  metrics and lock. It does not alter the bridge, GB audio path, audio-UAF
+  correctness hooks, or renderer and is not reported as a new FPS measurement.
+- Maintained patch forward/reverse verification and repository tests passed.
+  The 380,985,336-byte Simulator executable SHA-256 is
+  `34d4355083d917dd29de7c9429c6c7c457dbc7ecf6bf377bb6a8e40777ca3f67`;
+  it installed over the preserved private container, rendered the animated
+  intro, and accepted Start through the visible overlay as PID 63227.
+- The audited unsigned device executable is 378,195,736 bytes with SHA-256
+  `86be9fe47c51abfa72203b71575638e8cc3c67f37f60cee04357b5476834689d`.
+  Two 84,612,272-byte packages have different raw ZIP hashes but identical
+  eight-file canonical manifest SHA-256
+  `d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
+- Remaining: renderer/lower-level trace configuration classification, a fresh
+  isolated rebuild for this exact commit, and all signed physical-device gates.

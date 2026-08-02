@@ -112,6 +112,15 @@ is not yet physically proven or release-ready.
   previously audited an existing AOT archive instead of rebuilding it. Both now
   always invoke the incremental core build, so regenerated game sources cannot
   silently link against an old archive.
+- A later release-surface audit found that the default bridge returned before
+  the legacy audio-queue recorder, but the synthesized-PCM recorder still
+  calculated full-buffer metrics and took a mutex for every game audio buffer.
+  Release now pins the measured bridge/smoothing defaults and compiles both
+  diagnostic rings to no-ops. This removes 819,200 bytes of static ring storage
+  and the PCM metric/mutex path without changing the audio bridge, audio-UAF
+  protections, or validation builds. The rebuilt Simulator app rendered and
+  accepted Start; this is deterministic overhead removal, not a new measured-FPS
+  claim.
 
 ### 3. Metal color clears created and leaked native state
 

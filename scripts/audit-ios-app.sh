@@ -79,7 +79,7 @@ fi
 if rg -i -q 'LiveRecomp|MAP_JIT|libretro_(api|core)|TinyCC' < <(strings -a "$binary"); then
     die "forbidden dynamic-code or emulator marker found"
 fi
-release_diagnostic_markers='RECOMP_AUDIO_(DEBUG|SYNTH)|\[audio-debug\]|TCP diagnostics|PSR_(ASPMAIN_(REPLAY|CAPTURE|SPIKE_DIR|DEBUG)|DEBUG_PORT|TURBO|AUTOBOOT)|debug server started|aspmain_(replay|capture)|spike-capture|ares_worker'
+release_diagnostic_markers='RECOMP_AUDIO_(DEBUG|SYNTH)|\[audio-debug\]|TCP diagnostics|PSR_(ASPMAIN_(REPLAY|CAPTURE|SPIKE_DIR|DEBUG)|AUDIO_(BRIDGE|LEAD_MS|MAX_CORR|NO_DECIMATE|TARGET_MS)|AI_SMOOTH|DISABLE_AUDIO_(PCM|QUEUE)_RING|DEBUG_PORT|TURBO|AUTOBOOT)|debug server started|aspmain_(replay|capture)|spike-capture|ares_worker'
 if [[ "$expected_profile" == release ]] &&
    rg -i -q "$release_diagnostic_markers" < <(strings -a "$binary"); then
     die "validation-only diagnostics leaked into release executable"

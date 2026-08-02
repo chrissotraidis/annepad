@@ -1,5 +1,16 @@
 # Project history
 
+## 2026-08-02 — Release audio observability removed from the hot path
+
+- Found that Release still computed validation-only synthesized-PCM metrics and
+  locked a diagnostic ring once per game audio buffer, despite shipping without
+  the debug server that consumes it.
+- Made both audio rings validation-only and pinned the measured bridge/smoothing
+  defaults for Release, removing 819,200 bytes of static ring storage and the
+  per-buffer metric/mutex work while preserving functional audio protections.
+- Rebuilt and visibly smoke-tested Simulator, audited the unsigned device app,
+  and reproduced the new `d5c26978...c8f5` eight-file package manifest twice.
+
 ## 2026-08-02 — Visible battle-transition audit closes the Simulator hitch
 
 - Compared matched battle-entry and steady-state 20-second CPU samples; entry

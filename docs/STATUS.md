@@ -291,9 +291,15 @@ patches.
   (AOT game), `8535ef7c...` (`librecomp`), and `8325b873...`
   (`ultramodern`).
 - `./scripts/package-ios.sh` produced the audited ROM-free unsigned candidate.
-  Its arm64 iPhoneOS executable is 378,198,984 bytes, has no linker UUID, and
-  has SHA-256
-  `1c2bd2e923f60f84127b97cb05a7b536f5acb245784233ebdb92de99421d6850`.
+  Its current arm64 iPhoneOS executable is 378,195,736 bytes, has no linker UUID,
+  and has SHA-256
+  `86be9fe47c51abfa72203b71575638e8cc3c67f37f60cee04357b5476834689d`.
+  Release pins the shipping audio bridge/smoothing values and makes the
+  synthesized-PCM and legacy-queue diagnostic rings validation-only, removing
+  819,200 bytes of static ring storage plus per-buffer PCM metric/mutex work.
+  The 380,985,336-byte Release Simulator executable hashes to `34d43550...3f67`;
+  it installed over the preserved container, rendered the animated intro, and
+  accepted Start through the visible overlay.
   Unsigned builds deliberately link with `-reproducible,-no_uuid`; signed
   builds retain the normal UUID for symbolication. Release builds compile out
   validation-only audio capture/synthetic hooks, `aspMain` capture/replay and
@@ -303,14 +309,16 @@ patches.
 - Two local package passes produced different raw ZIP hashes, as expected from
   archive timestamps, but the exact same 8-file sorted path/size/content
   manifest. Its SHA-256 is
-  `bd6f14bea0db2342903a91448c8bfc24cc020879a446415ee145c3eb2dfd51fa`.
-  The two 84,621,652-byte archives have raw ZIP SHA-256 values
-  `f6005b8d...69ce` and `6933eecd...f7af`; timestamp variance makes those raw
-  hashes non-authoritative. A no-hardlink isolated clone of source commit
+  `d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
+  The two 84,612,272-byte archives have raw ZIP SHA-256 values
+  `c6ab08f7...efa7` and `950add42...8255`; timestamp variance makes those raw
+  hashes non-authoritative. An earlier no-hardlink isolated clone of source
+  commit
   `0cc91b6166126fc2156d30bba4114ffc3beb142b` then passed the complete fetch,
   generation, native macOS, Simulator, optimized device, app, package, and
-  repository verifier. It reproduced the exact 378,198,984-byte executable
-  hash and canonical manifest above. Its raw ZIP SHA-256 was
+  repository verifier for the preceding candidate. It reproduced that
+  378,198,984-byte executable and `bd6f14be...51fa` manifest. Its raw ZIP
+  SHA-256 was
   `90fa70bf...9f70`; the dependency-lock SHA-256 was
   `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`.
   Sanitized ignored evidence is retained at `logs/clean-checkout-latest/`.
@@ -353,12 +361,14 @@ patches.
   code-signing identities, and no installed provisioning profile.
 - Release now compiles 96 upstream diagnostic hook sites and their argument
   evaluation out while retaining six correctness hooks. Targeted probe output
-  is zero; the wider release-configuration classification remains open.
+  is zero. Release also removes the two audio diagnostic rings and pins the
+  proven bridge/smoothing values; the wider release-configuration classification
+  remains open.
 - App Store compatibility and redistribution of unlicensed upstream components
   are not established.
-- High-cost replay, capture, oracle, debug-server, turbo, and autoboot release
-  surfaces are removed. Gameplay/render/audio configuration and lower-level
-  trace toggles remain in the upstream static core; the broader release-
+- High-cost replay, capture, oracle, debug-server, turbo, autoboot, and audio-ring
+  release surfaces are removed. Renderer configuration and lower-level trace
+  toggles remain in the upstream static core; the broader release-
   configuration checklist remains open until those surfaces are classified or
   compiled out.
 

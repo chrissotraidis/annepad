@@ -34,3 +34,90 @@ diff --git a/src/main/recomp_audio_debug.h b/src/main/recomp_audio_debug.h
  #endif /* RECOMP_AUDIO_DEBUG_IMPL */
 +#endif /* ANNEPAD_RELEASE_BUILD */
  #endif /* RECOMP_AUDIO_DEBUG_H */
+diff --git a/src/main/main.cpp b/src/main/main.cpp
+--- a/src/main/main.cpp
++++ b/src/main/main.cpp
+@@ -665,11 +665,17 @@ static SDL_mutex   *g_audio_mtx    = nullptr;
+ static uint32_t     g_bridge_src   = 0;     // source rate the bridge was built at
+ 
+ static bool audio_bridge_enabled() {
++#if defined(ANNEPAD_RELEASE_BUILD)
++    // The bridge is the shipping audio path. The legacy queue remains available
++    // only in validation builds for A/B diagnosis.
++    return true;
++#else
+     static const bool en = [] {
+         const char* v = std::getenv("PSR_AUDIO_BRIDGE");
+         return !(v && v[0] == '0' && v[1] == '\0');   // default ON
+     }();
+     return en;
++#endif
+ }
+ 
+ // Timestamp (SDL performance counter, in ms) of the most recent bridge
+@@ -780,9 +786,15 @@ extern "C" int recomp_audio_bridge_stats(
+ // audio starts promptly. Env overrides (PSR_AUDIO_MAX_CORR /
+ // PSR_AUDIO_TARGET_MS) exist for by-ear A/B against the old behavior.
+ static double psr_audio_env_ms(const char* name, double dflt) {
++#if defined(ANNEPAD_RELEASE_BUILD)
++    // Ship the measured defaults; environment overrides are validation tools.
++    (void)name;
++    return dflt;
++#else
+     const char* v = std::getenv(name);
+     if (!v || !*v) return dflt;
+     return std::atof(v);
++#endif
+ }
+ 
+ static void bridge_reinit_locked() {
+@@ -816,6 +828,11 @@ static void update_audio_converter() {
+ // boundaries). Per the project ring rule this is always-on; query
+ // backward via the `audio_queue_recent` debug command. Env-gate
+ // PSR_DISABLE_AUDIO_QUEUE_RING=1 to disable.
++#if defined(ANNEPAD_RELEASE_BUILD)
++static inline void aq_record(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t) {}
++static inline void apcm_record(const int16_t*, size_t) {}
++static inline void apcm_record_output(const float*, size_t) {}
++#else
+ namespace {
+ struct AudioQueueEvent {
+     uint64_t seq;
+@@ -1000,6 +1017,7 @@ extern "C" size_t recomp_audio_pcm_event_size(void) {
+ extern "C" size_t recomp_audio_pcm_window(void) {
+     return PCM_WINDOW;
+ }
++#endif
+ 
+ static void queue_samples(int16_t* audio_data, size_t sample_count) {
+     apcm_record(audio_data, sample_count);
+@@ -1122,10 +1140,14 @@ static void queue_samples(int16_t* audio_data, size_t sample_count) {
+     // lets us observe whether the SDL queue self-stabilizes (game's
+     // osAiGetLength feedback loop) or grows unbounded (true clock
+     // mismatch) when the decimation drain is removed.
++#if defined(ANNEPAD_RELEASE_BUILD)
++    constexpr bool no_decimate = false;
++#else
+     static const bool no_decimate = [] {
+         const char* v = std::getenv("PSR_AUDIO_NO_DECIMATE");
+         return v && v[0] != '\0' && v[0] != '0';
+     }();
++#endif
+     uint32_t skip_factor = no_decimate ? 0u
+         : static_cast<uint32_t>(cur_queued_microseconds / 100000);
+     if (skip_factor != 0) {
+@@ -1172,10 +1194,14 @@ static size_t get_frames_remaining() {
+         // destabilized the 368/552 task cadence and, through it, the
+         // n_mainbus CPU-stream rings = announcer/crowd static).
+         // PSR_AI_SMOOTH=0 restores the stepped readback for A/B.
++#if defined(ANNEPAD_RELEASE_BUILD)
++        constexpr bool smooth = true;
++#else
+         static const bool smooth = [] {
+             const char* v = std::getenv("PSR_AI_SMOOTH");
+             return !(v && v[0] == '0' && v[1] == '\0');   // default ON
+         }();
++#endif
+         if (smooth) {
+             double anchor = g_last_pull_ms.load(std::memory_order_relaxed);
+             if (anchor > 0.0) {

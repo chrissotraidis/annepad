@@ -198,26 +198,25 @@ added to make a verifier pass.
 
 ## Passing local unsigned candidate
 
-The 2026-08-02 local release build and isolated rebuild produced:
+The current 2026-08-02 local release build produced:
 
-- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,621,652 bytes, raw SHA-256
-  `f6005b8d...69ce`. The independent `--no-build` repack has the same byte size
-  and raw SHA-256 `6933eecd...f7af`; raw ZIP hashes vary with timestamps and are
+- `artifacts/AnnePad-0.1.0-unsigned.ipa`: 84,612,272 bytes, raw SHA-256
+  `c6ab08f7...efa7`. The independent `--no-build` repack has the same byte size
+  and raw SHA-256 `950add42...8255`; raw ZIP hashes vary with timestamps and are
   not the reproducibility authority.
 - `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
 - `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
   manifest SHA-256
-  `bd6f14bea0db2342903a91448c8bfc24cc020879a446415ee145c3eb2dfd51fa`.
+  `d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
 
 Two local archive passes have the exact same manifest bytes/digest. The
-378,198,984-byte local unsigned executable hashes to `1c2bd2e9...6850` and has
+378,195,736-byte local unsigned executable hashes to `86be9fe4...4689d` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
-source-consistent candidate has local packages matching at `bd6f14be...51fa`;
-the full no-hardlink isolated verifier at source commit `0cc91b61...142b`
-reproduced the same executable and manifest. Its raw ZIP SHA-256 was
-`90fa70bf...9f70`; its dependency-lock digest is `aff563c4...ca4e`, and
-sanitized ignored evidence is under
-`logs/clean-checkout-latest/`. Release audio,
+source-consistent candidate has local packages matching at `d5c26978...c8f5`.
+The earlier full no-hardlink isolated verifier at source commit
+`0cc91b61...142b` proved the workflow for the preceding `bd6f14be...51fa`
+candidate; rerun it from the new published commit before calling this exact
+binary clean-checkout-reproduced. Release audio,
 replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
 surfaces are compiled out and enforced by the app audit. Signed builds retain
 the normal linker UUID for crash symbolication. These are local ignored
