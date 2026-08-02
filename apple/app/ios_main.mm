@@ -103,8 +103,6 @@ NSString* layoutDefaultsKey() {
     CGPoint _stickKnob;
     BOOL _editing;
     BOOL _hasUndo;
-    BOOL _zLatched;
-    NSUInteger _zLatchGeneration;
     NSInteger _selected;
 }
 
@@ -248,17 +246,12 @@ NSString* layoutDefaultsKey() {
                 break;
             }
         }
-        const BOOL latched = control.mask == 0x2000 && _zLatched;
-        UIColor* fill = latched
-            ? [UIColor colorWithRed:0.22 green:0.58 blue:0.96 alpha:0.92]
-            : (pressed
-                ? [UIColor colorWithWhite:0.32 alpha:MIN(0.90, alpha + 0.30)]
-                : [UIColor colorWithWhite:0.05 alpha:alpha]);
+        UIColor* fill = pressed
+            ? [UIColor colorWithWhite:0.32 alpha:MIN(0.90, alpha + 0.30)]
+            : [UIColor colorWithWhite:0.05 alpha:alpha];
         UIColor* stroke = (index == _selected && _editing)
             ? [UIColor colorWithRed:1.0 green:0.82 blue:0.18 alpha:0.95]
-            : (latched
-                ? [UIColor colorWithRed:0.62 green:0.82 blue:1.0 alpha:1.0]
-                : [UIColor colorWithWhite:1.0 alpha:MIN(0.75, alpha + 0.18)]);
+            : [UIColor colorWithWhite:1.0 alpha:MIN(0.75, alpha + 0.18)];
         CGContextSetFillColorWithColor(context, fill.CGColor);
         CGContextFillEllipseInRect(context, circle);
         CGContextSetStrokeColorWithColor(context, stroke.CGColor);
@@ -394,7 +387,7 @@ NSString* layoutDefaultsKey() {
 }
 
 - (void)publishInput {
-    uint16_t buttons = _zLatched ? 0x2000 : 0;
+    uint16_t buttons = 0;
     CGFloat x = 0.0;
     CGFloat y = 0.0;
     for (const auto& item : _touchRoles) {
@@ -426,8 +419,6 @@ NSString* layoutDefaultsKey() {
 }
 
 - (void)clearInput {
-    ++_zLatchGeneration;
-    _zLatched = NO;
     _touchRoles.clear();
     _stickOrigin = CGPointZero;
     _stickKnob = CGPointZero;
@@ -445,12 +436,6 @@ NSString* layoutDefaultsKey() {
         NSInteger control = [self controlAtPoint:point includeHidden:_editing];
         if (control == NSNotFound) continue;
         _selected = control;
-        if (!_editing && _controls[control].mask == 0x2000 && _zLatched) {
-            ++_zLatchGeneration;
-            _zLatched = NO;
-            g_touch_taps.clear(0x2000);
-            continue;
-        }
         _touchRoles[touch] = (int)control;
         if (_editing) {
             [self moveSelectedToPoint:point];
@@ -465,27 +450,6 @@ NSString* layoutDefaultsKey() {
             const uint8_t holdPolls = (mask & 0x0030u) != 0
                 ? kShoulderTapHoldPolls : kTapHoldPolls;
             g_touch_taps.extend(mask, holdPolls);
-            if (mask == 0x2000) {
-                const NSUInteger generation = ++_zLatchGeneration;
-                dispatch_after(
-                    dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)),
-                    dispatch_get_main_queue(), ^{
-                        if (_editing || _zLatched || _zLatchGeneration != generation) return;
-                        for (const auto& item : _touchRoles) {
-                            const NSInteger role = item.second;
-                            if (role >= 0 && role < (NSInteger)kControlCount &&
-                                _controls[role].mask == 0x2000) {
-                                _zLatched = YES;
-                                UIImpactFeedbackGenerator* feedback =
-                                    [[UIImpactFeedbackGenerator alloc]
-                                        initWithStyle:UIImpactFeedbackStyleMedium];
-                                [feedback impactOccurred];
-                                [self publishInput];
-                                break;
-                            }
-                        }
-                    });
-            }
         }
     }
     if (!_editing) [self publishInput];
@@ -509,11 +473,6 @@ NSString* layoutDefaultsKey() {
     for (UITouch* touch in touches) {
         auto found = _touchRoles.find(touch);
         if (found != _touchRoles.end()) {
-            const NSInteger role = found->second;
-            if (role >= 0 && role < (NSInteger)kControlCount &&
-                _controls[role].mask == 0x2000 && !_zLatched) {
-                ++_zLatchGeneration;
-            }
             _touchRoles.erase(found);
         }
     }

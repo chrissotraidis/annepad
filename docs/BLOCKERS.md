@@ -133,28 +133,39 @@ Resolved entries are never deleted.
   averaged 23.31 presents/s (4.15–30.56), effectively unchanged from the prior
   23.40 mixed-scene result. Logging is therefore no longer a shipping-surface
   blocker and was not the leading FPS cause.
+- Descriptor-batching result: contiguous dirty resources now use bulk Metal
+  argument-encoder calls immediately before draw/dispatch, while clean sets
+  return without scanning. In the exact-source 12-second attract sample, the
+  workload thread spent 3,928 of 6,849 samples waiting on its command fence and
+  265 waiting on its mutex; the old repeated single-entry setter hotspot was no
+  longer present. This is not a frame-identical FPS or physical-device sign-off.
 - Gate: measure the same heavy scene on a physical iPad before changing shared
   renderer behavior for a Simulator-specific driver cost. If hardware also
   misses the 30 Hz target, capture device GPU/frame-time evidence and optimize
   the smallest proven RT64 path. Physical sustained-battle, thermal, and audio
   evidence remains required.
 
-## B-015 — Touch overlay diverged from the preferred HarkinianPad reference
+## B-015 — Touch overlay physical acceptance remains open
 
-- Status: active implementation/acceptance gap
+- Status: active physical-device acceptance gap
 - Evidence: direct comparison with HarkinianPad commit
   `4db21e4be0f0be52948438de5d8c755d191897ae` found that the retained AnnePad
   build used one hand-drawn full-screen view and generic geometry. It reused
   safe-area normalization, separate profiles, cancellation, and normalized
-  input concepts, but not HarkinianPad's accepted low-grip layouts, pressed
-  feedback, or safe Z latch. The goal names HarkinianPad as the preferred touch
+  input concepts, but not HarkinianPad's accepted low-grip layouts or pressed
+  feedback. The goal names HarkinianPad as the preferred touch
   starting point unless a materially better implementation is proven; no such
   proof was recorded.
 - Current correction: working source now adapts HarkinianPad's physically
-  accepted phone/tablet positions, pressed/latched visuals, 0.5-second Z latch
-  with haptic confirmation, and cancellation on editor/ROM/lifecycle changes.
+  accepted phone/tablet positions, pressed visuals, customization, and
+  cancellation on editor/ROM/lifecycle changes.
   AnnePad keeps its direct analog N64 snapshot bridge because the reference's
   synthetic keyboard path would discard analog magnitude.
+- Game-specific correction: the official battle instructions and decompiled
+  input reads show held L/R inspection chords but edge-triggered Z actions.
+  HarkinianPad's Zelda-oriented persistent Z latch was therefore removed;
+  touching Z still holds it normally until release and retains very short taps
+  across runtime polls.
 - Input correction: quick taps now use independent atomic poll lifetimes per
   N64 button. Deterministic host tests prove exact quick-tap expiry, the longer
   shoulder chord window, overlapping A+R without cross-extension, explicit Z
@@ -171,9 +182,12 @@ Resolved entries are never deleted.
   the explicit `LOSE`, and returned to the main selection menu without a crash.
   Evidence SHA-256 is
   `1b931d2d684884fdac983086a4ddb4a439c7d868d1ba1e4a7da9d07bb449b0f3`.
-- Gate: exercise timed latch/release Z in UIKit plus persistence and
-  background/foreground cancellation. Repeat ergonomics and stuck-input
-  acceptance on physical iPhone and iPad before resolving this blocker.
+- Gate: smoke the non-latching Z path in UIKit, then repeat ergonomics,
+  held-L inspection, R-plus-selection inspection, and stuck-input acceptance
+  on physical iPhone and iPad before resolving this blocker.
+- Local limitation: the Simulator UI-control bridge timed out on three
+  attachment attempts after the exact app launched, so this gesture gate was
+  not inferred from screenshots or process survival.
 
 ## B-014 — iOS platform and dynamic-code separation is not yet compiled
 

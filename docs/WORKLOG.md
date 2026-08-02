@@ -565,3 +565,40 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Boundary: this proves source/package reproducibility, not signed installation
   or physical iPad FPS, controller, touch, speaker, lifecycle, or thermal
   acceptance. Timed UIKit Z-latch acceptance also remains open.
+
+## 2026-08-02 02:00–02:16 CDT — Pokémon Stadium-specific Z control audit
+
+- Question: determine whether HarkinianPad's 0.5-second persistent Z latch is
+  useful for Pokémon Stadium holds or combinations rather than inheriting it
+  solely from a Zelda-oriented reference port.
+- Evidence: the original Stadium battle instructions use R plus a Pokémon
+  button to inspect data and held L to reveal hidden Pokémon/move assignments.
+  Z is a cancel/reset-style press. The decompiled game checks `buttonPressed`
+  for its identified Z actions; only a generic list-navigation helper reads
+  held Z to accelerate scrolling. No Z-plus-button gameplay chord was found.
+- Decision: remove persistent Z toggling and its haptic/latched visuals. Z still
+  follows ordinary touch-down/touch-up hold semantics, and the independent
+  short-tap bridge still preserves taps across runtime polls.
+- Proof so far: the focused host touch-tap test passes and source diff checks
+  pass. The full source-consistent Release Simulator rebuild is in progress;
+  UIKit runtime acceptance is not claimed yet.
+
+## 2026-08-02 02:16–03:40 CDT — Exact-source Simulator rebuild and runtime proof
+
+- Built the complete Release Simulator graph with the Stadium-specific
+  non-latching Z change and contiguous Metal descriptor batching. The static
+  core audit, maintained patch forward/reverse checks, dependency build, and
+  Xcode app link passed.
+- Installed the ROM-free app on the iPad Pro 11-inch (M4), iOS 18.5 Simulator.
+  The preserved private user ROM booted into the animated attract path; two
+  captures showed different rendered scenes and PID 69075 remained alive
+  through a 12-second process sample.
+- The 380,988,632-byte Simulator executable SHA-256 is
+  `19bcd1cfef6f0fbaaac31acb046128baa748f87e5e231853de4a4c960b57b540`.
+  The workload thread spent 3,928 of 6,849 samples waiting on its command fence
+  and 265 on its mutex. Bulk argument-encoder calls replaced the earlier
+  repeated single-entry setter hotspot; this is directional Simulator evidence,
+  not measured FPS or physical-iPad acceptance.
+- Three sanctioned Computer Use attachment attempts timed out. Direct UIKit Z
+  press/release, held-L, and R-plus-selection acceptance therefore remains open
+  rather than being inferred from the passing host test or visible overlay.

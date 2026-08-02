@@ -37,7 +37,7 @@ int main() {
     taps.extend(Z, 6);
     expect(taps.consume(), Z, "Z tap");
     taps.clear(Z);
-    expect(taps.consume(), 0, "Z unlatch cancellation");
+    expect(taps.consume(), 0, "selective Z clear");
 
     taps.extend(static_cast<uint16_t>(A | R | Z), 6);
     taps.clearAll();

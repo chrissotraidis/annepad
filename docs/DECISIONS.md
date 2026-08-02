@@ -90,8 +90,11 @@ replacement.
 - Evidence: the first AnnePad overlay proved a full Simulator touch battle but
   did not justify its visual/state-machine divergence from HarkinianPad. The
   corrected candidate uses the reference's accepted phone/tablet grip geometry,
-  pressed feedback, Z latch/haptic, and lifecycle release behavior while
-  preserving analog stick values and normalized N64 button masks.
+  pressed feedback, customization, and lifecycle release behavior while
+  preserving analog stick values and normalized N64 button masks. A later
+  game-specific control audit rejected HarkinianPad's persistent Z latch:
+  Stadium's identified Z actions are edge-triggered except for generic held-Z
+  scroll acceleration, while its documented battle chords hold L/R.
 
 ## D-010 — Public redistribution remains gated
 

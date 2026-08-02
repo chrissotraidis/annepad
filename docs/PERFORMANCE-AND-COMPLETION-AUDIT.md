@@ -1,6 +1,6 @@
 # Performance and completion audit
 
-Updated: 2026-08-01 18:20 CDT
+Updated: 2026-08-02 03:40 CDT
 
 ## Bottom line
 
@@ -13,9 +13,10 @@ separates four different concerns:
 2. Release previously executed several upstream reverse-engineering probes.
    Ninety-six diagnostic hook sites are now compiled out while the six
    separately classified correctness hooks remain active.
-3. Gameplay correctness has touch-only battle proof. Release completion is now
-   gated by the exact package/clean-build proof, timed Z acceptance, and
-   physical iPad signing, lifecycle, audio, controller, sustained-performance,
+3. Gameplay correctness has touch-only battle proof. The latest exact-source
+   Simulator app builds, renders, advances, and remains alive; release
+   completion is gated by revised-control acceptance and physical iPad signing,
+   touch ergonomics, lifecycle, audio, controller, sustained-performance,
    orientation, and thermal tests.
 4. The retained Simulator process is stable enough to finish a touch-only
    battle and remain alive for hours, but occasional Simulator CoreAudio
@@ -32,6 +33,14 @@ is not yet physically proven or release-ready.
 
 - The optimized game reports a 30 Hz VI rate while the Simulator often presents
   fewer frames.
+- A bounded batching follow-up coalesces contiguous dirty Metal argument-buffer
+  entries immediately before draw/dispatch and bypasses clean descriptor sets.
+  The exact-source 12-second attract sample recorded 6,849 samples on the RT64
+  workload thread, including 3,928 waiting on its command fence and 265 waiting
+  on its mutex. Bulk `setBuffers`/`setTextures` calls replaced the old repeated
+  single-entry setter hotspot. Because the scene is not frame-identical and no
+  present counter was retained, this is directional throughput evidence rather
+  than FPS acceptance.
 - A five-second process sample repeatedly found synchronous
   `MTLSimArgumentEncoder` calls and `MTLSimDriver` XPC replies in the RT64
   workload thread.
@@ -88,11 +97,17 @@ is not yet physically proven or release-ready.
 ### 4. The corrected touch layer is HarkinianPad-derived and battle-proven
 
 - The current overlay adapts HarkinianPad's accepted phone/tablet grip geometry,
-  safe-area behavior, customization model, pressed/latched visuals, 0.5-second
-  Z latch, haptic confirmation, and cancellation rules.
+  safe-area behavior, customization model, pressed visuals, and cancellation
+  rules.
 - AnnePad intentionally uses a direct normalized N64 snapshot instead of
   HarkinianPad's synthetic keyboard events so analog stick magnitude is not
   discarded.
+- HarkinianPad's persistent Z latch is intentionally not retained. The original
+  Stadium battle instructions document R+Pokémon inspection and held L move
+  inspection, while Z is a cancel/reset-style press. Decompiled input paths
+  likewise use `buttonPressed` for Z, with only generic list scrolling reading
+  held Z. Persistent Z could suppress the next press edge or leak into another
+  screen; normal finger-down/finger-up Z behavior remains.
 - Quick taps now have independent atomic poll lifetimes per N64 button, so a
   later shoulder/Z tap cannot extend A/B/Start or another button. Host tests
   cover exact quick-tap expiry, the longer shoulder chord window, overlapping
@@ -100,7 +115,8 @@ is not yet physically proven or release-ready.
 - Start navigation and editor/lifecycle smokes pass in Simulator. A full
   touch-only Battle Now rerun selected Squirtle/Pikachu/Bulbasaur, resolved all
   six rentals through an explicit `LOSE`, and returned to the main selection
-  menu. The timed UIKit Z-latch and physical-device ergonomics remain open.
+  menu. The revised non-latching Z path and physical-device ergonomics remain
+  to be smoke-tested.
 
 ### 5. Current evidence does not reproduce an AnnePad crash
 
@@ -118,18 +134,21 @@ is not yet physically proven or release-ready.
   overlay visible. Cold orientation still needs the planned repeated-boot
   matrix; a raw framebuffer whose pixels are stored in portrait order is not
   itself evidence that the visible app is sideways.
+- The 2026-08-02 source-consistent Release app built and installed cleanly,
+  rendered two visibly different attract frames, and retained PID 69075 through
+  a 12-second live sample. The executable hash is
+  `19bcd1cfef6f0fbaaac31acb046128baa748f87e5e231853de4a4c960b57b540`.
 
 ### 6. The remaining finish line is mostly acceptance work
 
 In priority order:
 
-1. Complete the active source-consistent optimized device build and reproduce
-   its exact unsigned package from a clean checkout.
-2. Complete timed Z-latch UI acceptance with the corrected overlay.
-3. On an attached signed iPad, resolve cold orientation and run the same heavy
+1. Smoke the game-specific non-latching Z path, held-L inspection, and
+   R-plus-selection inspection with the corrected overlay.
+2. On an attached signed iPad, resolve cold orientation and run the same heavy
    scene while collecting frame-time,
    memory, thermal, audio, lifecycle, and controller evidence.
-4. Resolve upstream licensing and store/distribution requirements before any
+3. Resolve upstream licensing and store/distribution requirements before any
    public release.
 
 ## Decision rules

@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 01:18 CDT
+Updated: 2026-08-02 03:40 CDT
 
 ## Current state
 
@@ -42,8 +42,15 @@ deterministic tests cover overlap, expiry, Z clearing, and lifecycle clearing,
 and the rebuilt Release app accepted quick Start navigation in Simulator. A
 complete corrected-overlay rerun then selected Squirtle/Pikachu/Bulbasaur,
 resolved all six rentals through the explicit `LOSE` result, and returned to
-the main selection menu using touch only. Timed UIKit Z-latch acceptance remains
-open.
+the main selection menu using touch only. A subsequent game-specific control
+audit removed the inherited persistent Z latch: Stadium's sustained inspection
+chords use L/R, while its Z paths are edge-triggered cancel/reset actions. The
+source-consistent Release app then built, installed, rendered two advancing
+attract scenes, and remained alive through a 12-second live sample. Its
+380,988,632-byte executable hashes to
+`19bcd1cfef6f0fbaaac31acb046128baa748f87e5e231853de4a4c960b57b540`.
+The local Simulator UI-control bridge timed out on three attachment attempts,
+so revised Z/L/R UIKit gesture acceptance remains open rather than inferred.
 Physical-device runtime acceptance remains externally gated.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
@@ -131,8 +138,8 @@ patches.
   `5054e4799b43b0b825eaa3094b89cae31fc39aa32fc70081df7017522fda3572`).
   That proof does not accept its ergonomics. The corrected candidate replaces
   its generic defaults with HarkinianPad-derived, physically accepted low-grip
-  phone/tablet geometry, adds pressed-state feedback and a lifecycle-safe
-  hold-to-latch Z control, and keeps AnnePad's direct analog N64 input bridge.
+  phone/tablet geometry, adds pressed-state feedback and lifecycle-safe input
+  clearing, and keeps AnnePad's direct analog N64 input bridge.
   It builds and runs on the iPad Simulator; touch navigation, editor/reset, and
   one background/foreground cycle passed. The overlay is now edge-constrained
   to the live UIKit host rather than relying on an initial frame: three timed
@@ -144,7 +151,9 @@ patches.
   the main selection menu. Evidence:
   `evidence/m5-ios-touch-rental-battle-corrected-result.png` (SHA-256
   `1b931d2d684884fdac983086a4ddb4a439c7d868d1ba1e4a7da9d07bb449b0f3`).
-  The timed UIKit Z-latch and physical-device acceptance remain required.
+  Game-specific research subsequently removed persistent Z latching while
+  retaining normal touch-down hold and short-tap delivery. A fresh Simulator
+  smoke and physical-device acceptance remain required.
 - A temporary source-local counter at RT64's actual Metal swap-chain present
   call measured the validation candidate on the iPad Pro 11-inch (M4), iOS
   18.5. In the title/attract path it reached the scene's observed 30 Hz ceiling
@@ -183,6 +192,13 @@ patches.
   size and accepted Start touch into Game Pak Check. A fresh sample still found
   changing descriptor writes in the dominant Simulator Metal/XPC path, so this
   is retained as a bounded improvement rather than claimed as a complete fix.
+- A follow-up batches contiguous dirty descriptor entries immediately before
+  draw/dispatch and skips clean descriptor sets. In the exact-source 12-second
+  attract sample, the RT64 workload thread spent 3,928 of 6,849 samples waiting
+  on its command fence and 265 waiting on its mutex; the prior repeated
+  single-entry setter hotspot was replaced by bulk `setBuffers`/`setTextures`
+  calls. This is a directional Simulator throughput result, not FPS or physical
+  iPad acceptance.
 - On an iPhone 16 Pro Simulator, a cold launch with no ROM presents an upright
   native setup screen. The document picker imported the user's local `.v64`,
   normalized and validated it to the exact 32 MiB supported image, stored it
@@ -261,10 +277,11 @@ patches.
 - Optimized iOS Simulator frame pacing is measured and remains below acceptance
   in heavy scenes. The pre-cache run averaged 21.83 presents/s across 80 30 Hz
   VI windows, with 34 below 20. Descriptor-state caching improved a follow-up
-  path to 23.40 across 117 windows, with 20 below 20, but changing descriptor
-  updates remain the sampled Simulator hotspot. Physical iPad measurement is
-  required before deciding whether this is Simulator-only overhead or a device
-  release blocker.
+  path to 23.40 across 117 windows, with 20 below 20. Descriptor batching then
+  removed the repeated single-entry setter hotspot from an exact-source live
+  sample, but no frame-identical FPS capture or physical-device measurement has
+  accepted performance. Physical iPad evidence is still required before
+  deciding whether remaining Metal/XPC overhead is a device release blocker.
 - `xctrace` reports no attached physical iPhone or iPad, the keychain has zero
   valid code-signing identities, and no provisioning profile is installed.
 - Release now compiles 96 upstream diagnostic hook sites and their argument
@@ -301,8 +318,10 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Complete the timed Z-latch UIKit gate. When lawful signing assets and hardware
-are available, install this reproduced candidate and measure the same heavy
+Complete the revised Z press/release, held-L, and R-plus-selection Simulator
+gate when the local UI-control bridge is available.
+When lawful signing assets and hardware are available, install this reproduced
+candidate and measure the same heavy
 battle on a physical
 iPad before changing the renderer for a Simulator-specific bottleneck, and
 execute the signed controller, speaker, lifecycle, thermal, and hardware

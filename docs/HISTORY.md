@@ -1,5 +1,19 @@
 # Project history
 
+## 2026-08-02 — Stadium-specific controls and Metal descriptor batching
+
+- Audited the original Stadium manual and decompiled controller paths instead
+  of carrying over HarkinianPad's Zelda-specific Z toggle. The documented
+  battle chords hold L or R; Z remains held only while touched, with brief tap
+  retention for reliable runtime polling and no persistent latch.
+- Added a bounded RT64 Metal descriptor cache that coalesces contiguous dirty
+  resource bindings immediately before draw or dispatch. A matched Simulator
+  sample removed the prior repeated descriptor-setter hotspot and increased
+  renderer wait-for-work time. The exact-source Release app then built,
+  installed, rendered advancing attract scenes, and remained alive through a
+  12-second sample. Direct revised-control UI acceptance remains open because
+  the local Simulator UI-control bridge timed out.
+
 ## 2026-08-02 — Exact-source unsigned package reproduced
 
 - Rebuilt the complete locked source graph from a no-hardlink isolated clone of
