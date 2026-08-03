@@ -966,3 +966,27 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   pushed it directly to private GitHub `main`; local `HEAD` and `origin/main`
   matched exactly afterward. The isolated verifier for preceding published
   commit `6ca62d3` remained in progress and was not reported as passing.
+
+## 2026-08-02 16:45–21:28 CDT — Clean candidate proof and acceptance soak
+
+- Finished `scripts/verify-clean-checkout.sh` against exact published commit
+  `ceffab4e269e87ba4768cc2a4555eaf73e09f2f4`, the external legal US 1.0 ROM,
+  and expected manifest `4b7ef2d7...af21fd`. The no-hardlink clone passed source
+  pins/patches, ROM reconstruction, 1,006-file AOT generation, native macOS,
+  Simulator/device cores, SDL dependencies, app/package builds, audits, and
+  repository tests.
+- The clean 378,197,336-byte executable SHA-256 is
+  `a97b86428340bb5b3350ef60a2ce7e7cdb8ee5e571d2a1fb7fbf312fcbafc6cf`;
+  canonical manifest SHA-256 is `4b7ef2d7...af21fd`; raw timestamped ZIP
+  SHA-256 is `f09613ea...cdf6`; dependency-lock SHA-256 is `aff563c4...ca4e`.
+- Added `scripts/soak-ios-simulators.sh` and ran 180-second Release soaks on
+  iPhone 16 Pro and iPad Pro 11-inch (M4), iOS 18.5. Both spent 90 seconds in
+  foreground, five seconds behind Settings, and 90 seconds restored; both kept
+  the original PID and produced no new AnnePad crash report.
+- Inspected the actual Simulator windows through Computer Use. Both remained
+  upright in landscape; raw `simctl` captures used portrait coordinate order,
+  so the harness now retains the raw frame and creates a normalized landscape
+  copy. Evidence is ignored under `logs/simulator-soak-20260803T021555Z/`.
+- Classified fixed iOS renderer settings and documented recovery through a
+  scoped local-acceptance tag. The next product gate is the signed physical
+  iPhone/iPad matrix, not further unguided Simulator optimization.

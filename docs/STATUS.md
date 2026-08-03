@@ -1,6 +1,6 @@
 # Status
 
-Updated: 2026-08-02 16:26 CDT
+Updated: 2026-08-02 21:28 CDT
 
 ## Current state
 
@@ -97,7 +97,10 @@ texture limit. The crash is renderer-side, not touch-side. RT64's maintained
 iOS sizing clamp now matches the 8,192 limit; the rebuilt Release app completed
 a continuous 60-second title/attract/battle run with framebuffer logging and no
 new crash report. This closes the reproduced failure mode for the Simulator
-candidate, but physical-device and longer soak acceptance remain open.
+candidate. A later 180-second Release soak on both iPhone 16 Pro and iPad Pro
+11-inch (M4), iOS 18.5 Simulators kept the same process alive across foreground,
+Settings background, and restored foreground intervals, with no new AnnePad
+crash report. Physical-device acceptance remains open.
 AnnePad now builds as a native arm64 `.app`, renders through Metal, outputs
 CoreAudio, accepts keyboard input through the normalized N64 path, persists its
 game save, and has completed a full rental battle through an explicit result.
@@ -356,6 +359,15 @@ patches.
   The bundle contains only the executable, compiled icons/catalog, metadata,
   privacy manifest, and notices; it has no ROM, save, desktop artwork,
   provisioning profile, signature, unexpected dylib, or local developer path.
+- The current published candidate at exact commit
+  `ceffab4e269e87ba4768cc2a4555eaf73e09f2f4` also passed the complete
+  no-hardlink isolated verifier. It reproduced the 378,197,336-byte executable
+  SHA-256
+  `a97b86428340bb5b3350ef60a2ce7e7cdb8ee5e571d2a1fb7fbf312fcbafc6cf`
+  and canonical manifest SHA-256
+  `4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
+  Its non-authoritative raw ZIP SHA-256 was
+  `f09613ea4e1eb01bb423cb72efa3af6b4ab7b4ec537f05daaec479ccfd86cdf6`.
 - Default `package-ios.sh` now rebuilds the canonical device Release app before
   auditing and archiving. The previous missing-only condition was reproduced
   packaging the stale pre-overlay-fix binary; `--no-build` is now the sole
@@ -393,15 +405,18 @@ patches.
 - Release now compiles 96 upstream diagnostic hook sites and their argument
   evaluation out while retaining six correctness hooks. Targeted probe output
   is zero. Release also removes the two audio diagnostic rings and pins the
-  proven bridge/smoothing values; the wider release-configuration classification
-  remains open.
+  proven bridge/smoothing values. The retained iOS renderer configuration is
+  now classified: the native stub fixes fullscreen, 1x display scaling, and no
+  MSAA, while RT64 configuration-file loading is disabled and no renderer menu
+  is exposed.
 - App Store compatibility and redistribution of unlicensed upstream components
   are not established.
 - High-cost replay, capture, oracle, debug-server, turbo, autoboot, and audio-ring
   release surfaces are removed. Release now also compiles out the runtime and
   scheduler trace rings/recorders, removing 7,536,688 bytes of zero-fill static
   storage plus per-event trace work; the app audit rejects their exported
-  symbols. Retained renderer configuration still requires final classification.
+  symbols. The retained renderer defaults are fixed and classified as described
+  above.
 
 ## Known regressions
 
@@ -423,7 +438,8 @@ App-menu Quit exits cleanly.
 
 - Host tools: macOS arm64 command-line executables.
 - Reference runtime: macOS arm64 native app bundle (passing).
-- Passing runtime target: arm64 iOS Simulator on iPad Pro 11-inch (M4), iOS 18.5.
+- Passing runtime targets: arm64 iOS Simulator on iPhone 16 Pro and iPad Pro
+  11-inch (M4), iOS 18.5.
 - Compiling target: arm64 iPhoneOS unsigned app (passing).
 - Packaging target: release-optimized arm64 iPhoneOS app and audited unsigned
   IPA (passing and reproduced exactly from the isolated clean snapshot).
@@ -431,16 +447,15 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Finish the in-flight isolated clean verifier for published commit `6ca62d3` and
-its `63db42dd...bff7` package, then run the same verifier against the current
-side-rail candidate published at `5534784` with manifest
-`4b7ef2d7...af21fd`. Run longer iPhone/iPad Simulator soak and lifecycle checks
-on the new Metal dimension guard. Deterministic overlap/cancellation coverage
-passes, but accept the real pre-battle R-plus-selection gesture only with
-physical multitouch rather than inferring it from serialized Simulator clicks.
+Publish this locally accepted checkpoint and its repeatable Simulator soak
+harness. The exact published candidate at `ceffab4...f2f4` has already passed
+the full isolated verifier with manifest `4b7ef2d7...af21fd`, and both target
+Simulator form factors have passed the 180-second foreground/background/restore
+soak with no new crash report and the same live PID. No further speculative
+renderer rewrite is justified by the current evidence.
+
 When lawful signing assets and hardware are available, install this reproduced
-candidate and measure the same heavy
-battle on a physical
-iPad before changing the renderer for a Simulator-specific bottleneck, and
-execute the signed controller, speaker, lifecycle, thermal, and hardware
-touch-battle matrix. Keep public redistribution blocked on license review.
+candidate on a physical iPhone and iPad. Run the controller, real-speaker,
+interruption/route, lock/unlock, thermal, sustained-battle, orientation,
+ergonomics, and true-multitouch matrix, including R-plus-selection. Keep public
+redistribution blocked on license review.

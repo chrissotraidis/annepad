@@ -204,6 +204,11 @@ Resolved entries are never deleted.
 - Current local proof: the sanctioned UI-control path now drives the current
   clean iPhone Simulator build. Quick Z, independent L/R actions, held-R battle
   reveal, R release, and L battle cancel all have visible game responses.
+- Stability proof: a repeatable 180-second Release soak passed on both iPhone 16
+  Pro and iPad Pro 11-inch (M4), iOS 18.5 Simulators. Each retained its PID
+  across foreground, Settings background, and restored foreground intervals,
+  with no new AnnePad crash report. This closes the longer local Simulator soak,
+  not the physical-device gate.
 - Gate: deterministic overlap, expiry, and cancellation tests pass, but the
   serialized single-pointer Simulator path cannot honestly accept the real
   pre-battle R-plus-selection gesture. Repeat that chord plus the full

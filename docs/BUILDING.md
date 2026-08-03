@@ -214,15 +214,18 @@ Two local archive passes have the exact same manifest bytes/digest. The
 378,197,336-byte local unsigned executable hashes to `a97b8642...fc6cf` and has
 no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
 source-consistent candidate has local packages matching at `4b7ef2d7...af21fd`.
-The prior package checkpoint's full no-hardlink isolated verifier passed from exact published commit
-`f5b0048b7bd9b38a262f9ef0f516e2a3dae3dfd5`. It reconstructed the US 1.0
+The current package checkpoint's full no-hardlink isolated verifier passed from
+exact published commit `ceffab4e269e87ba4768cc2a4555eaf73e09f2f4`. It
+reconstructed the US 1.0
 input, regenerated 1,006 AOT files, built native macOS plus Simulator/device
 static cores, rebuilt and audited the unsigned device app, packaged the IPA,
 and reproduced the expected canonical manifest byte-for-byte. The clean
 archive's non-authoritative raw ZIP SHA-256 is
-`4e6f99e2f7e7fa786ab376d8e8a83965659a6f0b05ce22d712f03d077fe46994`;
-the authoritative prior clean-checkpoint manifest SHA-256 remains
-`d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`.
+`f09613ea4e1eb01bb423cb72efa3af6b4ab7b4ec537f05daaec479ccfd86cdf6`;
+the authoritative clean-checkpoint manifest SHA-256 is
+`4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
+The clean 378,197,336-byte executable SHA-256 is
+`a97b86428340bb5b3350ef60a2ce7e7cdb8ee5e571d2a1fb7fbf312fcbafc6cf`.
 The dependency-lock SHA-256 is
 `aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`,
 and sanitized evidence is retained under `logs/clean-checkout-latest/`.
@@ -231,3 +234,28 @@ replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
 surfaces are compiled out and enforced by the app audit. Signed builds retain
 the normal linker UUID for crash symbolication. These are local ignored
 artifacts, not a signed install or public distribution authorization.
+
+## Rollback and recovery
+
+The local-acceptance tag is the source rollback point. Inspect it before use and
+build it on a new branch; do not rewrite `main`:
+
+```bash
+git fetch origin --tags
+git switch -c codex/rollback-annepad-local-acceptance \
+  annepad-local-acceptance-2026-08-02
+./scripts/verify-clean-checkout.sh \
+  --rom /absolute/path/to/legal-user-rom.v64 \
+  --expected-manifest /absolute/path/to/AnnePad-0.1.0-unsigned.manifest.sha256
+```
+
+For Simulator or signed-device recovery, install the known-good app over the
+existing installation. Do not uninstall first: uninstalling removes the private
+app container, including the user-imported ROM and saves. AnnePad's atomic save
+path restores a valid backup and quarantines a corrupt primary automatically;
+copy any important device container or save evidence before further testing.
+Never commit the ROM, saves, signing material, IPA, or device container.
+
+The tag means locally reproduced source/package plus Simulator acceptance. It
+does not mean a signed physical-device build, public-distribution authorization,
+or App Store acceptance.

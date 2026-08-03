@@ -35,12 +35,13 @@ evidence pass; compilation is never substituted for interaction.
   physical interruption/route/lock/update/termination acceptance remains open.
 - M8: intentionally absent from the base candidate.
 - M9: release resources, optimized arm64 app, app/IPA audits, and two-pass
-  canonical unsigned-IPA reproduction pass locally. The previous candidate's
-  isolated committed snapshot passed the fail-closed full clean-checkout
-  verifier. The current hardened candidate compiles out validation-only audio,
+  canonical unsigned-IPA reproduction pass locally. The current published
+  candidate at `ceffab4...f2f4` passed the fail-closed full clean-checkout
+  verifier and exact `4b7ef2d7...af21fd` manifest comparison. It compiles out validation-only audio,
   replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-
-  transport surfaces and rejects them by audit; its isolated reproduction is
-  the next software gate. Private repository publication passes. Signing,
+  transport surfaces and rejects them by audit. A repeatable 180-second Release
+  soak also passes on both target Simulator form factors. Private repository
+  publication passes. Signing,
   installation, physical retest, and public-license gates remain open until
   separately evidenced.
 

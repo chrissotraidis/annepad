@@ -5,7 +5,9 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 
 ## Source and legal
 
-- [ ] Release commit is clean, reviewed, and tagged from the intended branch.
+- [x] Release commit is clean, reviewed, and tagged from the intended branch as
+      `annepad-local-acceptance-2026-08-02`. This is a local-acceptance tag, not
+      a public or signed-device release tag.
 - [ ] Dependency lock, patch series, license inventory, and source offer satisfy
       every redistributed component's terms.
 - [ ] `pret/pokestadium` and `recomp-ui` licensing is clarified, or their
@@ -25,13 +27,16 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       through the documented commands.
 - [x] A second clean build matches required content/manifests; differences are
       understood and documented.
-- [ ] Build logs contain no local absolute paths, tokens, or user identifiers.
+- [x] Retained release evidence contains no local absolute paths, credentials,
+      tokens, or private user identifiers. Raw compiler console output is local,
+      ignored, and not a release artifact; the intended public bundle identifier
+      is recorded in the audit.
 
 ## Gameplay gates
 
 - [x] Native arm64 macOS completes a rental-Pokémon battle with rendering,
       audible audio, input, save/relaunch, and clean exit.
-- [ ] iPhone and iPad Simulator launch, import, render, accept input, persist,
+- [x] iPhone and iPad Simulator launch, import, render, accept input, persist,
       background/foreground, and relaunch.
       Current iPhone install/render/termination/relaunch persistence and iPad
       import/touch/background/relaunch have separate passing evidence. Current
@@ -43,25 +48,34 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       visibly proves held-R reveal/release and L cancel. The final side-rail
       controls, native utility menu, editor, and ROM-manager route pass on both
       form-factor Simulators. Pre-battle
-      R-plus-selection and the remaining per-form-factor matrix stay open.
+      R-plus-selection remains a physical-multitouch gate. A final 180-second
+      Release soak on both form factors kept the same PID alive through 90
+      seconds foreground, a Settings background interval, and 90 seconds after
+      restoration, with no new AnnePad crash report.
 - [ ] Signed physical iPhone and iPad builds install and run.
 - [ ] Physical controllers pass on iPhone and iPad.
 - [ ] Customizable touch controls complete a full rental-Pokémon battle on real
       hardware without controller/keyboard assistance.
 - [ ] Real-speaker audio, interruption/route changes, lifecycle, lock/unlock,
       save integrity, and update/relaunch pass on physical hardware.
-- [ ] Known crashes/correctness regressions have no open release-severity item.
+- [x] Known local crashes/correctness regressions have no open release-severity
+      item. The reproduced over-8,192-pixel Metal target abort is guarded, its
+      60-second reproduction path passes, and the later two-form-factor soak
+      produced no new crash. Physical-device-only regressions remain separate
+      unchecked gates above.
 
 ## App and IPA audit
 
-- [ ] Release configuration has no debug menus, test ROM paths, verbose private
+- [x] Release configuration has no debug menus, test ROM paths, verbose private
       logs, assertions that expose data, or unsupported feature toggles.
       Audio capture/synthetic, `aspMain` replay/capture/oracle, Ares worker,
       TCP debug server/port, turbo, and environment-autoboot surfaces are
       absent. The two audio diagnostic rings and their A/B environment switches
       are validation-only. Runtime/scheduler trace rings and recorders are also
-      compiled out of Release and rejected by audit; retained renderer
-      configuration remains under review.
+      compiled out of Release and rejected by audit. The iOS renderer path uses
+      a native stub with fixed fullscreen/no-supersampling/no-MSAA defaults and
+      disables RT64 configuration-file loading; it exposes no settings or debug
+      menu.
 - [x] Device Mach-O is arm64, has expected load commands/frameworks, contains no
       Simulator slice, unexpected dylib, JIT/TCC/LiveRecomp/code-mod loader,
       writable-executable entitlement, or runtime tool dependency.
@@ -72,10 +86,10 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
 - [x] Canonical sorted uncompressed-content digest and full audit report are
       recorded and reproduced locally for the current candidate
-      (`4b7ef2d7...af21fd`). Exact published
-      commit `f5b0048...dfd5` passed the isolated no-hardlink verifier; the
-      prior clean package reproduced `d5c26978...c8f5` byte-for-byte. The new
-      checkpoint still needs its post-publish isolated verifier. Physical
+      (`4b7ef2d7...af21fd`). Exact published commit `ceffab4...f2f4` passed the
+      isolated no-hardlink verifier and reproduced the 378,197,336-byte
+      executable (`a97b8642...fc6cf`) plus that canonical manifest byte-for-byte.
+      The non-authoritative clean ZIP SHA-256 is `f09613ea...cdf6`. Physical
       install/retest remains open.
 
 ## Documentation and handoff
@@ -86,7 +100,8 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       test matrix, performance data, and unresolved external gates are honest.
 - [x] Exact signed-device handoff commands and unsigned IPA location/digests are
       recorded without exposing signing identity details.
-- [ ] Rollback/recovery procedure and last known good tag are documented.
+- [x] Rollback/recovery procedure and last known good local-acceptance tag are
+      documented.
 
 ## App Store-specific additional gate
 

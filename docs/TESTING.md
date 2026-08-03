@@ -130,8 +130,15 @@ target exceeded the Simulator Metal limit of 8,192. The crashing stack was
 `RenderTarget::setupColor` -> `MetalTexture` on `RT64 Workload`. The maintained
 iOS render-target clamp now uses 8,192; both Simulator and device Release builds
 pass, and the rebuilt iPhone app completed a continuous 60-second logged run
-through title/attract/battle without another crash. Longer and physical-device
-soak remain open.
+through title/attract/battle without another crash. A subsequent repeatable soak
+ran the Release app for 180 seconds each on iPhone 16 Pro and iPad Pro 11-inch
+(M4), iOS 18.5 Simulators: 90 seconds foreground, a five-second Settings
+background interval, then 90 seconds restored. Each retained its original PID
+and produced no new AnnePad crash report. Computer Use inspection confirmed the
+actual Simulator windows remained upright in landscape; raw `simctl` PNGs used
+portrait pixel coordinates, so the harness also writes a normalized landscape
+copy. Ignored evidence is retained under
+`logs/simulator-soak-20260803T021555Z/`. Physical-device soak remains open.
 
 Gate 6 native ROM setup passed 2026-07-31 on an iPhone 16 Pro Simulator, iOS
 18.5. Remove cleared the private normalized/runtime copies and config; cold
@@ -167,14 +174,16 @@ validation-only audio capture/synthetic, `aspMain` replay/capture/oracle, Ares
 worker, TCP debug-server/port, turbo, environment-autoboot, and unavailable-
 transport surfaces are compiled out. The app audit rejects their markers using
 process substitution so `pipefail` cannot turn an expected `strings` SIGPIPE
-into a false negative. Repeated local packages for the current audio-ring-free
-candidate produced identical 8-file canonical manifests with SHA-256
-`d5c26978dbc8d3443823df47444ea574af8e02278362450d8eb8480aca02c8f5`;
-the 378,195,736-byte executable hashes to `86be9fe4...4689d`. The app audit now
-also rejects release audio-ring and A/B-switch markers. The earlier no-hardlink
-clone of source commit `0cc91b61...142b` passed the full fail-closed verifier for
-the preceding `bd6f14be...51fa` candidate; this exact new source commit still
-needs that isolated rerun. Signing, install/retest, physical hardware, and
+into a false negative. Repeated local packages for the current candidate
+produced identical 8-file canonical manifests with SHA-256
+`4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`;
+the 378,197,336-byte executable hashes to
+`a97b86428340bb5b3350ef60a2ce7e7cdb8ee5e571d2a1fb7fbf312fcbafc6cf`.
+The app audit also rejects release audio-ring and A/B-switch markers. The
+no-hardlink clone of exact published commit
+`ceffab4e269e87ba4768cc2a4555eaf73e09f2f4` passed the full fail-closed
+verifier and reproduced that manifest byte-for-byte. Its raw timestamped ZIP
+SHA-256 is `f09613ea...cdf6`. Signing, install/retest, physical hardware, and
 public-license acceptance remain open.
 
 ### Runtime smoke automation
@@ -360,6 +369,25 @@ rejected because Computer Use showed the game surface incorrectly occupying only
 the upper-left quarter. All temporary probes were removed, full-resolution
 Release was rebuilt, and source verification passed. Do not infer physical-iPad
 performance from this Simulator driver result; repeat the heavy scene on device.
+
+## Repeatable Simulator soak
+
+Use the Release app and explicit Simulator UDIDs so the test never depends on a
+changing device name or whichever Simulator happens to be active:
+
+```bash
+ANNEPAD_SOAK_SECONDS=180 \
+  ./scripts/soak-ios-simulators.sh IPHONE_UDID IPAD_UDID
+```
+
+The harness installs without uninstalling, preserving private ROM/save data. On
+each device it launches AnnePad, holds a foreground phase, backgrounds it behind
+Settings, restores it, holds a second phase, captures the final frame and app
+log, rejects any new AnnePad crash report, and requires the restored process ID
+to remain alive. Ignored evidence is written under `logs/simulator-soak-*`.
+This is a repeatable lifecycle/stability gate; it does not replace visible
+gameplay interaction, physical multitouch, speaker, controller, or thermal
+acceptance.
 
 ## Failure report template
 

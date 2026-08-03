@@ -1,5 +1,23 @@
 # Project history
 
+## 2026-08-02 — Exact candidate reproduction and two-form-factor soak
+
+- Completed the full no-hardlink verifier from exact published commit
+  `ceffab4e269e87ba4768cc2a4555eaf73e09f2f4`. It rebuilt the locked source
+  graph, native macOS app, Simulator/device cores, unsigned device app, and IPA,
+  then passed every source, app, package, and repository audit.
+- Reproduced the 378,197,336-byte executable at SHA-256 `a97b8642...fc6cf`, the
+  authoritative eight-file canonical manifest at `4b7ef2d7...af21fd`, and the
+  non-authoritative timestamped clean ZIP at `f09613ea...cdf6`.
+- Added a repeatable Release Simulator soak and passed 180 seconds on both
+  iPhone 16 Pro and iPad Pro 11-inch (M4), iOS 18.5: foreground, Settings
+  background, restore, same PID, and no new crash report. Computer Use confirmed
+  both actual windows were upright in landscape.
+- Classified the retained iOS renderer defaults, documented rollback/recovery,
+  and narrowed remaining acceptance to signed physical hardware plus legal and
+  public-distribution review. No speculative renderer rewrite is currently
+  justified.
+
 ## 2026-08-02 — Side-rail touch layout and native utility menu
 
 - Moved the iPhone stick and right-hand N64 clusters into the black landscape
