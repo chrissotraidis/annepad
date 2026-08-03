@@ -990,3 +990,25 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Classified fixed iOS renderer settings and documented recovery through a
   scoped local-acceptance tag. The next product gate is the signed physical
   iPhone/iPad matrix, not further unguided Simulator optimization.
+
+## 2026-08-03 01:34–02:04 CDT — README finish and exact-tag build refresh
+
+- Compared AnnePad's minimal README with the in-repository HarkinianPad
+  reference and rebuilt it as a screenshot-led public project page. It now
+  explains setup, Harkinian-derived touch mechanics, Simulator acceptance,
+  reproducibility, physical-device handoff, legal limits, and the project map
+  without claiming untested hardware support.
+- Started the full no-hardlink verifier from exact tagged commit
+  `325fda592129e715a69a4973237ac076b4f0ae6e`. It passed locked fetch/pins,
+  patch forward/reverse checks, ROM reconstruction, 1,006-file generation,
+  optimized native macOS, strict Release Simulator core/SDL/app builds, and the
+  no-dynamic-code audit.
+- Confirmed the only changes from the already fully reproduced
+  `ceffab4...f2f4` candidate to the tag are documentation and
+  `scripts/soak-ios-simulators.sh`. Stopped the duplicate strict device-core
+  compile after the exact tag's user-facing build gates passed; the complete
+  iPhoneOS app/IPA reproduction and canonical manifest remain covered by the
+  unchanged prior source.
+- Retained the honest end state: local implementation and Simulator acceptance
+  are complete; signed physical iPhone/iPad validation and licensing/public
+  redistribution remain external blockers.

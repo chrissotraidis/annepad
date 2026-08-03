@@ -1,5 +1,23 @@
 # Project history
 
+## 2026-08-03 — Public README and exact-tag build refresh
+
+- Replaced the minimal status-pointer README with a HarkinianPad-style public
+  project page: badges, gameplay hero, setup/lifecycle captures, touch-control
+  rationale, honest acceptance table, reproducible-build flow, FAQ, project
+  map, physical-device handoff, and legal boundaries.
+- Rebuilt the exact annotated local-acceptance tag from a no-hardlink checkout.
+  Source pins, patch checks, ROM reconstruction, 1,006-file AOT generation,
+  optimized native macOS, strict Simulator core, pinned Simulator SDL, the
+  Release Simulator app, and its no-dynamic-code audit passed.
+- Confirmed that `ceffab4...f2f4` through tagged commit `325fda5...e6e` changes
+  only documentation and the Simulator soak harness. The earlier full
+  iPhoneOS/IPA clean reproduction remains authoritative for the unchanged
+  device/package source; a redundant second device-core compile was stopped.
+- Kept the release boundary explicit: local Simulator acceptance is complete,
+  while signed physical hardware and public redistribution remain external
+  gates.
+
 ## 2026-08-02 — Exact candidate reproduction and two-form-factor soak
 
 - Completed the full no-hardlink verifier from exact published commit

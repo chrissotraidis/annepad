@@ -1,31 +1,288 @@
 # AnnePad
 
-AnnePad is an experimental native iPhone, iPad, and Apple Silicon port of
-Pokémon Stadium built from static recompilation. It is not an emulator wrapper,
-contains no game ROM, and requires a legally obtained Pokémon Stadium (US) 1.0
-ROM supplied by the user.
+<p align="center">
+  <strong>Pokémon Stadium, statically recompiled for iPhone and iPad.</strong><br>
+  Native Metal rendering, Files-based ROM setup, customizable multitouch,
+  physical-controller plumbing, persistent saves, and a reproducible ROM-free IPA.
+</p>
 
-The native macOS build completes a full rental battle. iPhone and iPad Simulator
-builds render through Metal, use native customizable multitouch controls, import
-and validate the user's ROM through a document picker, and recover atomic saves
-across background/relaunch. The arm64 iPhoneOS app and audited,
-reproducible-content IPA build unsigned and reproduce from an isolated clean
-source snapshot. Signed
-physical iPhone/iPad, controller, real-speaker audio, hardware lifecycle, and
-hardware touch-battle gates remain open because this Mac currently has no
-attached device or signing identity.
+<p align="center">
+  <img alt="iOS and iPadOS 16 or newer" src="https://img.shields.io/badge/iOS%20%2F%20iPadOS-16%2B-0A84FF?logo=apple">
+  <img alt="Native static recompilation" src="https://img.shields.io/badge/runtime-static%20recompilation-30D158">
+  <img alt="Metal renderer" src="https://img.shields.io/badge/renderer-Metal-5E5CE6">
+  <img alt="iPhone and iPad Simulator accepted" src="https://img.shields.io/badge/Simulator-iPhone%20%2B%20iPad-30D158">
+  <img alt="Unsigned IPA builds" src="https://img.shields.io/badge/IPA-unsigned%20builds-FF9F0A">
+  <img alt="ROM not included" src="https://img.shields.io/badge/game%20ROM-not%20included-FF453A">
+</p>
 
-Start with:
+![AnnePad completing a touch-only Pokémon Stadium rental battle in iPad Simulator](docs/evidence/m5-ios-touch-rental-battle-corrected-result.png)
 
-- [`docs/STATUS.md`](docs/STATUS.md) for passing and open gates.
-- [`docs/BUILDING.md`](docs/BUILDING.md) for exact reproducible commands.
-- [`docs/TESTING.md`](docs/TESTING.md) for runtime acceptance criteria.
-- [`docs/LEGAL-AND-ASSET-BOUNDARIES.md`](docs/LEGAL-AND-ASSET-BOUNDARIES.md)
-  before handling any ROM, generated source, screenshot, or package.
-- [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md) before distributing
-  anything.
+AnnePad turns the
+[Pokémon Stadium recompilation project](https://github.com/mstan/PokemonStadiumRecomp)
+into a native Apple application. It is not a general Nintendo 64 emulator or an
+emulator wrapper. The game runs as ahead-of-time compiled arm64 code, renders
+through Metal, and accepts a legally obtained Pokémon Stadium (US) 1.0 ROM from
+the user.
 
-AnnePad is independent and is not affiliated with or endorsed by Nintendo,
-Creatures, or GAME FREAK. Pokémon and Pokémon Stadium are trademarks of their
-respective owners. This repository's upstream licensing gaps block public
-redistribution until resolved; see the legal document and blocker B-004.
+No ROM, save, extracted Nintendo asset, signing identity, or provisioning
+profile is included in this repository or its IPA. AnnePad is an independent,
+unofficial project and is not affiliated with or endorsed by Nintendo,
+Creatures, GAME FREAK, The Pokémon Company, or the upstream recompilation
+project.
+
+## Current status
+
+| Option | Status | What it means |
+|---|---|---|
+| iPhone and iPad Simulator | **Playable now** | Native setup, Metal rendering, touch input, a complete rental battle, save recovery, background/foreground, relaunch, and sustained battle cadence have passed. |
+| Unsigned iPhoneOS app and IPA | **Builds now** | The arm64 app and ROM-free IPA pass static/package audits and reproduce from an isolated clean checkout. |
+| Signed physical iPhone and iPad | **Awaiting hardware proof** | The build/install path exists, but this checkout has no signing identity, provisioning profile, or attached iPhone/iPad. |
+| Public binary / App Store | **Not available** | Upstream licensing and rights review must be resolved before public redistribution. |
+
+The current local-acceptance tag is
+`annepad-local-acceptance-2026-08-02`. It marks the reproducible Simulator and
+unsigned-package checkpoint, not a physical-device or public-release claim.
+
+## Get started
+
+You need:
+
+- an Apple Silicon Mac;
+- Xcode and its command-line tools;
+- CMake, Ninja, Git, and Python;
+- enough free storage for the generated AOT source and build trees; and
+- your own legally obtained Pokémon Stadium (US) 1.0 ROM.
+
+The supported normalized ROM is 32 MiB with MD5
+`ed1378bc12115f71209a77844965ba50`. AnnePad accepts `.z64`, `.v64`, and `.n64`
+byte orders and verifies the exact revision before use.
+
+```sh
+git clone https://github.com/chrissotraidis/annepad.git
+cd annepad
+
+./scripts/check-prerequisites.sh
+./scripts/fetch-sources.sh
+./scripts/prepare-game.sh --rom /absolute/path/to/your-game.v64
+./scripts/build-host-tools.sh
+./scripts/generate-game.sh --rom /absolute/path/to/your-game.v64
+
+# Playable Simulator app
+./scripts/build-ios-simulator.sh
+
+# Audited, unsigned iPhoneOS app and IPA
+./scripts/package-ios.sh
+```
+
+The optimized AOT compile is intentionally substantial. On a memory-constrained
+Mac, limit parallel jobs:
+
+```sh
+ANNEPAD_BUILD_JOBS=2 ./scripts/package-ios.sh
+```
+
+See [`docs/BUILDING.md`](docs/BUILDING.md) for the complete macOS, Simulator,
+device-signing, packaging, audit, rollback, and clean-checkout workflow.
+
+## First launch
+
+AnnePad never downloads game data.
+
+1. Launch the app in landscape.
+2. Choose **Choose ROM** on the native setup screen.
+3. Select your legal Pokémon Stadium (US) 1.0 dump from Files.
+4. AnnePad validates its size and hash, normalizes the byte order, and stores a
+   private protected copy in the app container.
+5. After **Verified. Starting Pokémon Stadium…**, the native game begins.
+
+The in-game utility button keeps **Replace ROM**, **Remove ROM**, and
+**Edit Touch Layout** reachable without placing a permanent settings strip over
+gameplay.
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/evidence/m6-ios-native-rom-setup.png" alt="AnnePad native Files-based ROM setup on iPhone Simulator">
+    </td>
+    <td width="50%">
+      <img src="docs/evidence/m7-ios-resume-after-background.png" alt="AnnePad restored after backgrounding on iPad Simulator">
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Bring your own ROM</strong><br>Exact revision validation, byte-order normalization, and private on-device storage.</td>
+    <td align="center"><strong>Resume safely</strong><br>Atomic primary/backup saves and lifecycle-aware input clearing.</td>
+  </tr>
+</table>
+
+These captures are from iPhone/iPad Simulator using privately supplied local
+game data. No game data is stored in the repository or distributed with the
+app.
+
+## Touch controls
+
+AnnePad adapts HarkinianPad's proven mobile-control ideas to Pokémon Stadium,
+while feeding the same normalized N64 input snapshot used by other input paths.
+It does not patch Pokémon Stadium's gameplay logic to fake touch behavior.
+
+- **Left side:** protected analog stick and compact D-pad.
+- **Right side:** A, B, Z, four C buttons, Start, L, and R.
+- **Phone layout:** primary controls sit in the landscape side rails to keep
+  the game surface visible.
+- **Tablet layout:** wider low-grip placement for two-handed play.
+- **Customize:** move, resize, change opacity, hide, show, or reset individual
+  controls while the game is running; phone and tablet layouts persist
+  separately.
+- **Multitouch:** independent button lifetimes preserve quick taps and held
+  shoulders without cross-extension or stuck input.
+- **Controller coexistence:** touch controls can be hidden while using a
+  physical controller; hardware acceptance still requires a real device.
+
+Pokémon Stadium uses held R to reveal battle move assignments, L for cancel in
+relevant battle paths, and edge-triggered Z actions. AnnePad therefore keeps Z
+as a normal press-and-hold touch instead of inheriting HarkinianPad's
+Zelda-specific persistent Z latch.
+
+## What works
+
+| Area | Current result |
+|---|---|
+| Native runtime | Static AOT arm64 game code; no general emulator wrapper, JIT, TCC, LiveRecomp, or runtime plugin loading in iOS builds |
+| Rendering | Direct Metal RT64 path on macOS and iPhone/iPad Simulator |
+| Gameplay | Complete rental battle on native macOS and a separate complete touch-only rental battle in Simulator |
+| Performance | Automatic title/attract averages 29.96 presents/s; controlled two-turn battle averages 29.47 presents/s against the game's 30 Hz cadence |
+| Touch | Analog stick, D-pad, A/B/Z, C buttons, shoulders, Start, pressed feedback, safe areas, and persistent customization |
+| ROM setup | Native Files picker, exact US 1.0 validation, normalization, replacement, and removal |
+| Saves | Serialized snapshots, atomic replacement, backup rotation, corrupt-primary quarantine/recovery, background flush, and relaunch persistence |
+| Lifecycle | iPhone and iPad Simulator soaks retain the same process across foreground, Settings background, and restored foreground intervals |
+| Packaging | ROM-free arm64 iPhoneOS app and unsigned IPA with deterministic content manifest and fail-closed audit |
+
+For the evidence ledger and honest remaining gates, read
+[`docs/STATUS.md`](docs/STATUS.md), [`docs/TESTING.md`](docs/TESTING.md), and
+[`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md).
+
+## Reproducible and ROM-free
+
+```mermaid
+flowchart LR
+    A["AnnePad scripts"] --> B["Pinned upstream source"]
+    B --> C["Maintained Apple/mobile patches"]
+    D["Your supported ROM"] --> E["Private validation and AOT generation"]
+    C --> F["Native arm64 app"]
+    E --> F
+    F --> G["Audited ROM-free IPA"]
+    D --> H["Files-based private app storage"]
+    H --> I["Native gameplay and saves"]
+    G --> I
+```
+
+`dependencies.lock.json` pins every source revision. Fetch scripts disable
+dependency push URLs, maintained patches are checked both forward and in
+reverse, and ROM-derived intermediate source remains ignored. The package audit
+rejects ROMs, saves, extracted assets, Simulator slices, private paths,
+credentials, provisioning profiles, signing keys, and debug-only release
+surfaces.
+
+The reproducibility authority is the sorted uncompressed-content manifest, not
+the raw ZIP hash (ZIP timestamps can differ). The accepted manifest SHA-256 is
+`4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
+
+## Physical-device handoff
+
+When an Apple development team and an iPhone or iPad are available:
+
+```sh
+DEVELOPMENT_TEAM="your-local-team-id" \
+  ./scripts/build-ios-device.sh release signed
+./scripts/install-ios-device.sh --device "attached-device-name-or-id"
+```
+
+The signed product is isolated under
+`build-ios-app-device-release-signed/Release/AnnePad.app`. A real iPhone and
+iPad must still pass touch ergonomics/true multitouch, physical controllers,
+speaker and route interruptions, lock/unlock, backgrounding, sustained battle,
+orientation, thermal behavior, and save/update/relaunch before physical-device
+support is claimed.
+
+## Frequently asked questions
+
+<details>
+<summary><strong>Is AnnePad an emulator?</strong></summary>
+
+No. AnnePad uses static recompilation: generated C code is compiled ahead of
+time into the native arm64 application. The iOS build audit rejects dynamic
+recompilers, JIT-related facilities, and general runtime plugin loading.
+</details>
+
+<details>
+<summary><strong>Does this repository include Pokémon Stadium?</strong></summary>
+
+No. You must provide your own legally obtained Pokémon Stadium (US) 1.0 ROM.
+Do not open issues requesting game data or download links.
+</details>
+
+<details>
+<summary><strong>Is the game playable?</strong></summary>
+
+Yes in the accepted local environments. Native macOS completed a full rental
+battle, and iPad Simulator completed a separate full rental battle using touch
+only. iPhone and iPad Simulator builds also pass launch, input, save, lifecycle,
+relaunch, crash-regression, and sustained-cadence checks. Physical-device proof
+is still open.
+</details>
+
+<details>
+<summary><strong>Where is the IPA?</strong></summary>
+
+Run `./scripts/package-ios.sh` to create the locally audited unsigned IPA under
+`artifacts/`. It is intentionally not committed. There is no public download
+while licensing and rights review remain unresolved.
+</details>
+
+<details>
+<summary><strong>Do physical controllers work?</strong></summary>
+
+The GameController/SDL controller path is compiled into the app and feeds the
+normalized N64 input path. It has not yet completed the required real-iPhone
+and real-iPad controller matrix, so hardware support is not claimed as accepted.
+</details>
+
+<details>
+<summary><strong>Why is the public release blocked?</strong></summary>
+
+Some pinned upstream components do not provide a sufficient repository-level
+license grant for redistribution. AnnePad does not assume that another
+project's license covers separately copyrighted material. See
+[`docs/LEGAL-AND-ASSET-BOUNDARIES.md`](docs/LEGAL-AND-ASSET-BOUNDARIES.md) and
+blocker B-004 in [`docs/BLOCKERS.md`](docs/BLOCKERS.md).
+</details>
+
+## Project map
+
+| Path | Purpose |
+|---|---|
+| [`apple/`](apple/) | Native Apple shell, ROM setup, touch UI, lifecycle, audio, and platform bridges |
+| [`patches/`](patches/) | Maintained changes replayed onto exact upstream revisions |
+| [`dependencies.lock.json`](dependencies.lock.json) | Machine-readable source pins |
+| [`scripts/fetch-sources.sh`](scripts/fetch-sources.sh) | Materialize and verify the locked source graph |
+| [`scripts/build-ios-simulator.sh`](scripts/build-ios-simulator.sh) | Build the playable release-profile Simulator app |
+| [`scripts/build-ios-device.sh`](scripts/build-ios-device.sh) | Build unsigned or locally signed iPhoneOS apps |
+| [`scripts/package-ios.sh`](scripts/package-ios.sh) | Build and audit the unsigned IPA |
+| [`scripts/verify-clean-checkout.sh`](scripts/verify-clean-checkout.sh) | Fail-closed isolated rebuild and manifest comparison |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Game core, renderer, Apple shell, input, saves, and packaging design |
+| [`docs/BUILDING.md`](docs/BUILDING.md) | Complete reproducible build and signing handoff |
+| [`docs/TESTING.md`](docs/TESTING.md) | Automated, Simulator, and physical-device acceptance matrix |
+| [`docs/STATUS.md`](docs/STATUS.md) | Current proven behavior and next concrete gate |
+
+Generated sources, external checkouts, ROMs, saves, build directories, logs,
+IPAs, and signing material are intentionally ignored.
+
+## Legal and acknowledgements
+
+AnnePad builds on PokémonStadiumRecomp, the Pokémon Stadium decompilation work,
+N64Recomp, N64ModernRuntime, RT64, SDL, and their contributors. Each project
+retains its own copyright and license. AnnePad does not relicense upstream or
+reverse-engineered material and does not conceal its origin.
+
+Before sharing source, screenshots, or a binary, follow the
+[`legal and asset boundaries`](docs/LEGAL-AND-ASSET-BOUNDARIES.md) and the
+[`release checklist`](docs/RELEASE-CHECKLIST.md).

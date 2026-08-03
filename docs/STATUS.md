@@ -368,6 +368,16 @@ patches.
   `4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
   Its non-authoritative raw ZIP SHA-256 was
   `f09613ea4e1eb01bb423cb72efa3af6b4ab7b4ec537f05daaec479ccfd86cdf6`.
+- The annotated local-acceptance tag points to
+  `325fda592129e715a69a4973237ac076b4f0ae6e`. Its delta from the fully
+  reproduced candidate above contains only documentation and the Simulator
+  soak harness; game, app, patch, dependency-lock, and packaging sources are
+  unchanged. A fresh no-hardlink checkout of the exact tag re-fetched and
+  verified every pin and patch, reconstructed the ROM, regenerated the 1,006
+  AOT files, rebuilt native macOS, and rebuilt/audited the Release Simulator
+  core, pinned SDL dependency, and app. The duplicate iPhoneOS AOT pass was
+  stopped after those gates because the unchanged device/package source is
+  already covered by the complete `ceffab4...f2f4` reproduction above.
 - Default `package-ios.sh` now rebuilds the canonical device Release app before
   auditing and archiving. The previous missing-only condition was reproduced
   packaging the stale pre-overlay-fix binary; `--no-build` is now the sole
@@ -447,14 +457,11 @@ App-menu Quit exits cleanly.
 
 ## Next concrete task
 
-Publish this locally accepted checkpoint and its repeatable Simulator soak
-harness. The exact published candidate at `ceffab4...f2f4` has already passed
-the full isolated verifier with manifest `4b7ef2d7...af21fd`, and both target
-Simulator form factors have passed the 180-second foreground/background/restore
-soak with no new crash report and the same live PID. No further speculative
-renderer rewrite is justified by the current evidence.
+The locally accepted checkpoint, repeatable Simulator soak harness, and public-
+facing project documentation are published. No further speculative renderer
+rewrite or unguided Simulator iteration is justified by the current evidence.
 
-When lawful signing assets and hardware are available, install this reproduced
+When lawful signing assets and hardware are available, install the reproduced
 candidate on a physical iPhone and iPad. Run the controller, real-speaker,
 interruption/route, lock/unlock, thermal, sustained-battle, orientation,
 ergonomics, and true-multitouch matrix, including R-plus-selection. Keep public

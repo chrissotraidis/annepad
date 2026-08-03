@@ -186,6 +186,14 @@ verifier and reproduced that manifest byte-for-byte. Its raw timestamped ZIP
 SHA-256 is `f09613ea...cdf6`. Signing, install/retest, physical hardware, and
 public-license acceptance remain open.
 
+The annotated local-acceptance tag at `325fda5...e6e` changes only
+documentation and the Simulator soak harness relative to that fully reproduced
+candidate. A second no-hardlink checkout of the exact tag passed source pins,
+patch forward/reverse checks, ROM reconstruction, 1,006-file AOT generation,
+native macOS, and the complete Release Simulator core/SDL/app build and audit.
+Its duplicate iPhoneOS AOT pass was intentionally stopped; the unchanged
+device/package source remains covered by the full verifier result above.
+
 ### Runtime smoke automation
 
 - macOS: start, wait for first frame, validate ROM, navigate deterministic test
