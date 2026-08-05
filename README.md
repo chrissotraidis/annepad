@@ -1,43 +1,30 @@
 # AnnePad
 
-<p align="center">
-  <strong>Pokémon Stadium, statically recompiled for iPhone and iPad.</strong><br>
-  Native Metal rendering, Files-based ROM setup, customizable multitouch,
-  physical-controller plumbing, persistent saves, and a reproducible ROM-free IPA.
-</p>
+Pokémon Stadium via static recompilation, rebuilt for iPhone and iPad.
+Native Metal rendering, Files-based setup, touch controls, persistent saves,
+and reproducible ROM-free builds.
 
-<p align="center">
-  <img alt="iOS and iPadOS 16 or newer" src="https://img.shields.io/badge/iOS%20%2F%20iPadOS-16%2B-0A84FF?logo=apple">
-  <img alt="Native static recompilation" src="https://img.shields.io/badge/runtime-static%20recompilation-30D158">
-  <img alt="Metal renderer" src="https://img.shields.io/badge/renderer-Metal-5E5CE6">
-  <img alt="iPhone and iPad Simulator accepted" src="https://img.shields.io/badge/Simulator-iPhone%20%2B%20iPad-30D158">
-  <img alt="Unsigned IPA builds" src="https://img.shields.io/badge/IPA-unsigned%20builds-FF9F0A">
-  <img alt="ROM not included" src="https://img.shields.io/badge/game%20ROM-not%20included-FF453A">
-</p>
-
-![AnnePad completing a touch-only Pokémon Stadium rental battle in iPad Simulator](docs/evidence/m5-ios-touch-rental-battle-corrected-result.png)
-
-AnnePad turns the
-[Pokémon Stadium recompilation project](https://github.com/mstan/PokemonStadiumRecomp)
-into a native Apple application. It is not a general Nintendo 64 emulator or an
-emulator wrapper. The game runs as ahead-of-time compiled arm64 code, renders
-through Metal, and accepts a legally obtained Pokémon Stadium (US) 1.0 ROM from
-the user.
+AnnePad packages the [Pokémon Stadium recompilation
+project](https://github.com/mstan/PokemonStadiumRecomp) as a native Apple app.
+It runs ahead-of-time compiled arm64 code through Metal, imports a user-provided
+Pokémon Stadium (US) 1.0 ROM through Files, and supplies a landscape touch
+controller that can be customized or hidden when using a physical controller.
 
 No ROM, save, extracted Nintendo asset, signing identity, or provisioning
-profile is included in this repository or its IPA. AnnePad is an independent,
-unofficial project and is not affiliated with or endorsed by Nintendo,
-Creatures, GAME FREAK, The Pokémon Company, or the upstream recompilation
-project.
+profile is included in this repository or its IPA. This repository contains the
+Apple integration and reproducible build scripts; it does not distribute
+Pokémon Stadium or ROM-derived game data. See the [legal and asset
+boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
 
-## Current status
+## Install status
 
 | Option | Status | What it means |
 |---|---|---|
-| iPhone and iPad Simulator | **Playable now** | Native setup, Metal rendering, touch input, a complete rental battle, save recovery, background/foreground, relaunch, and sustained battle cadence have passed. |
-| Unsigned iPhoneOS app and IPA | **Builds now** | The arm64 app and ROM-free IPA pass static/package audits and reproduce from an isolated clean checkout. |
-| Signed physical iPhone and iPad | **Awaiting hardware proof** | The build/install path exists, but this checkout has no signing identity, provisioning profile, or attached iPhone/iPad. |
-| Public binary / App Store | **Not available** | Upstream licensing and rights review must be resolved before public redistribution. |
+| iPhone and iPad Simulator | **Playable now** | Native setup, Metal rendering, touch input, a complete rental battle, save recovery, lifecycle, relaunch, and sustained battle cadence have passed. |
+| Local unsigned iPhoneOS IPA | **Available now** | Build it locally with `./scripts/package-ios.sh`; the arm64 app and ROM-free IPA pass static/package audits and reproduce from an isolated clean checkout. |
+| Signed physical iPhone and iPad | **Awaiting hardware proof** | The build and in-place installation path exists, but this checkout has no signing identity, provisioning profile, or attached device. |
+| Downloadable developer preview | **Not available** | No IPA is published while upstream redistribution rights remain unresolved. |
+| App Store / TestFlight | **Not available** | Separate rights authorization, Apple review, privacy, and store-readiness work remain open. |
 
 The current local-acceptance tag is
 `annepad-local-acceptance-2026-08-02`. It marks the reproducible Simulator and
@@ -95,34 +82,16 @@ AnnePad never downloads game data.
    private protected copy in the app container.
 5. After **Verified. Starting Pokémon Stadium…**, the native game begins.
 
-The in-game utility button keeps **Replace ROM**, **Remove ROM**, and
-**Edit Touch Layout** reachable without placing a permanent settings strip over
-gameplay.
-
-<table>
-  <tr>
-    <td width="50%">
-      <img src="docs/evidence/m6-ios-native-rom-setup.png" alt="AnnePad native Files-based ROM setup on iPhone Simulator">
-    </td>
-    <td width="50%">
-      <img src="docs/evidence/m7-ios-resume-after-background.png" alt="AnnePad restored after backgrounding on iPad Simulator">
-    </td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Bring your own ROM</strong><br>Exact revision validation, byte-order normalization, and private on-device storage.</td>
-    <td align="center"><strong>Resume safely</strong><br>Atomic primary/backup saves and lifecycle-aware input clearing.</td>
-  </tr>
-</table>
-
-These captures are from iPhone/iPad Simulator using privately supplied local
-game data. No game data is stored in the repository or distributed with the
-app.
+The in-game utility button keeps **Replace ROM**, **Remove ROM**, and **Edit
+Touch Layout** reachable without placing a permanent settings strip over
+gameplay. The user ROM and saves remain private to the app container and are
+excluded from Git and the package audit.
 
 ## Touch controls
 
-AnnePad adapts HarkinianPad's proven mobile-control ideas to Pokémon Stadium,
-while feeding the same normalized N64 input snapshot used by other input paths.
-It does not patch Pokémon Stadium's gameplay logic to fake touch behavior.
+AnnePad feeds touch input into the same normalized N64 input snapshot used by
+its other input paths. It does not patch Pokémon Stadium's gameplay logic to
+fake touch behavior.
 
 - **Left side:** protected analog stick and compact D-pad.
 - **Right side:** A, B, Z, four C buttons, Start, L, and R.
@@ -139,8 +108,41 @@ It does not patch Pokémon Stadium's gameplay logic to fake touch behavior.
 
 Pokémon Stadium uses held R to reveal battle move assignments, L for cancel in
 relevant battle paths, and edge-triggered Z actions. AnnePad therefore keeps Z
-as a normal press-and-hold touch instead of inheriting HarkinianPad's
-Zelda-specific persistent Z latch.
+as a normal press-and-hold touch.
+
+## Current screenshots
+
+![AnnePad title screen with the landscape touch controller](docs/evidence/readme/title-screen.png)
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/evidence/readme/battle-closeup.png" alt="AnnePad showing a close-up Pokémon Stadium battle scene with landscape touch controls">
+    </td>
+    <td width="50%">
+      <img src="docs/evidence/readme/entry-pokemon.png" alt="AnnePad showing the Pokémon Stadium entry Pokémon screen with landscape touch controls">
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Battle at a glance</strong><br>Every core N64 control remains within reach in landscape.</td>
+    <td align="center"><strong>Explore Stadium</strong><br>Touch input stays present across the game’s menu-driven modes.</td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/evidence/readme/rental-selection.png" alt="AnnePad showing Pokémon Stadium rental selection with landscape touch controls">
+    </td>
+    <td width="50%">
+      <img src="docs/evidence/readme/team-versus.png" alt="AnnePad showing Pokémon Stadium team versus selection with landscape touch controls">
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Pick a team</strong><br>Choose rental Pokémon using the same touch layout.</td>
+    <td align="center"><strong>Ready for the match</strong><br>Move from team selection into a Stadium battle without a controller.</td>
+  </tr>
+</table>
+
+These project-provided iPad captures use privately supplied local game data. No
+game data is stored in this repository or distributed with the app.
 
 ## What works
 
@@ -159,6 +161,16 @@ Zelda-specific persistent Z latch.
 For the evidence ledger and honest remaining gates, read
 [`docs/STATUS.md`](docs/STATUS.md), [`docs/TESTING.md`](docs/TESTING.md), and
 [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md).
+
+## Supported game
+
+| Game | Engine | Status |
+|---|---|---|
+| Pokémon Stadium (US) 1.0 | [Pokémon Stadium recompilation project](https://github.com/mstan/PokemonStadiumRecomp) | Supported |
+| Other Pokémon Stadium revisions and games | — | Not supported by this app |
+
+AnnePad is a native source-port integration, not a general Nintendo 64 emulator.
+It accepts only the exact US 1.0 ROM identified above.
 
 ## Reproducible and ROM-free
 
