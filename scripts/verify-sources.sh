@@ -46,7 +46,7 @@ git -C "$renderer_nfd" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/ios-native-file-dialog-null.patch"
 
 runtime_changes=$(git -C "$runtime" diff --name-only --ignore-submodules=dirty)
-expected_runtime_changes=$'librecomp/CMakeLists.txt\nlibrecomp/include/librecomp/audio_uaf_protect.hpp\nlibrecomp/include/librecomp/mods.hpp\nlibrecomp/src/audio_uaf_protect.cpp\nlibrecomp/src/files.cpp\nlibrecomp/src/mods.cpp\nlibrecomp/src/overlays.cpp\nlibrecomp/src/pi.cpp\nlibrecomp/src/recomp.cpp\nultramodern/include/ultramodern/ultra_trace.hpp\nultramodern/include/ultramodern/ultramodern.hpp\nultramodern/src/threadqueue.cpp\nultramodern/src/ultra_trace.cpp'
+expected_runtime_changes=$'librecomp/CMakeLists.txt\nlibrecomp/include/librecomp/audio_uaf_protect.hpp\nlibrecomp/include/librecomp/mods.hpp\nlibrecomp/src/audio_uaf_protect.cpp\nlibrecomp/src/files.cpp\nlibrecomp/src/gbcart.cpp\nlibrecomp/src/mods.cpp\nlibrecomp/src/overlays.cpp\nlibrecomp/src/pi.cpp\nlibrecomp/src/recomp.cpp\nultramodern/include/ultramodern/ultra_trace.hpp\nultramodern/include/ultramodern/ultramodern.hpp\nultramodern/src/events.cpp\nultramodern/src/threadqueue.cpp\nultramodern/src/ultra_trace.cpp'
 [[ "$runtime_changes" == "$expected_runtime_changes" ]] || \
     die "N64ModernRuntime has unexpected tracked modifications"
 git -C "$runtime" apply --reverse --check \
@@ -54,9 +54,13 @@ git -C "$runtime" apply --reverse --check \
 git -C "$runtime" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/n64-modern-runtime/static-mobile-core-profile.patch"
 git -C "$runtime" apply --reverse --check \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/gbcart-exact-rom-validation.patch"
+git -C "$runtime" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/n64-modern-runtime/atomic-save-lifecycle.patch"
 git -C "$runtime" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/n64-modern-runtime/ios-release-trace-exclusion.patch"
+git -C "$runtime" apply --reverse --check \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/synchronous-audio-tasks.patch"
 
 runtime_recompiler_changes=$(git -C "$runtime/N64Recomp" diff --name-only --ignore-submodules=dirty)
 [[ "$runtime_recompiler_changes" == "CMakeLists.txt" ]] || \
@@ -72,16 +76,14 @@ git -C "$renderer_hlslpp" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/apple-scalar-labs-declaration.patch"
 
 game_changes=$(git -C "$game" status --porcelain --untracked-files=all --ignore-submodules=dirty)
-expected_game_changes=$' M CMakeLists.txt\n M extras.c\n M game.toml\n M include/trace.h\n M src/main/main.cpp\n M src/main/recomp_audio_debug.h\n M src/main/rsp_aspmain_hook.cpp\n?? n64recomp\n?? src/main/non_windows_platform.cpp'
+expected_game_changes=$' M CMakeLists.txt\n M extras.c\n M game.toml\n M include/trace.h\n M src/main/main.cpp\n M src/main/recomp_audio_debug.h\n M src/main/rsp_aspmain_hook.cpp\n M src/main/rt64_render_context.cpp\n?? n64recomp\n?? src/main/non_windows_platform.cpp'
 [[ "$game_changes" == "$expected_game_changes" ]] || \
     die "PokemonStadiumRecomp has unexpected modifications"
 git -C "$game" apply --reverse --check \
-    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-surface.patch"
-git -C "$game" apply --reverse --check \
-    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-hook-surface.patch"
+    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/synchronous-audio-tasks.patch"
 
-# The release-surface patch intentionally extends files introduced by the
-# Apple-platform patch, so the earlier patch can no longer be reverse-checked
+# Later game patches intentionally extend hunks from the Apple, release-surface,
+# and hook-surface patches, so those earlier patches cannot be reverse-checked
 # independently against the final stacked tree. Recreate the stack from HEAD in
 # a disposable directory and byte-compare every maintained game source instead.
 game_patch_scratch=$(mktemp -d "${TMPDIR:-/tmp}/annepad-game-patches.XXXXXX")
@@ -98,13 +100,16 @@ git -C "$game" archive HEAD \
     include/trace.h \
     src/main/main.cpp \
     src/main/recomp_audio_debug.h \
-    src/main/rsp_aspmain_hook.cpp | tar -xf - -C "$game_patch_scratch"
+    src/main/rsp_aspmain_hook.cpp \
+    src/main/rt64_render_context.cpp | tar -xf - -C "$game_patch_scratch"
 (
     cd "$game_patch_scratch"
     git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/apple-platform-support.patch"
     git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-diagnostics.patch"
     git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-surface.patch"
     git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-hook-surface.patch"
+    git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/audio-active-list-repair.patch"
+    git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/synchronous-audio-tasks.patch"
 )
 for maintained_path in \
     CMakeLists.txt \
@@ -114,6 +119,7 @@ for maintained_path in \
     src/main/main.cpp \
     src/main/recomp_audio_debug.h \
     src/main/rsp_aspmain_hook.cpp \
+    src/main/rt64_render_context.cpp \
     src/main/non_windows_platform.cpp; do
     cmp "$game_patch_scratch/$maintained_path" "$game/$maintained_path" >/dev/null || \
         die "PokemonStadiumRecomp patch stack mismatch: $maintained_path"

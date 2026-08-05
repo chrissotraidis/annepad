@@ -1,0 +1,70 @@
+diff --git a/librecomp/src/gbcart.cpp b/librecomp/src/gbcart.cpp
+index 8f8ce6f..80794cc 100644
+--- a/librecomp/src/gbcart.cpp
++++ b/librecomp/src/gbcart.cpp
+@@ -11,7 +11,6 @@
+ // ---------------------------------------------------------------------
+ #include "librecomp/gbcart.hpp"
+ 
+-#include <algorithm>
+ #include <array>
+ #include <chrono>
+ #include <cstdint>
+@@ -64,7 +63,6 @@ namespace {
+         std::filesystem::path save_path;
+         std::vector<uint8_t> rom;
+         std::vector<uint8_t> ram;
+-        size_t rom_open_bus_start = 0;
+         Mbc mbc = Mbc::Unsupported;
+         bool ram_enabled = false;
+         bool dirty = false;
+@@ -79,32 +77,12 @@ namespace {
+             rom_path = configured_rom;
+             save_path = configured_save;
+             rom = read_file(rom_path);
+-            rom_open_bus_start = rom.size();
+             if (rom.size() < 0x150) {
+                 std::fprintf(stderr, "[gbcart] ROM is missing or too small: %s\n",
+                              rom_path.string().c_str());
+                 return false;
+             }
+ 
+-            // Some Gen-1 dumps are padded to the header-declared ROM size with
+-            // whole unused banks of zeroes. Real Transfer Pak hardware reads that
+-            // unprogrammed cart area as open bus (0xFF), not 0x00 — and Stadium's
+-            // GB Tower relies on it: fed the file's zeroes it stops before
+-            // installing MBC handlers, so DMG carts (e.g. Pokemon Red/Blue) never
+-            // boot. Treat >= 1 whole trailing zero bank as open bus.
+-            const auto last_programmed = std::find_if(
+-                rom.rbegin(), rom.rend(), [](uint8_t byte) { return byte != 0; });
+-            if (last_programmed != rom.rend()) {
+-                const size_t trailing_zero_start =
+-                    static_cast<size_t>(rom.rend() - last_programmed);
+-                if (rom.size() - trailing_zero_start >= 0x4000) {
+-                    rom_open_bus_start = trailing_zero_start;
+-                    std::fprintf(stderr,
+-                                 "[gbcart] trailing zero ROM padding -> open bus from 0x%zX: %s\n",
+-                                 rom_open_bus_start, rom_path.string().c_str());
+-                }
+-            }
+-
+             const uint8_t type = rom[0x147];
+             if (type == 0x00 || type == 0x08 || type == 0x09) {
+                 mbc = Mbc::RomOnly;
+@@ -174,16 +152,10 @@ namespace {
+                     bank = (bank_high & 0x03) << 5;
+                 }
+                 const size_t index = rom_index(bank, address);
+-                if (index >= rom_open_bus_start) {
+-                    return 0xFF;
+-                }
+                 return index < rom.size() ? rom[index] : 0xFF;
+             }
+             if (address < 0x8000) {
+                 const size_t index = rom_index(selected_switchable_rom_bank(), address - 0x4000);
+-                if (index >= rom_open_bus_start) {
+-                    return 0xFF;
+-                }
+                 return index < rom.size() ? rom[index] : 0xFF;
+             }
+             if (address >= 0xA000 && address < 0xC000 && ram_enabled) {

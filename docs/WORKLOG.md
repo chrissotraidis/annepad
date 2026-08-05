@@ -1012,3 +1012,96 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
 - Retained the honest end state: local implementation and Simulator acceptance
   are complete; signed physical iPhone/iPad validation and licensing/public
   redistribution remain external blockers.
+
+## 2026-08-03 10:24–10:57 CEST — First signed physical-iPad deployment
+
+- Rediscovered `Chris’ iPad Pro` (`iPad14,5`) through CoreDevice, validated the
+  local US 1.0 `.v64` input, regenerated the 1,006-file AOT source set, and
+  built the optimized arm64 iPhoneOS core. Installed the missing documented
+  `mips-linux-gnu-binutils` prerequisite; restricted GitHub/pip/CoreDevice
+  failures passed when the unchanged commands were retried with host access.
+- A fresh checkout exposed a handoff-order gap: the device app requires
+  `file_to_c` and `spirv_cross_msl` host tools produced by the macOS CMake
+  graph. Built those exact targets, then completed the Xcode link with local
+  Apple Development team `VKDH2T9UTF`.
+- The first signed-app audit rejected Xcode's required root
+  `embedded.mobileprovision` as forbidden private material. Corrected the
+  audit to require exactly that one profile for signed apps while continuing
+  to reject extra profiles, ROMs, saves, certificates, and private keys.
+  Repository tests, signature verification, icon/resource checks, and the
+  signed Release app audit passed afterward.
+- Installed the app in place on the iPad, copied the validated normalized ROM
+  only into AnnePad's private Application Support container, and verified the
+  device read-back at MD5 `ed1378bc12115f71209a77844965ba50` and SHA-256
+  `502f6082...f831519`. Relaunched the app with that private ROM; CoreDevice
+  reported the AnnePad process live as PID 2910.
+- Deployment and live-process proof do not close hands-on touch, audio,
+  controller, sustained-battle, thermal, lifecycle, lock/unlock, or save
+  acceptance gates on physical hardware.
+
+## 2026-08-03 11:03–11:17 CEST — Physical-iPad Metal startup fix
+
+- Captured AnnePad's attached device console and isolated the startup alert to
+  RT64 rejecting its successfully created default Metal device. The iOS 16
+  build made metal-cpp's iOS-18-only `MTLCopyAllDevices` wrapper return null;
+  the existing direct-device validity path covered Simulator only.
+- Kept the change scoped to RT64's physical-iOS validity check: require the
+  default device and Apple GPU family 6 support without enumerating devices.
+  Maintained-patch forward/reverse verification and the signed Release build,
+  app audit, signature, icon, and ROM-exclusion checks passed.
+- Installed the signed bundle in place on `Chris’ iPad Pro`, preserving its
+  private ROM and data. The console passed Metal initialization, entered RT64,
+  initialized the recomp heap, registered game fragments, and processed game
+  input; CoreDevice confirmed AnnePad remained live as PID 2936.
+
+## 2026-08-03 11:19–11:31 CEST — Stadium shoulder controls and iPad audio buffering
+
+- Confirmed against Stadium battle instructions and the physical screenshot that
+  L cancels a battle choice while held R reveals the face/C-button assignments;
+  switching Pokémon likewise requires practical R-plus-selection input. Moved
+  the default iPad L control to the left edge and retained R on the right.
+- Kept the existing shoulder grace behavior and exposed its state to the overlay:
+  a tapped shoulder now turns blue while its short input window remains active.
+  Bumped only the iPad layout key so the corrected default replaces the earlier
+  right-side L/R stack. Focused latch and repository tests passed.
+- The first physical run used four 512-frame CoreAudio queue buffers because
+  SDL enforces at least 15 ms of queued audio. Requested 1024 frames on iOS only;
+  SDL now uses two larger buffers with the same aggregate queue depth and half
+  the callback/bridge-lock frequency. The resampler and game audio remain
+  unchanged.
+- Maintained-patch verification, signed Release build, app audit, signature,
+  icon and ROM-exclusion checks passed. Installed in place on `Chris’ iPad Pro`;
+  the device console reported CoreAudio `samp=1024` requested and obtained,
+  initialized the bridge and Metal renderer, and booted the preserved ROM.
+  Intermittent-static acceptance remains a physical listening check.
+
+## 2026-08-03 12:20–12:27 CEST — Physical-iPad audio-command crash repair
+
+- Pulled `AnnePad-2026-08-03-122026.ips` and AnnePad's private diagnostic files
+  from the attached iPad. The app had run for about 42 seconds before a
+  deliberate `SIGABRT` in `unhandled_lookup_trampoline`, reached from
+  `func_80039CD0` during `n_alAudioFrame`; this was not an OS memory kill.
+- The runtime dump identified the exact malformed state: command opcode `0x71`
+  indexed beyond Stadium's 12-entry audio handler table and read adjacent data
+  as the bogus function pointer `0x00AF0000`.
+- Added one call-site-specific safety floor in the maintained runtime patch. A
+  lookup miss from the audio-command walker now clears only the malformed tail
+  count, returns the next stream pointer, and lets the existing function exit
+  normally. Other lookup misses retain their existing diagnostic/abort policy.
+- Source-patch verification, repository tests, arm64 Release compilation, signed
+  app audit, and in-place installation passed. Launched the preserved ROM under
+  the device console; CoreAudio, Metal, recomp initialization, and fragment
+  registration passed. The exact gameplay path still needs hands-on replay.
+
+## 2026-08-05 — Preview 1 public package
+
+- Built the ROM-free, unsigned iOS 16+ arm64 Release app with runtime-generated
+  code, validation tracing, developer paths, signing material, and private game
+  data excluded.
+- The app audit passed with Apple-system-only dynamic dependencies, no Mach-O
+  UUID, no signature or provisioning profile, and no prohibited assets.
+- Packaged `AnnePad-0.1.0-preview.1-unsigned.ipa` at 85,315,074 bytes. Its
+  archive SHA-256 is
+  `aaf8f6db9548176a8ba7637a8aa4147a00b9f9750d4ac6fdcf14a9f856221286`;
+  the sorted uncompressed-content manifest SHA-256 is
+  `451e5ab63d4c3f82f72aed3ac88becca3653d11d27fbc393b198837004031f0d`.

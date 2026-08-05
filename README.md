@@ -4,6 +4,8 @@ Pokémon Stadium via static recompilation, rebuilt for iPhone and iPad.
 Native Metal rendering, Files-based setup, touch controls, persistent saves,
 and reproducible ROM-free builds.
 
+![AnnePad running Pokémon Stadium with its landscape touch controller](docs/evidence/readme/title-screen.png)
+
 AnnePad packages the [Pokémon Stadium recompilation
 project](https://github.com/mstan/PokemonStadiumRecomp) as a native Apple app.
 It runs ahead-of-time compiled arm64 code through Metal, imports a user-provided
@@ -18,17 +20,22 @@ boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
 
 ## Install status
 
-| Option | Status | What it means |
+| Option | Status | What to do |
 |---|---|---|
-| iPhone and iPad Simulator | **Playable now** | Native setup, Metal rendering, touch input, a complete rental battle, save recovery, lifecycle, relaunch, and sustained battle cadence have passed. |
-| Local unsigned iPhoneOS IPA | **Available now** | Build it locally with `./scripts/package-ios.sh`; the arm64 app and ROM-free IPA pass static/package audits and reproduce from an isolated clean checkout. |
-| Signed physical iPhone and iPad | **Awaiting hardware proof** | The build and in-place installation path exists, but this checkout has no signing identity, provisioning profile, or attached device. |
-| Downloadable developer preview | **Not available** | No IPA is published while upstream redistribution rights remain unresolved. |
-| App Store / TestFlight | **Not available** | Separate rights authorization, Apple review, privacy, and store-readiness work remain open. |
+| Developer-preview `.ipa` | **Available with a computer** | [Download preview 0.1.0 build 1](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.1), then re-sign it with your Apple ID using AltStore Classic and AltServer by following the [installation guide](docs/INSTALL_IPA.md). |
+| Local iPhone or iPad build | **Available now** | Build and sign with your Apple development team using the instructions below. |
+| Simulator | **Available now** | Best for development and UI testing; it is not a substitute for physical-device testing. |
+| App Store / TestFlight | **Not announced** | No listing or public TestFlight currently exists. |
 
-The current local-acceptance tag is
-`annepad-local-acceptance-2026-08-02`. It marks the reproducible Simulator and
-unsigned-package checkpoint, not a physical-device or public-release claim.
+The current development build has been signed, installed, and played on a
+physical iPad. Files import, Metal rendering, touch gameplay, the settings and
+layout editors, resolution changes, saves, relaunch, and in-place updates have
+all been exercised on that hardware. Physical-controller, headphone/Bluetooth,
+interruption, thermal, and full iPhone acceptance remain separate test work.
+
+The downloadable IPA is unsigned and ROM-free. It contains no maintainer
+certificate or provisioning profile and must be re-signed for the installer's
+device.
 
 ## Get started
 
@@ -98,9 +105,9 @@ fake touch behavior.
 - **Phone layout:** primary controls sit in the landscape side rails to keep
   the game surface visible.
 - **Tablet layout:** wider low-grip placement for two-handed play.
-- **Customize:** move, resize, change opacity, hide, show, or reset individual
-  controls while the game is running; phone and tablet layouts persist
-  separately.
+- **Customize:** move, resize, hide, show, or reset individual controls while
+  the game is running; global opacity and separate phone/tablet layouts persist
+  between launches.
 - **Multitouch:** independent button lifetimes preserve quick taps and held
   shoulders without cross-extension or stuck input.
 - **Controller coexistence:** touch controls can be hidden while using a
@@ -111,8 +118,6 @@ relevant battle paths, and edge-triggered Z actions. AnnePad therefore keeps Z
 as a normal press-and-hold touch.
 
 ## Current screenshots
-
-![AnnePad title screen with the landscape touch controller](docs/evidence/readme/title-screen.png)
 
 <table>
   <tr>
@@ -149,8 +154,8 @@ game data is stored in this repository or distributed with the app.
 | Area | Current result |
 |---|---|
 | Native runtime | Static AOT arm64 game code; no general emulator wrapper, JIT, TCC, LiveRecomp, or runtime plugin loading in iOS builds |
-| Rendering | Direct Metal RT64 path on macOS and iPhone/iPad Simulator |
-| Gameplay | Complete rental battle on native macOS and a separate complete touch-only rental battle in Simulator |
+| Rendering | Direct Metal RT64 path on macOS, iPhone/iPad Simulator, and physical iPad |
+| Gameplay | Complete rental battles on native macOS and touch-only Simulator; the signed iPad build boots and plays through touch |
 | Performance | Automatic title/attract averages 29.96 presents/s; controlled two-turn battle averages 29.47 presents/s against the game's 30 Hz cadence |
 | Touch | Analog stick, D-pad, A/B/Z, C buttons, shoulders, Start, pressed feedback, safe areas, and persistent customization |
 | ROM setup | Native Files picker, exact US 1.0 validation, normalization, replacement, and removal |
@@ -195,8 +200,9 @@ credentials, provisioning profiles, signing keys, and debug-only release
 surfaces.
 
 The reproducibility authority is the sorted uncompressed-content manifest, not
-the raw ZIP hash (ZIP timestamps can differ). The accepted manifest SHA-256 is
-`4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
+the raw ZIP hash (ZIP timestamps can differ). Preview 1's accepted manifest
+SHA-256 is
+`451e5ab63d4c3f82f72aed3ac88becca3653d11d27fbc393b198837004031f0d`.
 
 ## Physical-device handoff
 
@@ -209,11 +215,9 @@ DEVELOPMENT_TEAM="your-local-team-id" \
 ```
 
 The signed product is isolated under
-`build-ios-app-device-release-signed/Release/AnnePad.app`. A real iPhone and
-iPad must still pass touch ergonomics/true multitouch, physical controllers,
-speaker and route interruptions, lock/unlock, backgrounding, sustained battle,
-orientation, thermal behavior, and save/update/relaunch before physical-device
-support is claimed.
+`build-ios-app-device-release-signed/Release/AnnePad.app`. The physical-iPad
+path has been exercised; iPhone ergonomics, the controller matrix, audio-route
+interruptions, and broader hardware coverage remain open.
 
 ## Frequently asked questions
 
@@ -235,19 +239,20 @@ Do not open issues requesting game data or download links.
 <details>
 <summary><strong>Is the game playable?</strong></summary>
 
-Yes in the accepted local environments. Native macOS completed a full rental
-battle, and iPad Simulator completed a separate full rental battle using touch
-only. iPhone and iPad Simulator builds also pass launch, input, save, lifecycle,
-relaunch, crash-regression, and sustained-cadence checks. Physical-device proof
-is still open.
+Yes. Native macOS completed a full rental battle, iPad Simulator completed a
+separate full rental battle using touch only, and the signed build has been
+installed and played on a physical iPad. The broader controller, audio-route,
+iPhone, and device matrix remains incomplete.
 </details>
 
 <details>
 <summary><strong>Where is the IPA?</strong></summary>
 
-Run `./scripts/package-ios.sh` to create the locally audited unsigned IPA under
-`artifacts/`. It is intentionally not committed. There is no public download
-while licensing and rights review remain unresolved.
+[Download the unsigned developer-preview IPA from GitHub
+Releases](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.1).
+It is not an App Store or TestFlight build. A Mac or Windows PC running
+AltServer is required to re-sign it with your own Apple ID through AltStore
+Classic. There is currently no supported computer-free installation path.
 </details>
 
 <details>
@@ -259,13 +264,13 @@ and real-iPad controller matrix, so hardware support is not claimed as accepted.
 </details>
 
 <details>
-<summary><strong>Why is the public release blocked?</strong></summary>
+<summary><strong>What is the licensing status?</strong></summary>
 
-Some pinned upstream components do not provide a sufficient repository-level
-license grant for redistribution. AnnePad does not assume that another
-project's license covers separately copyrighted material. See
-[`docs/LEGAL-AND-ASSET-BOUNDARIES.md`](docs/LEGAL-AND-ASSET-BOUNDARIES.md) and
-blocker B-004 in [`docs/BLOCKERS.md`](docs/BLOCKERS.md).
+Each upstream component retains its own copyright and license. Some pinned
+upstream components do not provide a repository-level license grant, so this
+free, unsigned, ROM-free developer preview should not be treated as a broad
+open-source, commercial, or official-store license. See the scoped [legal and
+asset boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
 </details>
 
 ## Project map
@@ -282,6 +287,7 @@ blocker B-004 in [`docs/BLOCKERS.md`](docs/BLOCKERS.md).
 | [`scripts/verify-clean-checkout.sh`](scripts/verify-clean-checkout.sh) | Fail-closed isolated rebuild and manifest comparison |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Game core, renderer, Apple shell, input, saves, and packaging design |
 | [`docs/BUILDING.md`](docs/BUILDING.md) | Complete reproducible build and signing handoff |
+| [`docs/INSTALL_IPA.md`](docs/INSTALL_IPA.md) | Install the unsigned developer preview with AltStore Classic |
 | [`docs/TESTING.md`](docs/TESTING.md) | Automated, Simulator, and physical-device acceptance matrix |
 | [`docs/STATUS.md`](docs/STATUS.md) | Current proven behavior and next concrete gate |
 

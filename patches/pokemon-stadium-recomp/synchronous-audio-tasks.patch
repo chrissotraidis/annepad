@@ -1,0 +1,16 @@
+diff --git a/src/main/main.cpp b/src/main/main.cpp
+--- a/src/main/main.cpp
++++ b/src/main/main.cpp
+@@ -2655,6 +2655,12 @@ int main(int argc, char** argv) {
+         .get_game_thread_name = get_game_thread_name,
+     };
+ 
++    // Stadium reuses its shallow CPU-fed announcer/crowd PCM rings as soon as
++    // an audio task is submitted. Finish that task on the submitting thread so
++    // the host SP worker cannot read samples after the game has overwritten
++    // them for the next frame.
++    ultramodern::set_synchronous_audio_tasks(true);
++
+     recomp::start(
+         project_version,
+         {},  // window_handle (created by create_window callback)

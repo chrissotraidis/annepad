@@ -305,7 +305,7 @@ diff --git a/src/metal/rt64_metal.cpp b/src/metal/rt64_metal.cpp
 index 0d88e46..b131425 100644
 --- a/src/metal/rt64_metal.cpp
 +++ b/src/metal/rt64_metal.cpp
-@@ -3130,8 +3130,15 @@ namespace RT64 {
+@@ -3130,8 +3130,18 @@ namespace RT64 {
      }
  
      bool MetalInterface::isValid() const {
@@ -314,6 +314,9 @@ index 0d88e46..b131425 100644
 +        // does not match physical Apple GPU families. The backend already
 +        // disables unsupported native-sampler paths for this target.
 +        return device != nullptr;
++#elif RT64_IOS
++        // MTLCopyAllDevices is unavailable when targeting iOS versions before 18.
++        return device != nullptr && device->supportsFamily(MTL::GPUFamilyApple6);
 +#else
          // check if Metal is available and we support bindless textures: GPUFamilyMac2 or GPUFamilyApple6
          return MTL::CopyAllDevices()->count() > 0 && (device->supportsFamily(MTL::GPUFamilyMac2) || device->supportsFamily(MTL::GPUFamilyApple6));

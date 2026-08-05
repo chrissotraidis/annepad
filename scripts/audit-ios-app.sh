@@ -96,6 +96,9 @@ fi
 if [[ "$expected_signing" == signed ]]; then
     codesign --verify --deep --strict "$app" || die "signed candidate failed code-signature verification"
     [[ -e "$app/_CodeSignature" ]] || die "signed candidate has no code-signature directory"
+    provisioning_profiles=$(find "$app" -type f -iname '*.mobileprovision' -print)
+    [[ "$provisioning_profiles" == "$app/embedded.mobileprovision" ]] || \
+        die "signed candidate must contain exactly one embedded provisioning profile"
 else
     if codesign -d "$app" >/dev/null 2>&1; then
         die "unsigned candidate unexpectedly contains a code signature"
@@ -107,7 +110,7 @@ fi
 [[ -f "$app/Assets.car" ]] || die "compiled asset catalog is missing"
 find "$app" -type l -print | rg -q . && die "symbolic link found in application bundle"
 
-forbidden_files=$(find "$app" -type f | rg -i '\.(n64|v64|z64|rom|sav|sra|eep|fla|gb|gbc|mobileprovision|p12|cer)$' || true)
+forbidden_files=$(find "$app" -type f | rg -i '\.(n64|v64|z64|rom|sav|sra|eep|fla|gb|gbc|p12|cer)$' || true)
 [[ -z "$forbidden_files" ]] || die "forbidden private material found in bundle"
 if find "$app" -type f | rg -i '(^|/)(boxart|carts)(/|\.)'; then
     die "game or desktop launcher artwork found in bundle"

@@ -57,15 +57,31 @@ else
         "iOS release diagnostic surface exclusion"
 fi
 
-apply_patch_file \
-    "$game_checkout" \
-    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-diagnostics.patch" \
-    "iOS release diagnostics exclusion"
-
-apply_patch_file \
-    "$game_checkout" \
-    "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-hook-surface.patch" \
-    "iOS release diagnostic hook exclusion"
+game_audio_repair="$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/audio-active-list-repair.patch"
+game_audio_sync="$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/synchronous-audio-tasks.patch"
+if git -C "$game_checkout" apply --reverse --check "$game_audio_sync" >/dev/null 2>&1; then
+    note "Already applied: iOS release diagnostics exclusion"
+    note "Already applied: iOS release diagnostic hook exclusion"
+    note "Already applied: Pokemon Stadium audio active-list repair"
+    note "Already applied: Pokemon Stadium synchronous audio tasks"
+else
+    apply_patch_file \
+        "$game_checkout" \
+        "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-diagnostics.patch" \
+        "iOS release diagnostics exclusion"
+    apply_patch_file \
+        "$game_checkout" \
+        "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-hook-surface.patch" \
+        "iOS release diagnostic hook exclusion"
+    apply_patch_file \
+        "$game_checkout" \
+        "$game_audio_repair" \
+        "Pokemon Stadium audio active-list repair"
+    apply_patch_file \
+        "$game_checkout" \
+        "$game_audio_sync" \
+        "Pokemon Stadium synchronous audio tasks"
+fi
 
 apply_patch_file \
     "$ANNEPAD_SOURCES/rt64" \
@@ -109,6 +125,11 @@ apply_patch_file \
 
 apply_patch_file \
     "$ANNEPAD_SOURCES/N64ModernRuntime" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/gbcart-exact-rom-validation.patch" \
+    "Transfer Pak exact ROM validation"
+
+apply_patch_file \
+    "$ANNEPAD_SOURCES/N64ModernRuntime" \
     "$ANNEPAD_ROOT/patches/n64-modern-runtime/atomic-save-lifecycle.patch" \
     "atomic save and lifecycle support"
 
@@ -116,6 +137,11 @@ apply_patch_file \
     "$ANNEPAD_SOURCES/N64ModernRuntime" \
     "$ANNEPAD_ROOT/patches/n64-modern-runtime/ios-release-trace-exclusion.patch" \
     "iOS release trace exclusion"
+
+apply_patch_file \
+    "$ANNEPAD_SOURCES/N64ModernRuntime" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/synchronous-audio-tasks.patch" \
+    "opt-in synchronous audio tasks"
 
 apply_patch_file \
     "$ANNEPAD_SOURCES/N64ModernRuntime/N64Recomp" \

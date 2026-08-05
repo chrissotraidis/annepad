@@ -15,6 +15,7 @@
 #include "touch_tap_latch.h"
 
 int annepad_recomp_main(int argc, char** argv);
+extern "C" void annepad_apply_resolution_multiplier(int multiplier);
 
 namespace {
 
@@ -36,11 +37,13 @@ struct TouchControl {
     CGFloat x;
     CGFloat y;
     CGFloat size;
-    CGFloat opacity;
     bool visible;
 };
 
 constexpr size_t kControlCount = 15;
+constexpr CGFloat kDefaultTouchOpacity = 0.46;
+constexpr CGFloat kMinimumTouchOpacity = 0.15;
+constexpr CGFloat kMaximumTouchOpacity = 0.85;
 
 std::array<TouchControl, kControlCount> defaultControls() {
     // Adapt HarkinianPad's physically accepted grip-first phone/tablet layouts
@@ -48,54 +51,87 @@ std::array<TouchControl, kControlCount> defaultControls() {
     // artwork and synthetic SDL-key path deliberately remain HarkinianPad-only.
     if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
         return {{
-            {"stick", "", ControlKind::Stick, 0x0000, 0.164, 0.745, 0.090, 0.42, true},
-            {"d_up", "\u2191", ControlKind::Button, 0x0800, 0.080, 0.550, 0.032, 0.42, true},
-            {"d_down", "\u2193", ControlKind::Button, 0x0400, 0.080, 0.665, 0.032, 0.42, true},
-            {"d_left", "\u2190", ControlKind::Button, 0x0200, 0.040, 0.608, 0.032, 0.42, true},
-            {"d_right", "\u2192", ControlKind::Button, 0x0100, 0.120, 0.608, 0.032, 0.42, true},
-            {"c_up", "\u2191", ControlKind::Button, 0x0008, 0.903, 0.805, 0.033, 0.42, true},
-            {"c_down", "\u2193", ControlKind::Button, 0x0004, 0.902, 0.905, 0.033, 0.42, true},
-            {"c_left", "\u2190", ControlKind::Button, 0x0002, 0.857, 0.854, 0.033, 0.42, true},
-            {"c_right", "\u2192", ControlKind::Button, 0x0001, 0.948, 0.853, 0.033, 0.42, true},
-            {"a", "A", ControlKind::Button, 0x8000, 0.893, 0.693, 0.048, 0.48, true},
-            {"b", "B", ControlKind::Button, 0x4000, 0.826, 0.635, 0.048, 0.48, true},
-            {"z", "Z", ControlKind::Button, 0x2000, 0.890, 0.560, 0.048, 0.44, true},
-            {"l", "L", ControlKind::Button, 0x0020, 0.941, 0.460, 0.041, 0.38, true},
-            {"r", "R", ControlKind::Button, 0x0010, 0.941, 0.380, 0.041, 0.38, true},
-            {"start", "START", ControlKind::Button, 0x1000, 0.865, 0.380, 0.033, 0.40, true},
+            {"stick", "", ControlKind::Stick, 0x0000, 0.164, 0.745, 0.090, true},
+            {"d_up", "\u2191", ControlKind::Button, 0x0800, 0.080, 0.550, 0.032, true},
+            {"d_down", "\u2193", ControlKind::Button, 0x0400, 0.080, 0.665, 0.032, true},
+            {"d_left", "\u2190", ControlKind::Button, 0x0200, 0.040, 0.608, 0.032, true},
+            {"d_right", "\u2192", ControlKind::Button, 0x0100, 0.120, 0.608, 0.032, true},
+            {"c_up", "\u2191", ControlKind::Button, 0x0008, 0.903, 0.805, 0.033, true},
+            {"c_down", "\u2193", ControlKind::Button, 0x0004, 0.902, 0.905, 0.033, true},
+            {"c_left", "\u2190", ControlKind::Button, 0x0002, 0.857, 0.854, 0.033, true},
+            {"c_right", "\u2192", ControlKind::Button, 0x0001, 0.948, 0.853, 0.033, true},
+            {"a", "A", ControlKind::Button, 0x8000, 0.893, 0.693, 0.048, true},
+            {"b", "B", ControlKind::Button, 0x4000, 0.826, 0.635, 0.048, true},
+            {"z", "Z", ControlKind::Button, 0x2000, 0.890, 0.560, 0.048, true},
+            {"l", "L", ControlKind::Button, 0x0020, 0.059, 0.380, 0.041, true},
+            {"r", "R", ControlKind::Button, 0x0010, 0.941, 0.380, 0.041, true},
+            {"start", "START", ControlKind::Button, 0x1000, 0.865, 0.380, 0.033, true},
         }};
     }
     // The phone radii normalize HarkinianPad's accepted 116-point stick,
-    // 52-point face, 44-point D/shoulder, and 40-point C-button targets. Its
-    // single Z stays in the right face cluster so the left thumb can move.
+    // 52-point face, 44-point D/shoulder, and 40-point C-button targets. The
+    // positions reproduce the physically accepted low-grip iPhone layout with
+    // exact axes and spacing for each directional and face-button cluster.
     return {{
-        {"stick", "", ControlKind::Stick, 0x0000, 0.125, 0.722, 0.148, 0.38, true},
-        {"d_up", "\u2191", ControlKind::Button, 0x0800, 0.131, 0.365, 0.056, 0.38, true},
-        {"d_down", "\u2193", ControlKind::Button, 0x0400, 0.131, 0.502, 0.056, 0.38, true},
-        {"d_left", "\u2190", ControlKind::Button, 0x0200, 0.080, 0.434, 0.056, 0.38, true},
-        {"d_right", "\u2192", ControlKind::Button, 0x0100, 0.182, 0.434, 0.056, 0.38, true},
-        {"c_up", "\u2191", ControlKind::Button, 0x0008, 0.914, 0.340, 0.051, 0.52, true},
-        {"c_down", "\u2193", ControlKind::Button, 0x0004, 0.914, 0.500, 0.051, 0.52, true},
-        {"c_left", "\u2190", ControlKind::Button, 0x0002, 0.871, 0.420, 0.051, 0.52, true},
-        {"c_right", "\u2192", ControlKind::Button, 0x0001, 0.957, 0.420, 0.051, 0.52, true},
-        {"a", "A", ControlKind::Button, 0x8000, 0.925, 0.780, 0.066, 0.58, true},
-        {"b", "B", ControlKind::Button, 0x4000, 0.835, 0.700, 0.066, 0.58, true},
-        {"z", "Z", ControlKind::Button, 0x2000, 0.920, 0.625, 0.066, 0.40, true},
-        {"l", "L", ControlKind::Button, 0x0020, 0.940, 0.270, 0.050, 0.36, true},
-        {"r", "R", ControlKind::Button, 0x0010, 0.940, 0.170, 0.050, 0.36, true},
-        {"start", "START", ControlKind::Button, 0x1000, 0.850, 0.170, 0.050, 0.54, true},
+        {"stick", "", ControlKind::Stick, 0x0000, 0.166, 0.855, 0.148, true},
+        {"d_up", "\u2191", ControlKind::Button, 0x0800, 0.126, 0.471, 0.056, true},
+        {"d_down", "\u2193", ControlKind::Button, 0x0400, 0.126, 0.645, 0.056, true},
+        {"d_left", "\u2190", ControlKind::Button, 0x0200, 0.073, 0.558, 0.056, true},
+        {"d_right", "\u2192", ControlKind::Button, 0x0100, 0.179, 0.558, 0.056, true},
+        {"c_up", "\u2191", ControlKind::Button, 0x0008, 0.923, 0.476, 0.051, true},
+        {"c_down", "\u2193", ControlKind::Button, 0x0004, 0.923, 0.644, 0.051, true},
+        {"c_left", "\u2190", ControlKind::Button, 0x0002, 0.875, 0.560, 0.051, true},
+        {"c_right", "\u2192", ControlKind::Button, 0x0001, 0.971, 0.560, 0.051, true},
+        {"a", "A", ControlKind::Button, 0x8000, 0.923, 0.913, 0.066, true},
+        {"b", "B", ControlKind::Button, 0x4000, 0.861, 0.845, 0.066, true},
+        {"z", "Z", ControlKind::Button, 0x2000, 0.923, 0.777, 0.066, true},
+        {"l", "L", ControlKind::Button, 0x0020, 0.960, 0.345, 0.050, true},
+        {"r", "R", ControlKind::Button, 0x0010, 0.960, 0.235, 0.050, true},
+        {"start", "START", ControlKind::Button, 0x1000, 0.907, 0.071, 0.050, true},
     }};
 }
 
 NSString* layoutDefaultsKey() {
     return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad
-        ? @"annepad.touch.layout.ipad.v3"
-        : @"annepad.touch.layout.iphone.v5";
+        ? @"annepad.touch.layout.ipad.v4"
+        : @"annepad.touch.layout.iphone.v6";
+}
+
+NSString* resolutionDefaultsKey() {
+    return @"annepad.video.internal-resolution.v1";
+}
+
+NSString* touchOpacityDefaultsKey() {
+    return @"annepad.touch.opacity.v1";
+}
+
+NSString* touchControlsEnabledDefaultsKey() {
+    return @"annepad.touch.enabled.v1";
+}
+
+CGFloat savedTouchOpacity() {
+    NSNumber* saved = [NSUserDefaults.standardUserDefaults
+        objectForKey:touchOpacityDefaultsKey()];
+    if (![saved isKindOfClass:NSNumber.class]) return kDefaultTouchOpacity;
+    return MAX(kMinimumTouchOpacity, MIN(kMaximumTouchOpacity, saved.doubleValue));
+}
+
+BOOL savedTouchControlsEnabled() {
+    NSNumber* saved = [NSUserDefaults.standardUserDefaults
+        objectForKey:touchControlsEnabledDefaultsKey()];
+    return ![saved isKindOfClass:NSNumber.class] || saved.boolValue;
+}
+
+int savedResolutionMultiplier() {
+    NSInteger value = [NSUserDefaults.standardUserDefaults
+        integerForKey:resolutionDefaultsKey()];
+    return value >= 1 && value <= 4 ? (int)value : 3;
 }
 
 } // namespace
 
 @interface AnnePadTouchOverlayView : UIView
+- (void)presentResolutionMenu;
 @end
 
 @implementation AnnePadTouchOverlayView {
@@ -107,6 +143,10 @@ NSString* layoutDefaultsKey() {
     BOOL _editing;
     BOOL _hasUndo;
     NSInteger _selected;
+    BOOL _touchControlsEnabled;
+    CGFloat _globalOpacity;
+    CGFloat _undoOpacity;
+    UISlider* _opacitySlider;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -118,7 +158,26 @@ NSString* layoutDefaultsKey() {
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _controls = defaultControls();
         _selected = 9;
+        _touchControlsEnabled = savedTouchControlsEnabled();
+        _globalOpacity = savedTouchOpacity();
         [self loadLayout];
+        _opacitySlider = [[UISlider alloc] initWithFrame:CGRectZero];
+        _opacitySlider.minimumValue = kMinimumTouchOpacity;
+        _opacitySlider.maximumValue = kMaximumTouchOpacity;
+        _opacitySlider.value = _globalOpacity;
+        _opacitySlider.minimumTrackTintColor = UIColor.systemBlueColor;
+        _opacitySlider.maximumTrackTintColor = [UIColor colorWithWhite:1.0 alpha:0.28];
+        _opacitySlider.accessibilityLabel = @"Touch control opacity";
+        _opacitySlider.accessibilityValue = [NSString stringWithFormat:@"%.0f percent",
+                                             _globalOpacity * 100.0];
+        _opacitySlider.hidden = YES;
+        [_opacitySlider addTarget:self
+                           action:@selector(opacitySliderChanged:)
+                 forControlEvents:UIControlEventValueChanged];
+        [self addSubview:_opacitySlider];
+#if !__has_feature(objc_arc)
+        [_opacitySlider release];
+#endif
         [[NSNotificationCenter defaultCenter]
             addObserver:self
                selector:@selector(clearInput)
@@ -126,6 +185,11 @@ NSString* layoutDefaultsKey() {
                  object:nil];
     }
     return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    _opacitySlider.frame = [self opacitySliderRect];
 }
 
 - (void)dealloc {
@@ -217,7 +281,6 @@ NSString* layoutDefaultsKey() {
         control.x = [value[@"x"] doubleValue];
         control.y = [value[@"y"] doubleValue];
         control.size = [value[@"size"] doubleValue];
-        control.opacity = [value[@"opacity"] doubleValue];
         control.visible = value[@"visible"] == nil || [value[@"visible"] boolValue];
     }
 }
@@ -228,33 +291,59 @@ NSString* layoutDefaultsKey() {
         NSString* key = [NSString stringWithUTF8String:control.key];
         saved[key] = @{
             @"x": @(control.x), @"y": @(control.y),
-            @"size": @(control.size), @"opacity": @(control.opacity),
-            @"visible": @(control.visible),
+            @"size": @(control.size), @"visible": @(control.visible),
         };
     }
     [NSUserDefaults.standardUserDefaults setObject:saved forKey:layoutDefaultsKey()];
+    [NSUserDefaults.standardUserDefaults setDouble:_globalOpacity
+                                             forKey:touchOpacityDefaultsKey()];
+    [NSUserDefaults.standardUserDefaults setBool:_touchControlsEnabled
+                                           forKey:touchControlsEnabledDefaultsKey()];
 }
 
 - (NSArray<NSString*>*)toolbarLabels {
     BOOL hasSelection = _selected >= 0 && _selected < (NSInteger)kControlCount;
     BOOL selectedVisible = hasSelection ? _controls[_selected].visible : YES;
     BOOL selectedHideable = hasSelection && _controls[_selected].kind != ControlKind::Stick;
-    return @[@"DONE", _hasUndo ? @"UNDO" : @"RESET", @"\u2212", @"+", @"FADE",
+    return @[@"DONE", _hasUndo ? @"UNDO" : @"RESET", @"\u2212", @"+",
              !selectedHideable ? @"FIXED" : (selectedVisible ? @"HIDE" : @"SHOW")];
 }
 
 - (CGRect)utilityButtonRect {
     CGRect usable = [self usableBounds];
-    return CGRectMake(CGRectGetMidX(usable) - 22.0,
+    return CGRectMake(CGRectGetMaxX(usable) - 48.0,
                       CGRectGetMinY(usable) + 4.0, 44.0, 44.0);
 }
 
 - (CGRect)toolbarRectAtIndex:(NSInteger)index {
     CGRect usable = [self usableBounds];
-    CGFloat width = MIN(64.0, usable.size.width / 7.0);
-    CGFloat total = width * 6.0;
+    CGFloat width = MIN(72.0, usable.size.width / 6.0);
+    CGFloat total = width * 5.0;
     return CGRectMake(CGRectGetMidX(usable) - total / 2.0 + width * index,
                       CGRectGetMinY(usable) + 6.0, width, 34.0);
+}
+
+- (CGRect)opacityPanelRect {
+    CGRect usable = [self usableBounds];
+    CGFloat width = MIN(330.0, usable.size.width - 16.0);
+    return CGRectMake(CGRectGetMidX(usable) - width / 2.0,
+                      CGRectGetMinY(usable) + 44.0, width, 42.0);
+}
+
+- (CGRect)opacitySliderRect {
+    CGRect panel = [self opacityPanelRect];
+    return CGRectMake(CGRectGetMinX(panel) + 82.0, CGRectGetMinY(panel) + 5.0,
+                      panel.size.width - 134.0, 32.0);
+}
+
+- (void)opacitySliderChanged:(UISlider*)slider {
+    _globalOpacity = MAX(kMinimumTouchOpacity,
+                         MIN(kMaximumTouchOpacity, (CGFloat)slider.value));
+    slider.accessibilityValue = [NSString stringWithFormat:@"%.0f percent",
+                                 _globalOpacity * 100.0];
+    _hasUndo = NO;
+    [self saveLayout];
+    [self setNeedsDisplay];
 }
 
 - (void)drawLabel:(NSString*)label inRect:(CGRect)rect color:(UIColor*)color size:(CGFloat)size {
@@ -275,9 +364,11 @@ NSString* layoutDefaultsKey() {
 - (void)drawRect:(CGRect)rect {
     CGContextRef context = UIGraphicsGetCurrentContext();
     if (context == nullptr) return;
+    const uint16_t latchedButtons = g_touch_taps.active();
 
     for (NSInteger index = 0; index < (NSInteger)kControlCount; ++index) {
         const TouchControl& control = _controls[index];
+        if (!_touchControlsEnabled && !_editing) continue;
         if (!control.visible && !_editing) continue;
         CGPoint center = [self centerForControl:control];
         CGFloat radius = [self radiusForControl:control];
@@ -285,8 +376,9 @@ NSString* layoutDefaultsKey() {
         UIBezierPath* controlPath = [self isShoulderControl:control]
             ? [UIBezierPath bezierPathWithRoundedRect:controlFrame cornerRadius:radius]
             : [UIBezierPath bezierPathWithOvalInRect:controlFrame];
-        CGFloat alpha = control.visible ? control.opacity : 0.16;
-        BOOL pressed = NO;
+        CGFloat alpha = control.visible ? _globalOpacity : 0.16;
+        BOOL latched = (latchedButtons & control.mask) != 0;
+        BOOL pressed = latched;
         for (const auto& item : _touchRoles) {
             if (item.second == index) {
                 pressed = YES;
@@ -294,10 +386,12 @@ NSString* layoutDefaultsKey() {
             }
         }
         UIColor* accent = [self accentColorForControl:control];
-        UIColor* fill = accent != nil
-            ? [accent colorWithAlphaComponent:pressed ? MIN(0.92, alpha + 0.24) : alpha]
-            : [UIColor colorWithWhite:pressed ? 0.34 : 0.04
-                                 alpha:pressed ? MIN(0.88, alpha + 0.30) : alpha];
+        UIColor* fill = latched && [self isShoulderControl:control]
+            ? [UIColor colorWithRed:0.12 green:0.52 blue:0.92 alpha:0.88]
+            : (accent != nil
+                ? [accent colorWithAlphaComponent:pressed ? MIN(0.92, alpha + 0.24) : alpha]
+                : [UIColor colorWithWhite:pressed ? 0.34 : 0.04
+                                     alpha:pressed ? MIN(0.88, alpha + 0.30) : alpha]);
         UIColor* stroke = (index == _selected && _editing)
             ? [UIColor colorWithRed:1.0 green:0.82 blue:0.18 alpha:0.95]
             : [UIColor colorWithWhite:1.0 alpha:MIN(0.88, alpha + 0.28)];
@@ -332,7 +426,7 @@ NSString* layoutDefaultsKey() {
     if (_editing) {
         NSArray<NSString*>* labels = [self toolbarLabels];
         CGRect first = [self toolbarRectAtIndex:0];
-        CGRect last = [self toolbarRectAtIndex:5];
+        CGRect last = [self toolbarRectAtIndex:4];
         CGRect toolbar = CGRectUnion(first, last);
         UIBezierPath* toolbarPath = [UIBezierPath bezierPathWithRoundedRect:toolbar
                                                               cornerRadius:10.0];
@@ -341,7 +435,7 @@ NSString* layoutDefaultsKey() {
         [[UIColor colorWithWhite:1.0 alpha:0.28] setStroke];
         toolbarPath.lineWidth = 1.0;
         [toolbarPath stroke];
-        for (NSInteger i = 0; i < 6; ++i) {
+        for (NSInteger i = 0; i < 5; ++i) {
             CGRect item = [self toolbarRectAtIndex:i];
             if (i > 0) {
                 CGFloat x = CGRectGetMinX(item);
@@ -354,6 +448,23 @@ NSString* layoutDefaultsKey() {
             }
             [self drawLabel:labels[i] inRect:item color:UIColor.whiteColor size:10.0];
         }
+        CGRect opacityPanel = [self opacityPanelRect];
+        UIBezierPath* opacityPath = [UIBezierPath bezierPathWithRoundedRect:opacityPanel
+                                                               cornerRadius:10.0];
+        [[UIColor colorWithWhite:0.02 alpha:0.84] setFill];
+        [opacityPath fill];
+        [[UIColor colorWithWhite:1.0 alpha:0.28] setStroke];
+        opacityPath.lineWidth = 1.0;
+        [opacityPath stroke];
+        CGRect opacityLabel = CGRectMake(CGRectGetMinX(opacityPanel) + 8.0,
+                                         CGRectGetMinY(opacityPanel), 70.0,
+                                         opacityPanel.size.height);
+        [self drawLabel:@"OPACITY" inRect:opacityLabel color:UIColor.whiteColor size:9.0];
+        CGRect percentLabel = CGRectMake(CGRectGetMaxX(opacityPanel) - 48.0,
+                                         CGRectGetMinY(opacityPanel), 40.0,
+                                         opacityPanel.size.height);
+        [self drawLabel:[NSString stringWithFormat:@"%.0f%%", _globalOpacity * 100.0]
+                  inRect:percentLabel color:UIColor.whiteColor size:9.0];
     } else {
         CGRect utility = [self utilityButtonRect];
         UIBezierPath* utilityPath = [UIBezierPath bezierPathWithRoundedRect:utility
@@ -401,6 +512,17 @@ NSString* layoutDefaultsKey() {
                                             message:nil
                                      preferredStyle:UIAlertControllerStyleActionSheet];
     AnnePadTouchOverlayView* overlay = self;
+    NSString* touchToggleTitle = _touchControlsEnabled
+        ? @"Turn Off Touch Controls"
+        : @"Turn On Touch Controls";
+    [menu addAction:[UIAlertAction actionWithTitle:touchToggleTitle
+                                             style:UIAlertActionStyleDefault
+                                           handler:^(__unused UIAlertAction* action) {
+        overlay->_touchControlsEnabled = !overlay->_touchControlsEnabled;
+        [overlay clearInput];
+        [overlay saveLayout];
+        [overlay setNeedsDisplay];
+    }]];
     [menu addAction:[UIAlertAction actionWithTitle:@"Manage Game ROM"
                                              style:UIAlertActionStyleDefault
                                            handler:^(__unused UIAlertAction* action) {
@@ -416,9 +538,59 @@ NSString* layoutDefaultsKey() {
                                              style:UIAlertActionStyleDefault
                                            handler:^(__unused UIAlertAction* action) {
         overlay->_editing = YES;
+        overlay->_opacitySlider.hidden = NO;
+        overlay->_opacitySlider.value = overlay->_globalOpacity;
         [overlay clearInput];
         [overlay setNeedsDisplay];
     }]];
+    NSString* resolutionTitle = [NSString stringWithFormat:@"Internal Resolution: %d\u00d7",
+                                 savedResolutionMultiplier()];
+    [menu addAction:[UIAlertAction actionWithTitle:resolutionTitle
+                                             style:UIAlertActionStyleDefault
+                                           handler:^(__unused UIAlertAction* action) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{
+            [overlay presentResolutionMenu];
+        });
+    }]];
+    [menu addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                             style:UIAlertActionStyleCancel
+                                           handler:nil]];
+    UIPopoverPresentationController* popover = menu.popoverPresentationController;
+    if (popover != nil) {
+        popover.sourceView = self;
+        popover.sourceRect = [self utilityButtonRect];
+        popover.permittedArrowDirections = UIPopoverArrowDirectionUp;
+    }
+    [presenter presentViewController:menu animated:YES completion:nil];
+}
+
+- (void)presentResolutionMenu {
+    UIViewController* presenter = self.window.rootViewController;
+    while (presenter.presentedViewController != nil) {
+        presenter = presenter.presentedViewController;
+    }
+    if (presenter == nil) return;
+
+    UIAlertController* menu =
+        [UIAlertController alertControllerWithTitle:@"Internal Resolution"
+                                            message:@"3\u00d7 is the tested default. Higher settings use more GPU and memory."
+                                     preferredStyle:UIAlertControllerStyleActionSheet];
+    const int current = savedResolutionMultiplier();
+    AnnePadTouchOverlayView* overlay = self;
+    for (int multiplier = 1; multiplier <= 4; ++multiplier) {
+        NSString* label = multiplier == current
+            ? [NSString stringWithFormat:@"\u2713  %d\u00d7", multiplier]
+            : [NSString stringWithFormat:@"%d\u00d7", multiplier];
+        [menu addAction:[UIAlertAction actionWithTitle:label
+                                                 style:UIAlertActionStyleDefault
+                                               handler:^(__unused UIAlertAction* action) {
+            [NSUserDefaults.standardUserDefaults setInteger:multiplier
+                                                     forKey:resolutionDefaultsKey()];
+            annepad_apply_resolution_multiplier(multiplier);
+            [overlay clearInput];
+        }]];
+    }
     [menu addAction:[UIAlertAction actionWithTitle:@"Cancel"
                                              style:UIAlertActionStyleCancel
                                            handler:nil]];
@@ -439,22 +611,28 @@ NSString* layoutDefaultsKey() {
         }
         return NO;
     }
-    for (NSInteger index = 0; index < 6; ++index) {
+    for (NSInteger index = 0; index < 5; ++index) {
         if (!CGRectContainsPoint([self toolbarRectAtIndex:index], point)) continue;
         TouchControl& selected = _controls[MAX(0, _selected)];
         switch (index) {
             case 0:
                 _editing = NO;
                 _hasUndo = NO;
+                _opacitySlider.hidden = YES;
                 [self saveLayout];
                 break;
             case 1:
                 if (_hasUndo) {
                     std::swap(_controls, _undoControls);
+                    std::swap(_globalOpacity, _undoOpacity);
+                    _opacitySlider.value = _globalOpacity;
                     _hasUndo = NO;
                 } else {
                     _undoControls = _controls;
+                    _undoOpacity = _globalOpacity;
                     _controls = defaultControls();
+                    _globalOpacity = kDefaultTouchOpacity;
+                    _opacitySlider.value = _globalOpacity;
                     _hasUndo = YES;
                 }
                 [self saveLayout];
@@ -476,12 +654,6 @@ NSString* layoutDefaultsKey() {
                 break;
             }
             case 4:
-                selected.opacity += 0.14;
-                if (selected.opacity > 0.78) selected.opacity = 0.24;
-                _hasUndo = NO;
-                [self saveLayout];
-                break;
-            case 5:
                 if (selected.kind != ControlKind::Stick) {
                     selected.visible = !selected.visible;
                 }
@@ -552,6 +724,7 @@ NSString* layoutDefaultsKey() {
     for (UITouch* touch in touches) {
         CGPoint point = [touch locationInView:self];
         if ([self handleToolbarPoint:point]) continue;
+        if (!_editing && !_touchControlsEnabled) continue;
         NSInteger control = [self controlAtPoint:point includeHidden:_editing];
         if (control == NSNotFound) continue;
         _selected = control;
@@ -569,6 +742,10 @@ NSString* layoutDefaultsKey() {
             const uint8_t holdPolls = (mask & 0x0030u) != 0
                 ? kShoulderTapHoldPolls : kTapHoldPolls;
             g_touch_taps.extend(mask, holdPolls);
+            if ((mask & 0x0030u) != 0) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC),
+                               dispatch_get_main_queue(), ^{ [self setNeedsDisplay]; });
+            }
         }
     }
     if (!_editing) [self publishInput];
@@ -611,6 +788,10 @@ NSString* layoutDefaultsKey() {
 }
 
 @end
+
+extern "C" int annepad_resolution_multiplier(void) {
+    return savedResolutionMultiplier();
+}
 
 extern "C" void annepad_touch_attach(void* window_pointer) {
     if (window_pointer == nullptr) return;

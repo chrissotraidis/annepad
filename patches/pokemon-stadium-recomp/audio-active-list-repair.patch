@@ -1,0 +1,129 @@
+diff --git a/extras.c b/extras.c
+index 275387a..372dc6b 100644
+--- a/extras.c
++++ b/extras.c
+@@ -53,6 +53,13 @@ extern int32_t* section_addresses;
+     ((uint32_t)(rdram)[((paddr) + 2) ^ 3] <<  8) | \
+     ((uint32_t)(rdram)[((paddr) + 3) ^ 3]))
+ 
++static void mem_store_be32(uint8_t* rdram, uint32_t paddr, uint32_t value) {
++    rdram[(paddr + 0) ^ 3] = (uint8_t)(value >> 24);
++    rdram[(paddr + 1) ^ 3] = (uint8_t)(value >> 16);
++    rdram[(paddr + 2) ^ 3] = (uint8_t)(value >> 8);
++    rdram[(paddr + 3) ^ 3] = (uint8_t)value;
++}
++
+ 
+ static void unhandled_abort(const char *kind, uint32_t pc, const char *detail) {
+     /* Persistent-file copy: stderr in headless runs gets buffered and
+@@ -2710,6 +2717,72 @@ extern int librecomp_audio_uaf_silence_voices_in_range(
+ extern int librecomp_audio_uaf_silence_secondary_in_range(
+     uint8_t* rdram, uint32_t start_vaddr, uint32_t end_vaddr);
+ 
++/* Validate Stadium's null-terminated active audio-voice list before its
++ * expiration walker runs. A duplicated enqueue can leave stale prev/tail
++ * metadata or a cycle; func_8003C408 then repeatedly frees the same voices.
++ * Rebuild only the reachable, unique prefix and reject an incoming node that
++ * is already active. The game configures at most 64 voices. */
++int pkmnstadium_audio_active_list_prepare(uint8_t* rdram, uint32_t incoming_v) {
++    enum { MAX_AUDIO_VOICES = 64 };
++    static const uint32_t head_p = 0x000FC808u;
++    static const uint32_t tail_p = 0x000FC80Cu;
++    static const uint32_t count_p = 0x000FC81Cu;
++    uint32_t nodes[MAX_AUDIO_VOICES];
++    uint32_t node_v = MEM_LOAD_BE32(rdram, head_p);
++    uint32_t count = 0;
++    int repair = 0;
++
++    while (node_v != 0 && count < MAX_AUDIO_VOICES) {
++        uint32_t i;
++        if (node_v < 0x80000000u || node_v >= 0x80800000u) {
++            repair = 1;
++            break;
++        }
++        for (i = 0; i < count; i++) {
++            if (nodes[i] == node_v) {
++                repair = 1;
++                break;
++            }
++        }
++        if (i != count) break;
++        nodes[count++] = node_v;
++        node_v = MEM_LOAD_BE32(rdram, (node_v & 0x1FFFFFFFu));
++    }
++    if (node_v != 0) repair = 1;
++
++    for (uint32_t i = 0; i < count; i++) {
++        uint32_t node_p = nodes[i] & 0x1FFFFFFFu;
++        uint32_t expected_prev = (i == 0) ? 0 : nodes[i - 1];
++        if (MEM_LOAD_BE32(rdram, node_p + 4) != expected_prev) repair = 1;
++    }
++
++    {
++        uint32_t expected_tail = (count == 0) ? 0 : nodes[count - 1];
++        if (MEM_LOAD_BE32(rdram, tail_p) != expected_tail ||
++            MEM_LOAD_BE32(rdram, count_p) != count) {
++            repair = 1;
++        }
++    }
++
++    if (repair) {
++        for (uint32_t i = 0; i < count; i++) {
++            uint32_t node_p = nodes[i] & 0x1FFFFFFFu;
++            uint32_t next = (i + 1 < count) ? nodes[i + 1] : 0;
++            uint32_t prev = (i == 0) ? 0 : nodes[i - 1];
++            mem_store_be32(rdram, node_p, next);
++            mem_store_be32(rdram, node_p + 4, prev);
++        }
++        mem_store_be32(rdram, head_p, (count == 0) ? 0 : nodes[0]);
++        mem_store_be32(rdram, tail_p, (count == 0) ? 0 : nodes[count - 1]);
++        mem_store_be32(rdram, count_p, count);
++    }
++
++    for (uint32_t i = 0; i < count; i++) {
++        if (nodes[i] == incoming_v) return 0;
++    }
++    return 1;
++}
++
+ void pkmnstadium_pool_pop_silence_voices(uint8_t* rdram) {
+     uint32_t pool_p = 0x000A6070u;
+     uint32_t cur_L  = MEM_LOAD_BE32(rdram, pool_p + 0x28);
+diff --git a/game.toml b/game.toml
+index dcd45b3..2ab9491 100644
+--- a/game.toml
++++ b/game.toml
+@@ -3232,6 +3232,20 @@ func = "n_alLoadParam"
+ before_vram = 0x8004F95C
+ text = "ANNEPAD_DIAGNOSTIC_HOOK(pkmnstadium_set_wavetable_probe(rdram, ctx->r4, ctx->r5, ctx->r6));"
+ 
++# Keep Stadium's active high-level audio-voice list well formed. A duplicate
++# enqueue can leave stale prev/tail metadata and make func_8003C408 repeatedly
++# free the same nodes. Reject duplicate insertion and normalize the list before
++# its expiration walker runs.
++[[patches.hook]]
++func = "func_8003C3A0"
++before_vram = 0x8003C3A0
++text = "if (!pkmnstadium_audio_active_list_prepare(rdram, (uint32_t)ctx->r4)) return;"
++
++[[patches.hook]]
++func = "func_8003C408"
++before_vram = 0x8003C408
++text = "pkmnstadium_audio_active_list_prepare(rdram, 0);"
++
+ # main_pool_pop_state caller probe — track who frees memory in the
+ # pool. The post-title audio UAF (2026-05-06) traced to a 1 MiB
+ # alloc at 0x8018A1B0 that overlaps wavetable structs voices still
+diff --git a/include/trace.h b/include/trace.h
+index b5bee62..ed0ff29 100644
+--- a/include/trace.h
++++ b/include/trace.h
+@@ -34,6 +34,8 @@ void pkmnstadium_gbtower_state_trace(unsigned char *rdram, unsigned int tag,
+ void pkmnstadium_gbtower_queue_audio(unsigned char *rdram,
+                                      unsigned int audio_addr,
+                                      unsigned int byte_count);
++int pkmnstadium_audio_active_list_prepare(unsigned char *rdram,
++                                          unsigned int incoming_vaddr);
+ 
+ /* Voluntary-preemption tick (defined in N64ModernRuntime
+  * ultramodern/src/scheduler_tick.cpp, extern "C"). One relaxed atomic

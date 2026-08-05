@@ -311,7 +311,7 @@ index 08fe7be..b0bf9f9 100644
      static const bool enabled = [](){
          const char* v = std::getenv("PSR_JIT_TIER");
          // Default ON; only an explicit 0/false/no disables it.
-@@ -3834,9 +3861,54 @@ static bool jit_tier_enabled() {
+@@ -3834,9 +3861,73 @@ static bool jit_tier_enabled() {
                   v[0] == 'n' || v[0] == 'N');
      }();
      return enabled;
@@ -319,6 +319,25 @@ index 08fe7be..b0bf9f9 100644
  }
  
  static void unhandled_lookup_trampoline(uint8_t* rdram, recomp_context* ctx) {
++    // Stadium's audio-command walker has 12 handlers. If a stale command
++    // buffer supplies a different opcode, stop only this frame's command tail
++    // instead of dispatching through adjacent data as a function pointer.
++    if ((uint32_t)ctx->host_return_target == 0x80039D2Cu) {
++        static std::atomic<uint32_t> command_repair_count{0};
++        const uint32_t n =
++            command_repair_count.fetch_add(1, std::memory_order_relaxed);
++        if (n < 8u) {
++            std::fprintf(stderr,
++                "[audio-cmd] discarded malformed tail opcode=0x%02X "
++                "target=0x%08X\n",
++                (uint32_t)ctx->r2 & 0xFFu, (uint32_t)g_self_heal_addr);
++            std::fflush(stderr);
++        }
++        MEM_W(0, (gpr)(int32_t)0x800FC7ECu) = 0;
++        ctx->r2 = ctx->r4;
++        return;
++    }
++
 +    // Stadium's high-level audio voice dispatcher returns to 0x8003ADB0.
 +    // A stale voice can index past the fixed handler table and produce a
 +    // sample-like target. Returning zero is the dispatcher's native failure
@@ -425,3 +444,18 @@ index 3757469..337db65 100644
              silenced, start_vaddr, end_vaddr);
          std::fflush(stderr);
      }
+diff --git a/librecomp/src/overlays.cpp b/librecomp/src/overlays.cpp
+index 08fe7be..6dcf36a 100644
+--- a/librecomp/src/overlays.cpp
++++ b/librecomp/src/overlays.cpp
+@@ -3062,8 +3062,8 @@ static void ensure_jit_cache_reserved() {
+     }
+     fprintf(f,
+         "Reserved for a future v2 sljit blob cache (arch-abi: %s).\n\n"
+-        "n64 v1 intentionally does NOT persist JIT bytes here. The LiveRecomp\n"
+-        "LiveGenerator emits final, position-dependent machine code (host pointers\n"
++        "n64 v1 intentionally does NOT persist runtime-generated code here.\n"
++        "The desktop code generator emits position-dependent machine code (host pointers\n"
+         "for functions, jump tables, string literals, and the executable offset are\n"
+         "baked in by sljit_generate_code), so a serialized blob cannot be reloaded\n"
+         "into another process. Fragment coverage is persisted instead as the\n"

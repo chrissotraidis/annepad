@@ -23,10 +23,12 @@ int main() {
 
     AnnePadTouchTapLatch taps;
     taps.extend(A, 6);
+    expect(taps.active(), A, "quick tap active feedback");
     for (int poll = 0; poll < 6; ++poll) {
         expect(taps.consume(), A, "quick tap duration");
     }
     expect(taps.consume(), 0, "quick tap expiry");
+    expect(taps.active(), 0, "quick tap inactive feedback");
 
     taps.extend(A, 6);
     for (int poll = 0; poll < 5; ++poll) expect(taps.consume(), A, "A lead-in");
@@ -39,6 +41,7 @@ int main() {
     taps.extend(Z, 6);
     expect(taps.consume(), Z, "Z tap");
     taps.clear(Z);
+    expect(taps.active(), 0, "selective Z feedback clear");
     expect(taps.consume(), 0, "selective Z clear");
 
     // Z is not persistently toggled, but independent touches may still form

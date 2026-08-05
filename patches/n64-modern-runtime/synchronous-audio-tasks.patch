@@ -1,0 +1,52 @@
+diff --git a/ultramodern/include/ultramodern/ultramodern.hpp b/ultramodern/include/ultramodern/ultramodern.hpp
+--- a/ultramodern/include/ultramodern/ultramodern.hpp
++++ b/ultramodern/include/ultramodern/ultramodern.hpp
+@@ -182,6 +182,7 @@ void set_native_thread_priority(ThreadPriority pri);
+ PTR(OSThread) this_thread();
+ void set_main_thread();
+ bool is_game_thread();
++void set_synchronous_audio_tasks(bool enabled);
+ void submit_rsp_task(RDRAM_ARG PTR(OSTask) task);
+ void send_si_message(RDRAM_ARG1);
+ uint32_t get_speed_multiplier();
+diff --git a/ultramodern/src/events.cpp b/ultramodern/src/events.cpp
+--- a/ultramodern/src/events.cpp
++++ b/ultramodern/src/events.cpp
+@@ -1363,6 +1363,7 @@ extern "C" PTR(void) osViGetCurrentFramebuffer() {
+ static std::atomic<uint64_t> g_submit_gfx{0};
+ static std::atomic<uint64_t> g_submit_audio{0};
+ static std::atomic<uint64_t> g_submit_other{0};
++static std::atomic<bool> g_synchronous_audio_tasks{false};
+ 
+ extern "C" uint64_t ultramodern_submit_gfx_count(void) { return g_submit_gfx.load(); }
+ extern "C" uint64_t ultramodern_submit_audio_count(void) { return g_submit_audio.load(); }
+@@ -1370,6 +1371,10 @@ extern "C" uint64_t ultramodern_submit_other_count(void) { return g_submit_other
+ extern "C" uint64_t ultramodern_sp_complete_count(void);
+ extern "C" uint64_t ultramodern_dp_complete_count(void);
+ 
++void ultramodern::set_synchronous_audio_tasks(bool enabled) {
++    g_synchronous_audio_tasks.store(enabled, std::memory_order_release);
++}
++
+ void ultramodern::submit_rsp_task(RDRAM_ARG PTR(OSTask) task_) {
+     OSTask* task = TO_PTR(OSTask, task_);
+ 
+@@ -1395,7 +1400,17 @@ void ultramodern::submit_rsp_task(RDRAM_ARG PTR(OSTask) task_) {
+         (void)run_rsp_task_or_warn(PASS_RDRAM task);
+         cosim_schedule_rcp_event(CosimRcpEventKind::SpComplete, task->t.type, cosim_rsp_sp_delay());
+ #else
+-        events_context.sp_task_queue.enqueue(task);
++        if (task->t.type == M_AUDTASK &&
++            g_synchronous_audio_tasks.load(std::memory_order_acquire)) {
++            // Stadium builds its announcer/crowd stream from shallow CPU-fed
++            // rings that it starts rewriting for the next frame immediately
++            // after submitting this task. Consume those inputs before returning
++            // so the host SP thread cannot observe a later frame's samples.
++            (void)run_rsp_task_or_warn(PASS_RDRAM task);
++            sp_complete(task->t.type);
++        } else {
++            events_context.sp_task_queue.enqueue(task);
++        }
+ #endif
+     }
+ }

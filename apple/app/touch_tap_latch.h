@@ -32,6 +32,16 @@ public:
         }
     }
 
+    uint16_t active() const {
+        uint16_t buttons = 0;
+        for (std::size_t bit = 0; bit < counters_.size(); ++bit) {
+            if (counters_[bit].load(std::memory_order_relaxed) != 0) {
+                buttons |= static_cast<uint16_t>(1u << bit);
+            }
+        }
+        return buttons;
+    }
+
     uint16_t consume() {
         uint16_t buttons = 0;
         for (std::size_t bit = 0; bit < counters_.size(); ++bit) {

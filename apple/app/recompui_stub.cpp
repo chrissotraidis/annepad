@@ -1,6 +1,16 @@
 #include "recompui_launcher.h"
 
+#include <algorithm>
 #include <cstring>
+#include <ultramodern/config.hpp>
+
+extern "C" int annepad_resolution_multiplier(void);
+
+extern "C" void annepad_apply_resolution_multiplier(int multiplier) {
+    auto config = ultramodern::renderer::get_graphics_config();
+    config.ds_option = std::clamp(multiplier, 1, 4);
+    ultramodern::renderer::set_graphics_config(config);
+}
 
 namespace pkmnstadium::recompui {
 
@@ -21,7 +31,7 @@ PortAssignment port_assignment(int port) {
 
 bool startup_fullscreen() { return true; }
 std::string startup_graphics_api() { return "auto"; }
-int startup_ds_option() { return 1; }
+int startup_ds_option() { return annepad_resolution_multiplier(); }
 int startup_msaa() { return 0; }
 std::string startup_audio_device() { return {}; }
 
