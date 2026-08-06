@@ -9,8 +9,8 @@ your own Apple ID.
 
 1. Install AltServer on your Mac or Windows PC and use it to install AltStore
    Classic on your iPhone or iPad.
-2. Download `AnnePad-0.1.0-preview.1-unsigned.ipa` from the [GitHub
-   release](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.1).
+2. Download `AnnePad-0.1.0-preview.2-unsigned.ipa` from the [GitHub
+release](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.2).
 3. Open the IPA with AltStore Classic, or use **My Apps → +** and select it.
 4. Keep the device connected to the same computer/network while AltServer
    signs and installs the app.

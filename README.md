@@ -22,7 +22,7 @@ boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
 
 | Option | Status | What to do |
 |---|---|---|
-| Developer-preview `.ipa` | **Available with a computer** | [Download preview 0.1.0 build 1](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.1), then re-sign it with your Apple ID using AltStore Classic and AltServer by following the [installation guide](docs/INSTALL_IPA.md). |
+| Developer-preview `.ipa` | **Available with a computer** | [Download preview 0.1.0 build 2](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.2), then re-sign it with your Apple ID using AltStore Classic and AltServer by following the [installation guide](docs/INSTALL_IPA.md). |
 | Local iPhone or iPad build | **Available now** | Build and sign with your Apple development team using the instructions below. |
 | Simulator | **Available now** | Best for development and UI testing; it is not a substitute for physical-device testing. |
 | App Store / TestFlight | **Not announced** | No listing or public TestFlight currently exists. |
@@ -200,9 +200,9 @@ credentials, provisioning profiles, signing keys, and debug-only release
 surfaces.
 
 The reproducibility authority is the sorted uncompressed-content manifest, not
-the raw ZIP hash (ZIP timestamps can differ). Preview 1's accepted manifest
+the raw ZIP hash (ZIP timestamps can differ). Preview 2's accepted manifest
 SHA-256 is
-`451e5ab63d4c3f82f72aed3ac88becca3653d11d27fbc393b198837004031f0d`.
+`151710f3e6a59d2191bf391bbf758359e09d1918d549869474d2e53f29c00112`.
 
 ## Physical-device handoff
 
@@ -249,7 +249,7 @@ iPhone, and device matrix remains incomplete.
 <summary><strong>Where is the IPA?</strong></summary>
 
 [Download the unsigned developer-preview IPA from GitHub
-Releases](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.1).
+Releases](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.2).
 It is not an App Store or TestFlight build. A Mac or Windows PC running
 AltServer is required to re-sign it with your own Apple ID through AltStore
 Classic. There is currently no supported computer-free installation path.
