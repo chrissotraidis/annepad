@@ -182,11 +182,13 @@ tests, packages, and audits. Record:
 - Host and Xcode/SDK versions.
 - Source/tree and patch verification results.
 - Generated-source manifest digest (not contents).
-- App binary UUID state/content hashes and package canonical content digest.
+- App binary UUID/content hashes and package canonical content digest.
 - Test and audit summaries.
 
 ZIP byte hashes may differ because archive tools encode timestamps; canonical
 sorted uncompressed path+content hashing is the package reproducibility gate.
+Unsigned packages retain the linker's normal hash-derived `LC_UUID` command so
+they are accepted by loaders that require it, including LiveContainer.
 
 `verify-clean-checkout.sh` deliberately requires a committed, clean AnnePad
 `HEAD` and an expected canonical candidate manifest, then creates a local

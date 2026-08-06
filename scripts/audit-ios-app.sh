@@ -128,12 +128,7 @@ printf '%s\n' "$privacy_dump" | rg -q '"NSPrivacyTracking" => false' || \
     die "privacy manifest tracking declaration is not false"
 
 uuid=$(xcrun dwarfdump --uuid "$binary" | awk '{print $2}')
-if [[ "$expected_signing" == signed ]]; then
-    [[ -n "$uuid" ]] || die "signed candidate is missing its Mach-O UUID"
-else
-    [[ -z "$uuid" ]] || die "unsigned candidate contains a nondeterministic Mach-O UUID"
-    uuid=absent
-fi
+[[ -n "$uuid" ]] || die "candidate is missing its Mach-O LC_UUID load command"
 binary_sha=$(shasum -a 256 "$binary" | awk '{print $1}')
 binary_size=$(stat -f '%z' "$binary")
 note "AnnePad iOS app audit passed."

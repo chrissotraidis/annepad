@@ -168,8 +168,9 @@ Gate 9's local unsigned-package sub-gate and the isolated verifier's internal
 checks passed 2026-08-02. The release app is arm64 iPhoneOS 16.0, links only
 Apple system libraries, and passed profile,
 privacy, metadata, icon, forbidden-runtime, local-path, ROM/save/artwork,
-signature, provisioning, and targeted release-diagnostic audits. Unsigned
-linking omits the nondeterministic Mach-O UUID; signed linking retains it. The
+signature, provisioning, and targeted release-diagnostic audits. Unsigned and
+signed linking retain the normal hash-derived Mach-O UUID; the unsigned build
+also uses the linker reproducibility mode. The
 validation-only audio capture/synthetic, `aspMain` replay/capture/oracle, Ares
 worker, TCP debug-server/port, turbo, environment-autoboot, and unavailable-
 transport surfaces are compiled out. The app audit rejects their markers using

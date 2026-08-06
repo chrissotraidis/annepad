@@ -19,11 +19,10 @@ esac
 case "$signing" in
     unsigned)
         signing_suffix=
-        # Apple ld emits a fresh UUID for every link even when every input is
-        # identical. Unsigned handoff packages omit it so their canonical
-        # uncompressed content can be reproduced byte-for-byte. Signed builds
-        # retain the UUID for crash-symbolication workflows.
-        linker_flags=-Wl,-reproducible,-no_uuid
+        # Keep the normal hash-derived LC_UUID: launchers such as LiveContainer
+        # require it. -reproducible makes the rest of the link insensitive to
+        # incidental input metadata without suppressing that load command.
+        linker_flags=-Wl,-reproducible
         ;;
     signed)
         [[ "$profile" == release ]] || die "signed builds require the release profile"
