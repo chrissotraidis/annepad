@@ -1,0 +1,476 @@
+--- a/src/main/main.cpp
++++ b/src/main/main.cpp
+@@ -120,6 +120,7 @@
+ #include "transfer_pak.h"
+ #include "recompui_launcher.h"
+ #include "input_bindings.h"
++#include "controller_slots.h"
+ 
+ extern "C" void recomp_entrypoint(uint8_t* rdram, recomp_context* ctx);
+ 
+@@ -1514,6 +1515,24 @@
+ // which is consistent so long as TAB isn't being held at toggle time.
+ static std::atomic<bool> s_turbo_persistent{false};
+ 
++enum class ControllerReconcileReason : uint8_t {
++    None,
++    Startup,
++    Added,
++    Removed,
++    Remapped,
++    Foreground,
++    Periodic,
++    LauncherConfig,
++};
++
++static std::atomic<ControllerReconcileReason> g_controller_reconcile_reason{
++    ControllerReconcileReason::Startup};
++
++static void request_controller_reconcile(ControllerReconcileReason reason) {
++    g_controller_reconcile_reason.store(reason);
++}
++
+ static void handle_mobile_lifecycle_event(uint32_t event_type) {
+     if (event_type == SDL_APP_WILLENTERBACKGROUND ||
+         event_type == SDL_APP_TERMINATING) {
+@@ -1530,6 +1549,7 @@
+         if (audio_device != 0) {
+             SDL_PauseAudioDevice(audio_device, 0);
+         }
++        request_controller_reconcile(ControllerReconcileReason::Foreground);
+         std::fprintf(stderr, "[AnnePad] lifecycle: foreground active\n");
+         std::fflush(stderr);
+     }
+@@ -1553,6 +1573,13 @@
+             ev.type == SDL_APP_LOWMEMORY) {
+             handle_mobile_lifecycle_event(ev.type);
+         }
++        if (ev.type == SDL_CONTROLLERDEVICEADDED) {
++            request_controller_reconcile(ControllerReconcileReason::Added);
++        } else if (ev.type == SDL_CONTROLLERDEVICEREMOVED) {
++            request_controller_reconcile(ControllerReconcileReason::Removed);
++        } else if (ev.type == SDL_CONTROLLERDEVICEREMAPPED) {
++            request_controller_reconcile(ControllerReconcileReason::Remapped);
++        }
+         if (ev.type == SDL_KEYDOWN && ev.key.repeat == 0 &&
+             ev.key.keysym.scancode < SDL_NUM_SCANCODES) {
+             std::lock_guard<std::mutex> lock(g_keyboard_tap_mutex);
+@@ -1607,17 +1634,142 @@
+ // real behavior, not a fake. Real input takes effect when a controller is
+ // plugged in and SDL_GameControllerOpen succeeds.
+ 
+-static SDL_GameController* g_pad = nullptr;
+-
+ // ---- per-port input routing (driven by the SS Anne launcher) --------------
+ // When the launcher commits a config at PLAY, each N64 port (0..3) is routed to
+ // a specific device. Until then (or under PSR_AUTOBOOT) the legacy single-human
+ // model applies: port 0 = keyboard + first pad, ports 1-3 = Transfer-Pak idle.
+ static std::atomic<bool> g_launcher_input_active{false};
+ static pkmnstadium::recompui::DeviceKind g_port_kind[4] = {};
+-static int g_port_instance[4] = {-1, -1, -1, -1};
+ static bool g_port_enabled[4] = {false, false, false, false};
+-static SDL_GameController* g_port_pad[4] = {nullptr, nullptr, nullptr, nullptr};
++static std::array<SDL_GameController*, pkmnstadium::controller::kPlayerCount>
++    g_controller_pads{};
++static pkmnstadium::controller::Instances g_controller_instances{
++    pkmnstadium::controller::kNoController,
++    pkmnstadium::controller::kNoController,
++    pkmnstadium::controller::kNoController,
++    pkmnstadium::controller::kNoController,
++};
++static std::array<std::string, pkmnstadium::controller::kPlayerCount>
++    g_controller_names{};
++static bool g_controller_reconciled = false;
++static std::chrono::steady_clock::time_point g_next_controller_check{};
++
++struct EnumeratedController {
++    int device_index = -1;
++    int instance = pkmnstadium::controller::kNoController;
++    std::string name;
++};
++
++static const char* controller_reconcile_reason_name(ControllerReconcileReason reason) {
++    switch (reason) {
++        case ControllerReconcileReason::Startup: return "startup";
++        case ControllerReconcileReason::Added: return "device-added";
++        case ControllerReconcileReason::Removed: return "device-removed";
++        case ControllerReconcileReason::Remapped: return "device-remapped";
++        case ControllerReconcileReason::Foreground: return "foreground";
++        case ControllerReconcileReason::Periodic: return "active-check";
++        case ControllerReconcileReason::LauncherConfig: return "launcher-config";
++        default: return "unspecified";
++    }
++}
++
++static bool controller_handle_valid(std::size_t slot) {
++    SDL_GameController* pad = g_controller_pads[slot];
++    if (pad == nullptr || !SDL_GameControllerGetAttached(pad)) return false;
++    SDL_Joystick* joystick = SDL_GameControllerGetJoystick(pad);
++    return joystick != nullptr &&
++        static_cast<int>(SDL_JoystickInstanceID(joystick)) == g_controller_instances[slot];
++}
++
++static void close_controller_slot(std::size_t slot, const char* reason) {
++    SDL_GameController* pad = g_controller_pads[slot];
++    if (pad != nullptr) {
++        std::fprintf(stderr,
++            "[controller] released/closed reason=%s instance=%d player=%zu name='%s'\n",
++            reason, g_controller_instances[slot], slot + 1,
++            g_controller_names[slot].empty() ? "(unknown)" : g_controller_names[slot].c_str());
++        SDL_GameControllerClose(pad);
++    }
++    g_controller_pads[slot] = nullptr;
++    g_controller_instances[slot] = pkmnstadium::controller::kNoController;
++    g_controller_names[slot].clear();
++}
++
++static std::vector<EnumeratedController> enumerate_controllers() {
++    std::vector<EnumeratedController> current;
++    const int joystick_count = SDL_NumJoysticks();
++    for (int device_index = 0; device_index < joystick_count; ++device_index) {
++        if (!SDL_IsGameController(device_index)) continue;
++        EnumeratedController device;
++        device.device_index = device_index;
++        device.instance = static_cast<int>(SDL_JoystickGetDeviceInstanceID(device_index));
++        const char* name = SDL_GameControllerNameForIndex(device_index);
++        device.name = name != nullptr ? name : "(unknown)";
++        if (device.instance >= 0) current.push_back(std::move(device));
++    }
++    return current;
++}
++
++static void reconcile_controllers(ControllerReconcileReason reason) {
++#ifndef __APPLE__
++    SDL_PumpEvents();
++    SDL_GameControllerUpdate();
++#endif
++    const char* reason_name = controller_reconcile_reason_name(reason);
++    const auto current = enumerate_controllers();
++    std::vector<int> current_instances;
++    current_instances.reserve(current.size());
++    for (const auto& device : current) current_instances.push_back(device.instance);
++    if (reason != ControllerReconcileReason::Periodic) {
++        std::fprintf(stderr, "[controller] reconcile reason=%s devices=%zu\n",
++                     reason_name, current.size());
++    }
++
++    pkmnstadium::controller::Eligibility eligible{};
++    for (std::size_t slot = 0; slot < eligible.size(); ++slot) {
++        eligible[slot] = !g_launcher_input_active.load() ||
++            g_port_kind[slot] == pkmnstadium::recompui::DeviceKind::Gamepad;
++        if (g_controller_pads[slot] != nullptr && !controller_handle_valid(slot)) {
++            close_controller_slot(slot, reason_name);
++        }
++    }
++
++    const auto plan = pkmnstadium::controller::reconcile_slots(
++        g_controller_instances, eligible, current_instances.data(), current_instances.size());
++    for (std::size_t slot = 0; slot < plan.instances.size(); ++slot) {
++        if (g_controller_instances[slot] != plan.instances[slot]) {
++            if (g_controller_pads[slot] != nullptr) close_controller_slot(slot, reason_name);
++            g_controller_instances[slot] = plan.instances[slot];
++        }
++        if (g_controller_instances[slot] < 0 || g_controller_pads[slot] != nullptr) continue;
++
++        const auto found = std::find_if(current.begin(), current.end(), [&](const auto& device) {
++            return device.instance == g_controller_instances[slot];
++        });
++        if (found == current.end()) {
++            g_controller_instances[slot] = pkmnstadium::controller::kNoController;
++            continue;
++        }
++        SDL_GameController* pad = SDL_GameControllerOpen(found->device_index);
++        if (pad == nullptr) {
++            std::fprintf(stderr,
++                "[controller] open-failed reason=%s instance=%d player=%zu device-index=%d name='%s' error='%s'\n",
++                reason_name, found->instance, slot + 1, found->device_index,
++                found->name.c_str(), SDL_GetError());
++            g_controller_instances[slot] = pkmnstadium::controller::kNoController;
++            continue;
++        }
++        g_controller_pads[slot] = pad;
++        g_controller_names[slot] = found->name;
++        std::fprintf(stderr,
++            "[controller] assigned reason=%s instance=%d player=%zu device-index=%d name='%s'\n",
++            reason_name, found->instance, slot + 1, found->device_index,
++            found->name.c_str());
++    }
++    std::fflush(stderr);
++    g_controller_reconciled = true;
++    g_next_controller_check = std::chrono::steady_clock::now() + std::chrono::seconds(1);
++}
+ 
+ // Snapshot the launcher's assignment into the per-port routing tables. Called
+ // once from the boot thread when PLAY is clicked. SDL handles are opened lazily
+@@ -1627,9 +1779,10 @@
+         const auto pa = pkmnstadium::recompui::port_assignment(port);
+         g_port_enabled[port] = pa.enabled;
+         g_port_kind[port] = pa.enabled ? pa.kind : pkmnstadium::recompui::DeviceKind::None;
+-        g_port_instance[port] = pa.gamepad_instance;
++        g_controller_instances[port] = pa.gamepad_instance;
+     }
+     g_launcher_input_active.store(true);
++    request_controller_reconcile(ControllerReconcileReason::LauncherConfig);
+     std::fprintf(stderr, "[input] launcher config applied: "
+                  "P1=%d P2=%d P3=%d P4=%d (0=None 1=Kbd 2=Pad)\n",
+                  (int)g_port_kind[0], (int)g_port_kind[1],
+@@ -1637,51 +1790,18 @@
+     std::fflush(stderr);
+ }
+ 
+-// Open the SDL gamepad with the given instance id (find its device index).
+-static SDL_GameController* open_pad_by_instance(int instance) {
+-    // Reuse the handle if it's already open (e.g. opened for launcher nav).
+-    if (SDL_GameController* existing = SDL_GameControllerFromInstanceID(instance)) {
+-        return existing;
+-    }
+-    const int njoy = SDL_NumJoysticks();
+-    for (int i = 0; i < njoy; ++i) {
+-        if (SDL_IsGameController(i) && SDL_JoystickGetDeviceInstanceID(i) == instance) {
+-            return SDL_GameControllerOpen(i);
+-        }
+-    }
+-    return nullptr;
+-}
+-
+-// Lazy-detect/open the first SDL gamepad. Safe to call from any of the
++// Lazy-detect/open current SDL gamepads. Safe to call from any of the
+ // input callbacks â€” both poll_inputs and get_connected_device_info
+ // invoke this so the device status is correct even when osContInit
+ // queries before the first poll cycle.
+-static void ensure_pad_open() {
+-    if (g_pad) return;
+-    // SDL only sees newly-attached pads after the event subsystem has
+-    // pumped at least once. get_connected_device_info() is called by
+-    // libultra's osContInit BEFORE the runner enters its frame loop
+-    // (which is what would normally call SDL_GameControllerUpdate),
+-    // so without an explicit pump SDL_NumJoysticks returns 0 and the
+-    // game reports "Controller 1 not connected" even with a pad
+-    // plugged in.
+-#ifndef __APPLE__
+-    SDL_PumpEvents();
+-    SDL_GameControllerUpdate();
+-#endif
+-    int njoy = SDL_NumJoysticks();
+-    for (int i = 0; i < njoy; i++) {
+-        if (SDL_IsGameController(i)) {
+-            g_pad = SDL_GameControllerOpen(i);
+-            if (g_pad) {
+-                const char* ctrl_name = SDL_GameControllerName(g_pad);
+-                fprintf(stderr,
+-                    "[input] OPENED controller: name='%s'\n",
+-                    ctrl_name ? ctrl_name : "(null)");
+-                fflush(stderr);
+-                return;
+-            }
+-        }
++static void ensure_controllers_open() {
++    if (!g_controller_reconciled) {
++        ControllerReconcileReason reason =
++            g_controller_reconcile_reason.exchange(ControllerReconcileReason::None);
++        if (reason == ControllerReconcileReason::None) {
++            reason = ControllerReconcileReason::Startup;
++        }
++        reconcile_controllers(reason);
+     }
+ }
+ 
+@@ -1689,17 +1804,15 @@
+ #ifndef __APPLE__
+     SDL_GameControllerUpdate();
+ #endif
+-    if (g_launcher_input_active.load()) {
+-        // Lazily open each port's assigned gamepad (on this gfx thread).
+-        for (int port = 0; port < 4; ++port) {
+-            if (g_port_kind[port] == pkmnstadium::recompui::DeviceKind::Gamepad &&
+-                g_port_pad[port] == nullptr && g_port_instance[port] >= 0) {
+-                g_port_pad[port] = open_pad_by_instance(g_port_instance[port]);
+-            }
+-        }
+-    } else {
+-        ensure_pad_open();
++    ControllerReconcileReason reason =
++        g_controller_reconcile_reason.exchange(ControllerReconcileReason::None);
++    if (reason == ControllerReconcileReason::None &&
++        std::chrono::steady_clock::now() >= g_next_controller_check) {
++        reason = ControllerReconcileReason::Periodic;
+     }
++    if (reason != ControllerReconcileReason::None) {
++        reconcile_controllers(reason);
++    }
+ }
+ 
+ static float normalized_stick_axis(int32_t value, int32_t deadzone) {
+@@ -1734,7 +1847,9 @@
+         }
+         switch (g_port_kind[controller_num]) {
+             case pkmnstadium::recompui::DeviceKind::Gamepad:
+-                pad = g_port_pad[controller_num];
++                if (controller_handle_valid(controller_num)) {
++                    pad = g_controller_pads[controller_num];
++                }
+                 break;
+             case pkmnstadium::recompui::DeviceKind::Keyboard:
+                 use_kb = true;
+@@ -1746,12 +1861,16 @@
+         }
+         primary_port = (controller_num == 0);
+     } else {
+-        if (controller_num != 0) {
++        if (controller_num < 0 || controller_num >= 4) {
++            return false;
++        }
++        if (controller_handle_valid(controller_num)) {
++            pad = g_controller_pads[controller_num];
++        } else if (controller_num != 0) {
+             return pkmnstadium::transfer_pak::has_transfer_pak(controller_num);
+         }
+-        pad = g_pad;
+-        use_kb = true;
+-        primary_port = true;
++        use_kb = (controller_num == 0);
++        primary_port = (controller_num == 0);
+     }
+ 
+     // TCP override (debug harness) layers only onto the primary port.
+@@ -1887,12 +2006,10 @@
+ }
+ 
+ static void set_rumble(int controller_num, bool on) {
+-    SDL_GameController* pad = nullptr;
+-    if (g_launcher_input_active.load()) {
+-        if (controller_num >= 0 && controller_num < 4) pad = g_port_pad[controller_num];
+-    } else if (controller_num == 0) {
+-        pad = g_pad;
+-    }
++    SDL_GameController* pad =
++        controller_num >= 0 && controller_num < 4 && controller_handle_valid(controller_num)
++        ? g_controller_pads[controller_num]
++        : nullptr;
+     if (!pad) return;
+     SDL_GameControllerRumble(pad, on ? 0xFFFF : 0, on ? 0xFFFF : 0, 1000);
+ }
+@@ -1906,8 +2023,12 @@
+     // which is how the launcher suppresses unconfigured players.
+     if (g_launcher_input_active.load()) {
++        ensure_controllers_open();
+         const bool enabled = (controller_num >= 0 && controller_num < 4) && g_port_enabled[controller_num];
+-        const bool has_dev = enabled &&
+-            (g_port_kind[controller_num] != pkmnstadium::recompui::DeviceKind::None || has_transfer_pak);
++        const bool has_input = enabled &&
++            (g_port_kind[controller_num] == pkmnstadium::recompui::DeviceKind::Keyboard ||
++             (g_port_kind[controller_num] == pkmnstadium::recompui::DeviceKind::Gamepad &&
++              controller_handle_valid(controller_num)));
++        const bool has_dev = has_input || (enabled && has_transfer_pak);
+         info.connected_device = has_dev
+             ? ultramodern::input::Device::Controller
+             : ultramodern::input::Device::None;
+@@ -1920,11 +2040,13 @@
+     // Legacy: libultra's osContInit() queries before the first poll, so
+     // lazy-detect the pad here too (else "Controller 1 not connected").
+     if (controller_num == 0) {
+-        ensure_pad_open();
++        ensure_controllers_open();
+     }
+     // Port 0 always reports present (keyboard/pad/TCP all feed get_n64_input);
+     // ports 1-3 present only when a Transfer Pak cart is configured.
+-    info.connected_device = (controller_num == 0 || has_transfer_pak)
++    const bool has_controller = controller_num >= 0 && controller_num < 4 &&
++        controller_handle_valid(controller_num);
++    info.connected_device = (controller_num == 0 || has_controller || has_transfer_pak)
+         ? ultramodern::input::Device::Controller
+         : ultramodern::input::Device::None;
+     // Stadium identifies the *kind* of pak by reading its bus
+--- /dev/null
++++ b/src/main/controller_slots.h
+@@ -0,0 +1,70 @@
++#pragma once
++
++#include <array>
++#include <cstddef>
++
++namespace pkmnstadium::controller {
++
++constexpr std::size_t kPlayerCount = 4;
++constexpr int kNoController = -1;
++
++using Instances = std::array<int, kPlayerCount>;
++using Eligibility = std::array<bool, kPlayerCount>;
++
++struct ReconcilePlan {
++    Instances instances{};
++    std::array<bool, kPlayerCount> released{};
++    std::array<bool, kPlayerCount> assigned{};
++};
++
++inline bool contains_instance(const int* current, std::size_t count, int instance) {
++    if (instance < 0) return false;
++    for (std::size_t i = 0; i < count; ++i) {
++        if (current[i] == instance) return true;
++    }
++    return false;
++}
++
++inline ReconcilePlan reconcile_slots(const Instances& previous,
++                                     const Eligibility& eligible,
++                                     const int* current,
++                                     std::size_t current_count) {
++    ReconcilePlan plan;
++    plan.instances.fill(kNoController);
++
++    // Retain valid ownership in place. Duplicate or vanished identities are
++    // released so they cannot occupy a player slot indefinitely.
++    for (std::size_t slot = 0; slot < kPlayerCount; ++slot) {
++        const int instance = previous[slot];
++        bool already_retained = false;
++        for (std::size_t prior = 0; prior < slot; ++prior) {
++            already_retained |= plan.instances[prior] == instance;
++        }
++        if (eligible[slot] && contains_instance(current, current_count, instance) &&
++            !already_retained) {
++            plan.instances[slot] = instance;
++        } else if (instance >= 0) {
++            plan.released[slot] = true;
++        }
++    }
++
++    // Assign genuinely unowned controllers in enumeration order to the first
++    // eligible free slot. Existing players never move.
++    for (std::size_t device = 0; device < current_count; ++device) {
++        const int instance = current[device];
++        if (contains_instance(plan.instances.data(), plan.instances.size(), instance)) {
++            continue;
++        }
++        for (std::size_t slot = 0; slot < kPlayerCount; ++slot) {
++            if (eligible[slot] && plan.instances[slot] < 0) {
++                plan.instances[slot] = instance;
++                plan.assigned[slot] = true;
++                break;
++            }
++        }
++    }
++
++    return plan;
++}
++
++} // namespace pkmnstadium::controller
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -252,7 +252,7 @@
+         MACOSX_BUNDLE_BUNDLE_NAME "AnnePad"
+         MACOSX_BUNDLE_GUI_IDENTIFIER "com.chrissotraidis.annepad"
+         MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1.0"
+-        MACOSX_BUNDLE_BUNDLE_VERSION "1"
++        MACOSX_BUNDLE_BUNDLE_VERSION "3"
+         OUTPUT_NAME "AnnePad"
+         XCODE_ATTRIBUTE_CODE_SIGN_STYLE Automatic
+         XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "${DEVELOPMENT_TEAM}"
+@@ -267,7 +267,7 @@
+         MACOSX_BUNDLE_BUNDLE_NAME "AnnePad"
+         MACOSX_BUNDLE_GUI_IDENTIFIER "com.chrissotraidis.annepad.macos"
+         MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1.0"
+-        MACOSX_BUNDLE_BUNDLE_VERSION "1"
++        MACOSX_BUNDLE_BUNDLE_VERSION "3"
+         OUTPUT_NAME "AnnePad")
+ endif()
+ 

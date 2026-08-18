@@ -1,6 +1,46 @@
 # Status
 
-Updated: 2026-08-02 21:28 CDT
+Updated: 2026-08-18 CEST
+
+## Preview 3 controller lifecycle result
+
+AnnePad uses SDL2 2.32.10 and owns four `SDL_GameController` handles directly
+in the PokémonStadiumRecomp runner. The prior implementation treated a non-null
+handle as permanently valid and did not reconcile controller add/remove/remap
+events or foreground resume. A removal missed during controller sleep or app
+backgrounding could therefore leave stale player-1 ownership, preserve held
+input, and assign a returning controller incorrectly.
+
+Preview 3 adds a focused instance-ID slot reconciliation helper. It retains
+valid ownership, closes detached or identity-mismatched handles, assigns a sole
+returning controller to player 1, places additional controllers in the next
+free eligible slot, and ensures gameplay and rumble read only an attached handle.
+Reconciliation runs at startup, relevant SDL controller events, foreground
+resume, and once per second while active; it does not restart SDL or alter
+controller mappings, touch layouts, or preferences.
+
+Deterministic regression coverage passes for a missed removal with held buttons,
+sticks, and triggers; neutral input after release; sole return to player 1;
+additional assignment to player 2; preservation of the unaffected player when
+one of two controllers changes; foreground reconciliation; and launcher slot
+eligibility. Repository tests, maintained-patch reconstruction, native macOS,
+ROM-free Release Simulator, signed arm64 iPhoneOS, unsigned app/IPA audits, and
+two byte-identical package passes all pass.
+
+The signed 0.1.0 build 3 app was installed in place on an attached 12.9-inch
+iPad Pro (6th generation) under the existing
+`com.chrissotraidis.annepad` identity. The app found the preserved game data,
+loaded the Transfer Pak ROM/save, initialized CoreAudio and Metal, initialized
+the recomp runtime, and logged startup and foreground controller reconciliation.
+Separate pre-install backup and final readback proved the game ROM copies,
+Stadium saves/backups, Transfer Pak ROM/save, launcher configuration, and
+AnnePad preferences byte-identical. `rom.cfg` changed only its stale data-
+container UUID to the current preserved container path required by the runtime.
+
+No physical controller was available during this pass. Bluetooth, wired,
+natural-sleep/wake, held-input release on real hardware, full mapping, and
+two-controller slot acceptance remain open and are not inferred from build,
+install, console, or deterministic test evidence.
 
 ## Current state
 
@@ -394,9 +434,9 @@ patches.
 - The official Windows v0.4.6 executable has not run on this Mac; no compatible
   Windows runtime is installed.
 - The exact dependency graph used to build upstream v0.4.6 is not published.
-- Physical controller proof and signed iPhone/iPad installation do not exist.
-  Simulator touch/lifecycle proof and unsigned iPhoneOS compilation do not imply
-  physical-device runtime success.
+- Physical controller proof and signed iPhone installation do not exist. Signed
+  iPad installation and meaningful boot pass, but do not imply controller,
+  touch, audio-route, thermal, or gameplay acceptance.
 - Real-speaker audio, lock/unlock, interruptions/routes, thermal performance,
   and a touch-only battle on physical hardware remain open.
 - Optimized iOS Simulator frame pacing previously remained below acceptance in
@@ -410,8 +450,9 @@ patches.
   transition hitches and physical-device measurement remain open.
   Physical iPad evidence is still required before treating any remaining
   Simulator Metal/XPC overhead as a device release blocker.
-- A 2026-08-02 refresh found no attached physical iPhone or iPad, zero valid
-  code-signing identities, and no installed provisioning profile.
+- The 2026-08-02 host snapshot had no attached device or signing assets. The
+  2026-08-18 pass rediscovered an attached iPad and valid local development
+  signing, then completed a signed in-place install and preservation readback.
 - Release now compiles 96 upstream diagnostic hook sites and their argument
   evaluation out while retaining six correctness hooks. Targeted probe output
   is zero. Release also removes the two audio diagnostic rings and pins the
@@ -453,7 +494,10 @@ App-menu Quit exits cleanly.
 - Compiling target: arm64 iPhoneOS unsigned app (passing).
 - Packaging target: release-optimized arm64 iPhoneOS app and audited unsigned
   IPA (passing and reproduced exactly from the isolated clean snapshot).
-- External targets: signed physical iPhone/iPad runtime and controllers.
+- Passing device target: signed arm64 iPhoneOS app installed and meaningfully
+  booted on a physical iPad, with protected data preserved.
+- External targets: signed physical iPhone runtime and physical-controller
+  acceptance on both iPhone and iPad.
 
 ## Next concrete task
 
@@ -461,8 +505,8 @@ The locally accepted checkpoint, repeatable Simulator soak harness, and public-
 facing project documentation are published. No further speculative renderer
 rewrite or unguided Simulator iteration is justified by the current evidence.
 
-When lawful signing assets and hardware are available, install the reproduced
-candidate on a physical iPhone and iPad. Run the controller, real-speaker,
+Install the reproduced candidate on a physical iPhone when one is available.
+Run the controller, real-speaker,
 interruption/route, lock/unlock, thermal, sustained-battle, orientation,
 ergonomics, and true-multitouch matrix, including R-plus-selection. Keep public
 redistribution blocked on license review.

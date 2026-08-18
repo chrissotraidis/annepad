@@ -22,7 +22,7 @@ boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
 
 | Option | Status | What to do |
 |---|---|---|
-| Developer-preview `.ipa` | **Available with a computer** | [Download preview 0.1.0 build 2](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.2), then re-sign it with your Apple ID using AltStore Classic and AltServer by following the [installation guide](docs/INSTALL_IPA.md). |
+| Developer-preview `.ipa` | **Available with a computer** | [Download preview 0.1.0 build 3](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.3), then re-sign it with your Apple ID using AltStore Classic and AltServer by following the [installation guide](docs/INSTALL_IPA.md). |
 | Local iPhone or iPad build | **Available now** | Build and sign with your Apple development team using the instructions below. |
 | Simulator | **Available now** | Best for development and UI testing; it is not a substitute for physical-device testing. |
 | App Store / TestFlight | **Not announced** | No listing or public TestFlight currently exists. |
@@ -113,6 +113,14 @@ fake touch behavior.
 - **Controller coexistence:** touch controls can be hidden while using a
   physical controller; hardware acceptance still requires a real device.
 
+AnnePad's controller backend is SDL2 2.32.10. Preview 3 reconciles current SDL
+controller instance IDs with four stable player slots at startup, controller
+add/remove/remap events, foreground resume, and a bounded active check. A stale
+or detached handle is closed, its input becomes neutral, a sole returning pad
+reclaims player 1, and an additional pad takes the next free slot. This behavior
+has deterministic regression coverage; Bluetooth, wired, natural-sleep, full
+mapping, and two-controller acceptance still require hands-on hardware tests.
+
 Pokémon Stadium uses held R to reveal battle move assignments, L for cancel in
 relevant battle paths, and edge-triggered Z actions. AnnePad therefore keeps Z
 as a normal press-and-hold touch.
@@ -161,6 +169,7 @@ game data is stored in this repository or distributed with the app.
 | ROM setup | Native Files picker, exact US 1.0 validation, normalization, replacement, and removal |
 | Saves | Serialized snapshots, atomic replacement, backup rotation, corrupt-primary quarantine/recovery, background flush, and relaunch persistence |
 | Lifecycle | iPhone and iPad Simulator soaks retain the same process across foreground, Settings background, and restored foreground intervals |
+| Controllers | SDL2 instance-ID ownership is reconciled across disconnect, reconnect, remap, and foreground resume; deterministic slot/input tests pass, while hands-on hardware acceptance remains open |
 | Packaging | ROM-free arm64 iPhoneOS app and unsigned IPA with deterministic content manifest and fail-closed audit |
 
 For the evidence ledger and honest remaining gates, read
@@ -199,10 +208,11 @@ rejects ROMs, saves, extracted assets, Simulator slices, private paths,
 credentials, provisioning profiles, signing keys, and debug-only release
 surfaces.
 
-The reproducibility authority is the sorted uncompressed-content manifest, not
-the raw ZIP hash (ZIP timestamps can differ). Preview 2's accepted manifest
-SHA-256 is
-`151710f3e6a59d2191bf391bbf758359e09d1918d549869474d2e53f29c00112`.
+Preview 3 normalizes staged file times, so two local package passes produced the
+same IPA bytes. The IPA SHA-256 is
+`aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`;
+the independently audited sorted-content manifest SHA-256 is
+`1c1b9db69aeb69b54be7f615a6f113552405b1b9a2c54c16a1e3df481fb142c6`.
 
 ## Physical-device handoff
 
@@ -249,7 +259,7 @@ iPhone, and device matrix remains incomplete.
 <summary><strong>Where is the IPA?</strong></summary>
 
 [Download the unsigned developer-preview IPA from GitHub
-Releases](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.2).
+Releases](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.3).
 It is not an App Store or TestFlight build. A Mac or Windows PC running
 AltServer is required to re-sign it with your own Apple ID through AltStore
 Classic. There is currently no supported computer-free installation path.
@@ -258,9 +268,11 @@ Classic. There is currently no supported computer-free installation path.
 <details>
 <summary><strong>Do physical controllers work?</strong></summary>
 
-The GameController/SDL controller path is compiled into the app and feeds the
-normalized N64 input path. It has not yet completed the required real-iPhone
-and real-iPad controller matrix, so hardware support is not claimed as accepted.
+The SDL2 controller path feeds the normalized N64 input path. Preview 3 repairs
+stale-handle and player-slot ownership after disconnect, reconnect, and
+foreground resume, with deterministic regression coverage. It has not yet
+completed the required real-iPhone and real-iPad controller matrix, so hardware
+support is not claimed as accepted.
 </details>
 
 <details>

@@ -76,7 +76,7 @@ git -C "$renderer_hlslpp" apply --reverse --check \
     "$ANNEPAD_ROOT/patches/rt64/apple-scalar-labs-declaration.patch"
 
 game_changes=$(git -C "$game" status --porcelain --untracked-files=all --ignore-submodules=dirty)
-expected_game_changes=$' M CMakeLists.txt\n M extras.c\n M game.toml\n M include/trace.h\n M src/main/main.cpp\n M src/main/recomp_audio_debug.h\n M src/main/rsp_aspmain_hook.cpp\n M src/main/rt64_render_context.cpp\n?? n64recomp\n?? src/main/non_windows_platform.cpp'
+expected_game_changes=$' M CMakeLists.txt\n M extras.c\n M game.toml\n M include/trace.h\n M src/main/main.cpp\n M src/main/recomp_audio_debug.h\n M src/main/rsp_aspmain_hook.cpp\n M src/main/rt64_render_context.cpp\n?? n64recomp\n?? src/main/controller_slots.h\n?? src/main/non_windows_platform.cpp'
 [[ "$game_changes" == "$expected_game_changes" ]] || \
     die "PokemonStadiumRecomp has unexpected modifications"
 git -C "$game" apply --reverse --check \
@@ -110,6 +110,7 @@ git -C "$game" archive HEAD \
     git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/ios-release-hook-surface.patch"
     git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/audio-active-list-repair.patch"
     git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/synchronous-audio-tasks.patch"
+    git apply "$ANNEPAD_ROOT/patches/pokemon-stadium-recomp/controller-lifecycle-reconciliation.patch"
 )
 for maintained_path in \
     CMakeLists.txt \
@@ -117,6 +118,7 @@ for maintained_path in \
     game.toml \
     include/trace.h \
     src/main/main.cpp \
+    src/main/controller_slots.h \
     src/main/recomp_audio_debug.h \
     src/main/rsp_aspmain_hook.cpp \
     src/main/rt64_render_context.cpp \

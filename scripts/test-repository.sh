@@ -20,6 +20,7 @@ if (ANNEPAD_BUILD_JOBS=two configured_build_jobs >/dev/null 2>&1); then
     die "non-numeric ANNEPAD_BUILD_JOBS value was accepted"
 fi
 "$ANNEPAD_ROOT/scripts/test-touch-tap-latch.sh"
+"$ANNEPAD_ROOT/scripts/test-controller-slots.sh"
 
 required_docs=(
     GOAL.md RESEARCH.md REPOSITORY-INVENTORY.md ARCHITECTURE.md PLAN.md

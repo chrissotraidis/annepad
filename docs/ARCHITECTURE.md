@@ -86,9 +86,9 @@ definitions, not runtime platform branching scattered through the core.
 All sources produce one normalized N64 controller state per player:
 
 ```text
-UIKit multitouch ----+
-GameController/SDL --+--> normalized stick/buttons --> runtime input snapshot
-keyboard (macOS) ----+
+UIKit multitouch --+
+SDL2 controllers --+--> normalized stick/buttons --> runtime input snapshot
+keyboard (macOS) --+
 ```
 
 The touch overlay tracks each finger independently, supports stick recentering,
@@ -96,6 +96,15 @@ The touch overlay tracks each finger independently, supports stick recentering,
 layout. Phone and tablet profiles store normalized positions, sizes, opacity,
 visibility, and handedness. Edit/reset operations are explicit and reversible.
 Touch never invokes game menu or battle functions directly.
+
+SDL2 owns controller enumeration and `SDL_GameController` handles. AnnePad
+tracks joystick instance IDs in four player slots, verifies each stored handle
+with `SDL_GameControllerGetAttached()`, and reconciles ownership against current
+SDL enumeration on startup, controller events, foreground resume, and a bounded
+active check. Valid controllers keep their slot; stale handles are closed; new
+controllers fill only free eligible slots. Polling and rumble use a handle only
+while its attached state and instance ID still match. UIKit does not bypass or
+duplicate that ownership layer.
 
 ## Audio
 
