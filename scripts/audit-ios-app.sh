@@ -43,7 +43,7 @@ plist_value() {
 [[ "$(plist_value CFBundleIdentifier)" == com.chrissotraidis.annepad ]] || \
     die "unexpected bundle identifier"
 [[ "$(plist_value CFBundleShortVersionString)" == 0.1.0 ]] || die "unexpected app version"
-[[ "$(plist_value CFBundleVersion)" == 1 ]] || die "unexpected build number"
+[[ "$(plist_value CFBundleVersion)" == 3 ]] || die "unexpected build number"
 [[ "$(plist_value MinimumOSVersion)" == 16.0 ]] || die "unexpected minimum iOS version"
 [[ "$(plist_value AnnePadBuildProfile)" == "$expected_profile" ]] || \
     die "app build profile is not $expected_profile"
@@ -134,7 +134,7 @@ binary_size=$(stat -f '%z' "$binary")
 note "AnnePad iOS app audit passed."
 note "profile=$expected_profile"
 note "platform=iOS architecture=arm64 minimum_os=16.0"
-note "bundle_id=com.chrissotraidis.annepad version=0.1.0 build=1"
+note "bundle_id=com.chrissotraidis.annepad version=0.1.0 build=3"
 note "binary_size=$binary_size binary_sha256=$binary_sha uuid=$uuid"
 if [[ "$expected_signing" == signed ]]; then
     note "dynamic_dependencies=Apple-system-only signature=valid"

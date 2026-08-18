@@ -5,10 +5,12 @@ script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 source "$script_dir/lib/common.sh"
 
 require_command ditto
+require_command find
 require_command mkdir
 require_command mktemp
 require_command mv
 require_command plutil
+require_command touch
 require_command zip
 
 default_app="$ANNEPAD_ROOT/build-ios-app-device-release/Release/AnnePad.app"
@@ -70,6 +72,9 @@ trap cleanup EXIT
 
 mkdir -p "$staging/Payload"
 ditto "$app" "$staging/Payload/AnnePad.app"
+# ZIP records local modification times even with -X. Normalize every staged
+# entry so two packages of the same audited app are byte-identical.
+find "$staging/Payload" -exec touch -h -t 200001010000 {} +
 (
     cd "$staging"
     zip -X -q -r AnnePad-unsigned.ipa Payload

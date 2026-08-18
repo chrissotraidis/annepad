@@ -1,5 +1,26 @@
 # Project history
 
+## 2026-08-18 — Preview 3 controller lifecycle repair
+
+- Identified the real backend as SDL2 2.32.10 with direct
+  `SDL_GameController` ownership, rather than Apple GameController or an
+  engine-managed input layer.
+- Replaced stale non-null-handle assumptions with four stable instance-ID slots
+  reconciled at startup, SDL add/remove/remap events, foreground resume, and a
+  bounded active check. Valid owners remain in place, stale handles close, held
+  input becomes neutral, and returning/additional controllers fill the correct
+  free slots without restarting SDL or changing mappings/preferences.
+- Added deterministic lifecycle/slot tests and diagnostics; source, repository,
+  macOS, Simulator, signed-device, and IPA audits/builds passed.
+- Installed 0.1.0 build 3 in place on a physical iPad, reached meaningful game
+  boot with startup/foreground reconciliation logs, and read back the protected
+  game data, saves, Transfer Pak data, launcher configuration, and preferences.
+  Physical controller hardware acceptance remains open.
+- Produced two byte-identical ROM-free unsigned Preview 3 IPAs at SHA-256
+  `aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`;
+  canonical content manifest SHA-256 is
+  `1c1b9db69aeb69b54be7f615a6f113552405b1b9a2c54c16a1e3df481fb142c6`.
+
 ## 2026-08-03 — Public README and exact-tag build refresh
 
 - Replaced the minimal status-pointer README with a HarkinianPad-style public

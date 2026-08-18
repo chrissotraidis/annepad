@@ -153,8 +153,9 @@ canonical device Release app by default, audits it, assembles the payload, and
 calls `audit-ipa.sh`. Use `--no-build` only when deliberately repackaging the
 existing audited app; a caller-supplied `--app` is never replaced. The audit
 emits a full text report plus a sorted path/size/content-SHA manifest. The
-SHA-256 of that manifest is the reproducibility gate; the raw ZIP hash is
-recorded but is not authoritative.
+SHA-256 of that manifest remains the content-level reproducibility gate.
+Packaging normalizes staged entry times so repeated packages from the same
+audited app should also have identical ZIP bytes and archive SHA-256.
 
 When a lawful local development team and attached device are available, build,
 verify, install, and launch without writing the team or device identifier into
@@ -185,8 +186,9 @@ tests, packages, and audits. Record:
 - App binary UUID/content hashes and package canonical content digest.
 - Test and audit summaries.
 
-ZIP byte hashes may differ because archive tools encode timestamps; canonical
-sorted uncompressed path+content hashing is the package reproducibility gate.
+The packager normalizes ZIP entry timestamps, so repeated packages from the
+same audited app should be byte-identical. Canonical sorted uncompressed
+path+content hashing remains the independent content-level gate.
 Unsigned packages retain the linker's normal hash-derived `LC_UUID` command so
 they are accepted by loaders that require it, including LiveContainer.
 
@@ -201,41 +203,23 @@ added to make a verifier pass.
 
 ## Passing local unsigned candidate
 
-The current 2026-08-02 local release build produced:
+The 2026-08-18 Preview 3 build produced:
 
-- `artifacts/AnnePad-0.1.0-unsigned.ipa`: latest raw SHA-256
-  `c88b9428...e68bc`. The preceding independent pass has raw SHA-256
-  `4591e3f7...826c3`;
-  raw ZIP hashes vary with timestamps and are not the reproducibility authority.
-- `artifacts/AnnePad-0.1.0-unsigned.audit.txt`: passing app/package report.
-- `artifacts/AnnePad-0.1.0-unsigned.manifest.sha256`: eight sorted file records,
-  manifest SHA-256
-  `4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
+- `artifacts/AnnePad-0.1.0-preview.3-unsigned.ipa`: 85,343,107 bytes, SHA-256
+  `aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`;
+- `artifacts/AnnePad-0.1.0-preview.3-unsigned.audit.txt`: passing app/package
+  report; and
+- `artifacts/AnnePad-0.1.0-preview.3-unsigned.manifest.sha256`: sorted content
+  records, SHA-256
+  `1c1b9db69aeb69b54be7f615a6f113552405b1b9a2c54c16a1e3df481fb142c6`.
 
-Two local archive passes have the exact same manifest bytes/digest. The
-378,197,336-byte local unsigned executable hashes to `a97b8642...fc6cf` and has
-no linker UUID. Unsigned linking uses `-reproducible,-no_uuid`. The current
-source-consistent candidate has local packages matching at `4b7ef2d7...af21fd`.
-The current package checkpoint's full no-hardlink isolated verifier passed from
-exact published commit `ceffab4e269e87ba4768cc2a4555eaf73e09f2f4`. It
-reconstructed the US 1.0
-input, regenerated 1,006 AOT files, built native macOS plus Simulator/device
-static cores, rebuilt and audited the unsigned device app, packaged the IPA,
-and reproduced the expected canonical manifest byte-for-byte. The clean
-archive's non-authoritative raw ZIP SHA-256 is
-`f09613ea4e1eb01bb423cb72efa3af6b4ab7b4ec537f05daaec479ccfd86cdf6`;
-the authoritative clean-checkpoint manifest SHA-256 is
-`4b7ef2d779aae1146db401c982c724e16e56b3d8786f0e655628af45a0af21fd`.
-The clean 378,197,336-byte executable SHA-256 is
-`a97b86428340bb5b3350ef60a2ce7e7cdb8ee5e571d2a1fb7fbf312fcbafc6cf`.
-The dependency-lock SHA-256 is
-`aff563c400119e53f69fd4e91d55c956b60bc9851cd7ac9bbc67efa107fdca4e`,
-and sanitized evidence is retained under `logs/clean-checkout-latest/`.
-Release audio,
-replay/capture/oracle, debug-server, turbo, autoboot, and unavailable-transport
-surfaces are compiled out and enforced by the app audit. Signed builds retain
-the normal linker UUID for crash symbolication. These are local ignored
-artifacts, not a signed install or public distribution authorization.
+An independent second package pass from the same audited app matched both the
+IPA bytes and manifest bytes exactly. The 382,638,528-byte unsigned arm64
+iPhoneOS executable hashes to
+`de308691a730b70073000eddbca42398551928d29f5545f6e3aae24f68f438a2`.
+The app and IPA audits report iOS 16.0 minimum, Apple-system-only dynamic
+dependencies, required notices/privacy manifest, and no ROM, save, log, private
+path, credential, signature, or provisioning profile.
 
 ## Rollback and recovery
 

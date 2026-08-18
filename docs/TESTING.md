@@ -5,6 +5,37 @@ device, configuration, command, and evidence path. Build success is never
 reported as runtime success; Simulator evidence is never reported as device
 evidence.
 
+## 2026-08-18 controller lifecycle regression
+
+`scripts/test-controller-slots.sh` deterministically models SDL2 instance-ID
+enumeration and player ownership. It passes the following cases:
+
+- missed removal while buttons, both sticks/axes, and triggers are held;
+- stale player-1 release followed by completely neutral input;
+- a sole returning controller reclaiming player 1;
+- an additional controller taking player 2 without moving player 1;
+- preservation of the unaffected owner when one of two controllers changes;
+- foreground reconciliation without moving valid owners; and
+- launcher-configured slot eligibility.
+
+The test is part of `scripts/test-repository.sh`. Source reconstruction and
+reverse-patch checks pass, as do the full practical repository suite, native
+macOS build, ROM-free Release Simulator build, signed arm64 iPhoneOS build,
+strict signed/unsigned app audits, and two byte-identical unsigned IPA passes.
+
+The build-3 signed app was installed in place on a physical 12.9-inch iPad Pro
+(6th generation). Console evidence reached ROM and Transfer Pak discovery,
+CoreAudio and Metal initialization, recomp heap/fragment initialization, and
+both startup and foreground controller reconciliation. Pre-install backup and
+post-install readback proved game data, saves, Transfer Pak data, launcher
+configuration, and AnnePad preferences preserved; the sole expected config
+delta updated `rom.cfg` from an obsolete data-container UUID to the current
+container path.
+
+This is not physical-controller acceptance. No Bluetooth controller, wired
+controller, natural controller sleep/wake, full mapping, or two-controller
+session was exercised in this pass. Those checks remain open.
+
 ## Automated gates
 
 ### Repository and input safety

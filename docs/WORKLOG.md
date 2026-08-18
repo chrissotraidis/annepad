@@ -1105,3 +1105,24 @@ ignored `logs/` or `artifacts/`; this file records sanitized durable evidence.
   `aaf8f6db9548176a8ba7637a8aa4147a00b9f9750d4ac6fdcf14a9f856221286`;
   the sorted uncompressed-content manifest SHA-256 is
   `451e5ab63d4c3f82f72aed3ac88becca3653d11d27fbc393b198837004031f0d`.
+
+## 2026-08-18 — SDL2 controller reconciliation and Preview 3
+
+- Traced controller ownership through PokémonStadiumRecomp and confirmed direct
+  SDL2 2.32.10 enumeration, handles, instance IDs, polling, and rumble.
+- Reproduced the design defect in code: a non-null stored handle bypassed every
+  later open check, while no add/remove/remap or foreground path reconciled it.
+- Added a compact four-slot instance-ID reconciliation helper, attachment and
+  identity validation, relevant event/foreground triggers, a one-second active
+  check, neutral invalid input, stable ownership, and concise diagnostics.
+- Passed focused lifecycle tests, the repository suite, patch reconstruction,
+  native macOS, ROM-free Simulator, signed iPhoneOS, app/IPA audits, and two
+  byte-identical package passes.
+- Backed up `Documents` and `Library` separately outside the repository, then
+  installed build 3 in place under the same bundle ID. Meaningful boot and
+  startup/foreground reconciliation appeared in the device console. Final
+  readback matched all material game data, saves, Transfer Pak data, launcher
+  configuration, and preferences; `rom.cfg` received only its required current
+  container-path update.
+- No controller hardware was exercised. Bluetooth, wired, natural sleep/wake,
+  held-input release, mapping, and two-player hardware gates remain open.

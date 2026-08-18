@@ -52,7 +52,14 @@ features may ship disabled/absent, but their incomplete state must be explicit.
       Release soak on both form factors kept the same PID alive through 90
       seconds foreground, a Settings background interval, and 90 seconds after
       restoration, with no new AnnePad crash report.
-- [ ] Signed physical iPhone and iPad builds install and run.
+- [ ] Signed physical iPhone build installs and runs.
+- [x] Signed physical iPad build 0.1.0 (3) installs in place and reaches game
+      boot. The 2026-08-18 pass found the existing game data and saves,
+      initialized audio, Metal, and recomp fragments, and logged startup plus
+      foreground controller reconciliation. Pre/post readback preserved the
+      material ROMs, saves, Transfer Pak data, launcher configuration, and
+      AnnePad preferences; only the obsolete data-container path in `rom.cfg`
+      was migrated to the current container.
 - [ ] Physical controllers pass on iPhone and iPad.
 - [ ] Customizable touch controls complete a full rental-Pokémon battle on real
       hardware without controller/keyboard assistance.
@@ -85,12 +92,11 @@ features may ship disabled/absent, but their incomplete state must be explicit.
 - [x] IPA manifest contains only expected files and every third-party notice.
 - [x] Unsigned IPA has no embedded provisioning profile/signing secret.
 - [x] Canonical sorted uncompressed-content digest and full audit report are
-      recorded and reproduced locally for the current candidate
-      (`4b7ef2d7...af21fd`). Exact published commit `ceffab4...f2f4` passed the
-      isolated no-hardlink verifier and reproduced the 378,197,336-byte
-      executable (`a97b8642...fc6cf`) plus that canonical manifest byte-for-byte.
-      The non-authoritative clean ZIP SHA-256 is `f09613ea...cdf6`. Physical
-      install/retest remains open.
+      recorded for Preview 3. Two package passes from the same audited app are
+      byte-identical at IPA SHA-256
+      `aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`;
+      their canonical manifest is also identical at SHA-256
+      `1c1b9db69aeb69b54be7f615a6f113552405b1b9a2c54c16a1e3df481fb142c6`.
 
 ## Documentation and handoff
 
