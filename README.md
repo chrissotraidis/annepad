@@ -2,7 +2,7 @@
 
 Pokémon Stadium via static recompilation, rebuilt for iPhone and iPad.
 Native Metal rendering, Files-based setup, touch controls, persistent saves,
-and reproducible ROM-free builds.
+and pinned, ROM-free local builds.
 
 ![AnnePad running Pokémon Stadium with its landscape touch controller](docs/evidence/readme/title-screen.png)
 
@@ -14,9 +14,16 @@ controller that can be customized or hidden when using a physical controller.
 
 No ROM, save, extracted Nintendo asset, signing identity, or provisioning
 profile is included in this repository or its IPA. This repository contains the
-Apple integration and reproducible build scripts; it does not distribute
-Pokémon Stadium or ROM-derived game data. See the [legal and asset
-boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
+Apple integration and build scripts. The executable contains translated game
+logic, while ROM files and extracted resource files remain private. See the
+[legal and asset boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
+
+**Maintenance status:** the foundational upstream is now archived. AnnePad's
+current production build still prepares its pinned source with patches; a
+maintained-source conversion and complete release-source delivery are pending.
+The [modernization record](docs/MODERNIZATION.md) separates the verified
+baseline, issue #2 investigation, and remaining publication gates. Preview 3
+has not been superseded by a verified fix for the Brock-gym crash.
 
 ## Install status
 
@@ -186,7 +193,7 @@ For the evidence ledger and honest remaining gates, read
 AnnePad is a native source-port integration, not a general Nintendo 64 emulator.
 It accepts only the exact US 1.0 ROM identified above.
 
-## Reproducible and ROM-free
+## Build provenance and ROM-free packaging
 
 ```mermaid
 flowchart LR
@@ -213,6 +220,12 @@ same IPA bytes. The IPA SHA-256 is
 `aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`;
 the independently audited sorted-content manifest SHA-256 is
 `1c1b9db69aeb69b54be7f615a6f113552405b1b9a2c54c16a1e3df481fb142c6`.
+
+This demonstrates repeat packaging of the same app. It does not establish an
+independent offline rebuild from the published release: Preview 3 has no complete
+nested source archive. The native executable includes ahead-of-time translated
+game logic; absence of a ROM file or separable assets does not establish rights
+to redistribute every linked component.
 
 ## Physical-device handoff
 
