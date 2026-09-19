@@ -1,6 +1,6 @@
 # Source maintenance and issue #2 — 19 September 2026
 
-Status: **blocked for public migration/release; investigation remains open**.
+Status: **diagnostic build 4 qualified; full source migration and issue resolution remain follow-up**.
 This is an engineering evidence record, not a rights clearance or a claim that
 the reported crash has been fixed.
 
@@ -8,7 +8,7 @@ the reported crash has been fixed.
 
 - Repository: `chrissotraidis/annepad`; clean `main` and freshly fetched
   `origin/main`: `65b8eb7ddfd6c067832600d684597d73ca6491ae`.
-- Latest public release: [Preview 3](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.3),
+- Starting public release: [Preview 3](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.3),
   iOS/iPadOS 0.1.0 build 3. No macOS binary is published in that release.
 - The anonymously downloaded IPA matches SHA-256
   `aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`.
@@ -57,7 +57,7 @@ All other baseline pins remain in `dependencies.lock.json`.
    generated output has been compared. **Pending.**
 4. Qualify the issue fix independently, build clean release commits, deliver
    matching permitted source/notices/provenance, and verify anonymous downloads.
-   **Pending; no new IPA published.**
+   **Diagnostic build 4 qualified; battle-fix acceptance remains pending.**
 
 Source verification now compares the entire prepared runtime and renderer
 against their ordered patch stacks using a temporary Git index. Previously,
@@ -85,8 +85,10 @@ those files; a fork badge would not resolve their treatment under this policy.
 
 Required decision: establish permitted delivery for the linked translated game
 and RSP sources, including corresponding-source requirements, and for any
-redistributed disassembly content. A complete public migration/release cannot
-be declared while that decision remains open. No upstream contact was made.
+redistributed disassembly content. Complete source-delivery compliance and a finished public migration cannot
+be declared while that decision remains open. The diagnostic update retains
+the existing preview source pins and translated-code boundary; it does not
+resolve this question or expand the source redistribution scope. No upstream contact was made.
 
 ## Issue #2 investigation
 
@@ -113,12 +115,29 @@ installation has simctl/runtime support but no Simulator.app, preventing the
 interactive battle path through the available UI tooling. This does not test
 iOS 16.6.1, TrollStore, physical-device memory pressure or battle acceptance.
 
-The next diagnostic input is the exact installed version/build and the matching
-AnnePad `.ips` crash report (or a JetsamEvent entry naming AnnePad if it was
-memory-terminated), plus rental/Transfer Pak team and whether failure precedes
-the first Pokémon appearing. Redact personal/device identifiers; do not supply
-a ROM or save. This distinguishes an exception/lookup failure from memory
-termination before selecting a fix. No speculative gameplay change was made.
+## Diagnostic build 4
+
+The owner's explicit follow-up authorized continued investigation, a diagnostic
+IPA, and a response on issue #2. Build 4 adds **Share Diagnostics** to the
+utility menu and ROM setup screen. It records bounded current/previous sessions,
+version/build and executable UUID, lifecycle events, memory footprint/available
+memory, fatal-signal details where catchable, and numeric guest failure addresses.
+It does not enable gameplay traces or dynamic code, upload automatically, or
+export raw runtime logs, guest memory, paths, ROMs, saves or device identifiers.
+See [the reporting guide](DIAGNOSTICS.md).
+
+This is a diagnostic update, not a confirmed fix for the reported battle crash.
+The next input is the reporter's exported report, selected team and point of
+failure. A system crash report may still be needed for jetsam or a full stack.
+The original component pins, save paths, bundle ID and iOS 16 deployment floor
+are unchanged. No speculative gameplay change was made.
+
+`scripts/package-build-recipe.py` archives the clean wrapper source, dependency
+lock, patch series, recursive gitlinks, prepared-file hashes and available
+license texts. Restore the archive and check `MANIFEST.sha256` before using its
+build instructions. It explicitly requires fetching dependencies and supplying
+private game inputs; it is **not** a complete/offline corresponding-source kit.
+No claim of complete source delivery or legal clearance is made.
 
 ## Validation and rollback
 
@@ -127,7 +146,12 @@ termination before selecting a fix. No speculative gameplay change was made.
 - New regression: an extra edit accepted by reverse-patch checking is rejected
   by exact-tree verification; the original index and source remain unchanged.
 - Existing Preview 3 unsigned package audit and anonymous hash comparison pass.
-- No new device build, physical install, fixed battle or new binary is claimed.
+- Unsigned arm64 device Release build 4 and strict app audit pass; same bundle
+  ID, version 0.1.0, minimum iOS 16, Apple-only dynamic dependencies.
+- Simulator probe compiles the exact diagnostic implementation: real SIGABRT
+  termination, recovery after relaunch, bounded journals, numeric-only export,
+  share-controller construction and stale-error clearing all pass.
+- No new physical install, reporter-device reproduction or fixed battle is claimed.
 
 The production dependency checkouts and existing release tags remain unchanged.
 Rollback of this wrapper change is an ordinary revert of the review commit;
