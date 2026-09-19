@@ -1,4 +1,5 @@
 #import "rom_setup.h"
+#import "diagnostics.h"
 
 #import <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
@@ -229,8 +230,11 @@ void styleButton(UIButton* button) {
     self.statusLabel.textAlignment = NSTextAlignmentCenter;
     self.statusLabel.numberOfLines = 0;
 
+    UIButton* diagnostics = [UIButton buttonWithType:UIButtonTypeSystem];
+    [diagnostics setTitle:@"Share Diagnostics" forState:UIControlStateNormal];
+    [diagnostics addTarget:self action:@selector(shareDiagnostics) forControlEvents:UIControlEventTouchUpInside];
     UIStackView* stack = [[UIStackView alloc] initWithArrangedSubviews:@[
-        title, body, choose, self.statusLabel,
+        title, body, choose, diagnostics, self.statusLabel,
     ]];
     stack.axis = UILayoutConstraintAxisVertical;
     stack.alignment = UIStackViewAlignmentCenter;
@@ -244,6 +248,10 @@ void styleButton(UIButton* button) {
         [stack.widthAnchor constraintLessThanOrEqualToAnchor:self.view.safeAreaLayoutGuide.widthAnchor multiplier:0.78],
         [body.widthAnchor constraintLessThanOrEqualToConstant:650.0],
     ]];
+}
+
+- (void)shareDiagnostics {
+    annepad_share_diagnostics(self);
 }
 
 - (void)chooseROM {

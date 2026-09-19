@@ -13,6 +13,7 @@
 
 #include "rom_setup.h"
 #include "touch_tap_latch.h"
+#include "diagnostics_impl.h"
 
 int annepad_recomp_main(int argc, char** argv);
 extern "C" void annepad_apply_resolution_multiplier(int multiplier);
@@ -553,6 +554,12 @@ int savedResolutionMultiplier() {
             [overlay presentResolutionMenu];
         });
     }]];
+    [menu addAction:[UIAlertAction actionWithTitle:@"Share Diagnostics"
+                                             style:UIAlertActionStyleDefault
+                                           handler:^(__unused UIAlertAction* action) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{ annepad_share_diagnostics(presenter); });
+    }]];
     [menu addAction:[UIAlertAction actionWithTitle:@"Cancel"
                                              style:UIAlertActionStyleCancel
                                            handler:nil]];
@@ -844,12 +851,17 @@ extern "C" int SDL_main(int argc, char** argv) {
                          error.localizedDescription.UTF8String);
             return EXIT_FAILURE;
         }
+        annepad_start_diagnostics(root);
         if (!annepad_prepare_rom_setup()) return EXIT_FAILURE;
+        annepad_diagnostic_event("rom_verified");
         if (chdir(root.fileSystemRepresentation) != 0) {
             std::perror("AnnePad could not enter Application Support");
             return EXIT_FAILURE;
         }
 
-        return annepad_recomp_main(argc, argv);
+        annepad_diagnostic_event("runtime_start");
+        const int result = annepad_recomp_main(argc, argv);
+        annepad_diagnostic_event("runtime_exit");
+        return result;
     }
 }

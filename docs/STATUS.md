@@ -1,5 +1,18 @@
 # Status
 
+## Preview 4 diagnostic qualification — 19 September 2026
+
+Build 4 adds a bounded local crash/memory report and **Share Diagnostics** for
+[issue #2](https://github.com/chrissotraidis/annepad/issues/2). Device Release
+build/app audit and the Simulator fault/relaunch/privacy/export tests pass.
+Source verification now rejects extra edits inside patched runtime/renderer
+files. No upstream upgrade, save migration or speculative gameplay fix is
+included. Physical/reporter battle acceptance and complete source modernization
+remain open; see [modernization](MODERNIZATION.md) and [diagnostics](DIAGNOSTICS.md).
+
+The historical acceptance records below apply to their named builds.
+
+
 Updated: 2026-08-18 CEST
 
 ## Preview 3 controller lifecycle result

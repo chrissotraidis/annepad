@@ -6,6 +6,7 @@ source "$script_dir/lib/common.sh"
 
 require_command git
 require_command jq
+require_command python3
 
 game="$ANNEPAD_SOURCES/PokemonStadiumRecomp"
 runtime="$ANNEPAD_SOURCES/N64ModernRuntime"
@@ -175,4 +176,19 @@ for checkout in "$game" "$game/disasm" "$game/recomp-ui" "$runtime" \
     [[ "$push_url" == "DISABLED" ]] || die "push is not disabled for $checkout"
 done
 
-note "Source revisions, cleanliness, assembly links, and push guards passed."
+# Reverse applicability alone allows unrelated edits elsewhere in an already
+# modified file. Compare complete prepared files using a disposable Git index.
+python3 "$script_dir/verify-patch-stack.py" "$runtime" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/apple-audio-uaf-size-type.patch" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/static-mobile-core-profile.patch" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/gbcart-exact-rom-validation.patch" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/atomic-save-lifecycle.patch" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/ios-release-trace-exclusion.patch" \
+    "$ANNEPAD_ROOT/patches/n64-modern-runtime/synchronous-audio-tasks.patch"
+python3 "$script_dir/verify-patch-stack.py" "$renderer" \
+    "$ANNEPAD_ROOT/patches/rt64/ios-metal-runtime.patch" \
+    "$ANNEPAD_ROOT/patches/rt64/metal-descriptor-state-cache.patch" \
+    "$ANNEPAD_ROOT/patches/rt64/metal-clear-state-cache.patch" \
+    "$ANNEPAD_ROOT/patches/rt64/ios-render-target-limit.patch"
+
+note "Source revisions, exact runtime/renderer trees, assembly links, and push guards passed."

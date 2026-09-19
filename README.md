@@ -2,7 +2,7 @@
 
 Pokémon Stadium via static recompilation, rebuilt for iPhone and iPad.
 Native Metal rendering, Files-based setup, touch controls, persistent saves,
-and reproducible ROM-free builds.
+and pinned, ROM-free local builds.
 
 ![AnnePad running Pokémon Stadium with its landscape touch controller](docs/evidence/readme/title-screen.png)
 
@@ -14,21 +14,30 @@ controller that can be customized or hidden when using a physical controller.
 
 No ROM, save, extracted Nintendo asset, signing identity, or provisioning
 profile is included in this repository or its IPA. This repository contains the
-Apple integration and reproducible build scripts; it does not distribute
-Pokémon Stadium or ROM-derived game data. See the [legal and asset
-boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
+Apple integration and build scripts. The executable contains translated game
+logic, while ROM files and extracted resource files remain private. See the
+[legal and asset boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
+
+**Maintenance status:** the foundational upstream is now archived. AnnePad's
+current production build still prepares its pinned source with patches; a
+maintained-source conversion and complete release-source delivery are pending.
+The [modernization record](docs/MODERNIZATION.md) separates the verified
+baseline, issue #2 investigation, and remaining source-delivery work. Preview 4
+adds [shareable diagnostics](docs/DIAGNOSTICS.md) for the Brock-gym crash; it is
+not a confirmed gameplay fix.
 
 ## Install status
 
 | Option | Status | What to do |
 |---|---|---|
-| Developer-preview `.ipa` | **Available with a computer** | [Download preview 0.1.0 build 3](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.3), then re-sign it with your Apple ID using AltStore Classic and AltServer by following the [installation guide](docs/INSTALL_IPA.md). |
+| Developer-preview `.ipa` | **Available with a computer** | [Download diagnostic preview 0.1.0 build 4](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.4), then re-sign it with your Apple ID using AltStore Classic and AltServer by following the [installation guide](docs/INSTALL_IPA.md). |
 | Local iPhone or iPad build | **Available now** | Build and sign with your Apple development team using the instructions below. |
 | Simulator | **Available now** | Best for development and UI testing; it is not a substitute for physical-device testing. |
 | App Store / TestFlight | **Not announced** | No listing or public TestFlight currently exists. |
 
-The current development build has been signed, installed, and played on a
-physical iPad. Files import, Metal rendering, touch gameplay, the settings and
+Earlier builds were signed, installed, and played on a physical iPad. Build 4
+has device-build/package and synthetic Simulator diagnostic validation; its
+new diagnostics have not yet been accepted on the reporter’s hardware. Files import, Metal rendering, touch gameplay, the settings and
 layout editors, resolution changes, saves, relaunch, and in-place updates have
 all been exercised on that hardware. Physical-controller, headphone/Bluetooth,
 interruption, thermal, and full iPhone acceptance remain separate test work.
@@ -186,7 +195,7 @@ For the evidence ledger and honest remaining gates, read
 AnnePad is a native source-port integration, not a general Nintendo 64 emulator.
 It accepts only the exact US 1.0 ROM identified above.
 
-## Reproducible and ROM-free
+## Build provenance and ROM-free packaging
 
 ```mermaid
 flowchart LR
@@ -213,6 +222,14 @@ same IPA bytes. The IPA SHA-256 is
 `aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`;
 the independently audited sorted-content manifest SHA-256 is
 `1c1b9db69aeb69b54be7f615a6f113552405b1b9a2c54c16a1e3df481fb142c6`.
+
+This demonstrates repeat packaging of the same app. It does not establish an
+independent offline rebuild from the published release. Preview 4 adds an
+explicitly scoped build-recipe archive with wrapper source, pins, patch series,
+prepared-file hashes and license texts. It still requires external dependencies
+and private game inputs; complete nested source delivery remains pending. The native executable includes ahead-of-time translated
+game logic; absence of a ROM file or separable assets does not establish rights
+to redistribute every linked component.
 
 ## Physical-device handoff
 
@@ -259,7 +276,7 @@ iPhone, and device matrix remains incomplete.
 <summary><strong>Where is the IPA?</strong></summary>
 
 [Download the unsigned developer-preview IPA from GitHub
-Releases](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.3).
+Releases](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.4).
 It is not an App Store or TestFlight build. A Mac or Windows PC running
 AltServer is required to re-sign it with your own Apple ID through AltStore
 Classic. There is currently no supported computer-free installation path.

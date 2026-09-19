@@ -6,6 +6,7 @@ source "$script_dir/lib/common.sh"
 
 require_command git
 require_command jq
+require_command python3
 
 jq empty "$ANNEPAD_LOCK"
 for script in "$ANNEPAD_ROOT"/scripts/*.sh "$ANNEPAD_ROOT"/scripts/lib/*.sh; do
@@ -21,6 +22,7 @@ if (ANNEPAD_BUILD_JOBS=two configured_build_jobs >/dev/null 2>&1); then
 fi
 "$ANNEPAD_ROOT/scripts/test-touch-tap-latch.sh"
 "$ANNEPAD_ROOT/scripts/test-controller-slots.sh"
+python3 "$ANNEPAD_ROOT/tests/patch_stack_test.py"
 
 required_docs=(
     GOAL.md RESEARCH.md REPOSITORY-INVENTORY.md ARCHITECTURE.md PLAN.md
