@@ -70,6 +70,14 @@
           "command": [
             "{repo}/scripts/package-ios.sh",
             "--output",
+            "{repo}/artifacts/AnnePad-personal-unsigned.ipa"
+          ]
+        },
+        {
+          "stage": "export",
+          "command": [
+            "cp",
+            "{repo}/artifacts/AnnePad-personal-unsigned.ipa",
             "{output}"
           ]
         }
