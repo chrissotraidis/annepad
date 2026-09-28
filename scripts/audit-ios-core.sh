@@ -82,7 +82,9 @@ done
 if [[ "$profile" == release ]]; then
     diagnostic_surface=$(nm -u "$build_dir/libAnnePadRecompiledCore.a" 2>/dev/null | \
         rg '^_pkmnstadium_' | sort -u || true)
-    expected_release_surface=$'_pkmnstadium_gbtower_queue_audio\n_pkmnstadium_memmap_clear_fragment\n_pkmnstadium_pool_pop_silence_voices'
+    # audio_active_list_prepare is the release audio repair from
+    # patches/pokemon-stadium-recomp/audio-active-list-repair.patch.
+    expected_release_surface=$'_pkmnstadium_audio_active_list_prepare\n_pkmnstadium_gbtower_queue_audio\n_pkmnstadium_memmap_clear_fragment\n_pkmnstadium_pool_pop_silence_voices'
     [[ "$diagnostic_surface" == "$expected_release_surface" ]] || \
         die "release AOT core contains unexpected Pokemon Stadium hook calls"
 fi
