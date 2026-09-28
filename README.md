@@ -13,7 +13,7 @@ Pokémon Stadium (US) 1.0 ROM through Files, and supplies a landscape touch
 controller that can be customized or hidden when using a physical controller.
 
 No ROM, save, extracted Nintendo asset, signing identity, or provisioning
-profile is included in this repository or its IPA. This repository contains the
+profile is included in this repository. This repository contains the
 Apple integration and build scripts. The executable contains translated game
 logic, while ROM files and extracted resource files remain private. See the
 [legal and asset boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
@@ -30,7 +30,6 @@ not a confirmed gameplay fix.
 
 | Option | Status | What to do |
 |---|---|---|
-| Developer-preview `.ipa` | **Available with a computer** | [Download diagnostic preview 0.1.0 build 4](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.4), then re-sign it with your Apple ID using AltStore Classic and AltServer by following the [installation guide](docs/INSTALL_IPA.md). |
 | Local iPhone or iPad build | **Available now** | Build and sign with your Apple development team using the instructions below. |
 | Simulator | **Available now** | Best for development and UI testing; it is not a substitute for physical-device testing. |
 | App Store / TestFlight | **Not announced** | No listing or public TestFlight currently exists. |
@@ -41,10 +40,6 @@ new diagnostics have not yet been accepted on the reporter’s hardware. Files i
 layout editors, resolution changes, saves, relaunch, and in-place updates have
 all been exercised on that hardware. Physical-controller, headphone/Bluetooth,
 interruption, thermal, and full iPhone acceptance remain separate test work.
-
-The downloadable IPA is unsigned and ROM-free. It contains no maintainer
-certificate or provisioning profile and must be re-signed for the installer's
-device.
 
 ## Get started
 
@@ -217,12 +212,6 @@ rejects ROMs, saves, extracted assets, Simulator slices, private paths,
 credentials, provisioning profiles, signing keys, and debug-only release
 surfaces.
 
-Preview 3 normalizes staged file times, so two local package passes produced the
-same IPA bytes. The IPA SHA-256 is
-`aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`;
-the independently audited sorted-content manifest SHA-256 is
-`1c1b9db69aeb69b54be7f615a6f113552405b1b9a2c54c16a1e3df481fb142c6`.
-
 This demonstrates repeat packaging of the same app. It does not establish an
 independent offline rebuild from the published release. Preview 4 adds an
 explicitly scoped build-recipe archive with wrapper source, pins, patch series,
@@ -275,11 +264,7 @@ iPhone, and device matrix remains incomplete.
 <details>
 <summary><strong>Where is the IPA?</strong></summary>
 
-[Download the unsigned developer-preview IPA from GitHub
-Releases](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.4).
-It is not an App Store or TestFlight build. A Mac or Windows PC running
-AltServer is required to re-sign it with your own Apple ID through AltStore
-Classic. There is currently no supported computer-free installation path.
+Previous builds have been retired; a new version is in progress.
 </details>
 
 <details>
