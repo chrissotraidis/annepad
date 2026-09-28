@@ -8,7 +8,7 @@ the reported crash has been fixed.
 
 - Repository: `chrissotraidis/annepad`; clean `main` and freshly fetched
   `origin/main`: `65b8eb7ddfd6c067832600d684597d73ca6491ae`.
-- Starting public release: [Preview 3](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.3),
+- Starting public release: Preview 3 (retired),
   iOS/iPadOS 0.1.0 build 3. No macOS binary is published in that release.
 - The anonymously downloaded IPA matches SHA-256
   `aaff759f17f127e2bbfe2125f01f0f1effdf0640f76d332444f818fc6cadd85d`.

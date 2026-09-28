@@ -1,5 +1,9 @@
 # Install the AnnePad developer preview
 
+> [!IMPORTANT]
+> **Downloads retired.** Prebuilt builds are no longer published, and release
+> links on this page no longer work. A build-it-yourself version is in progress.
+
 AnnePad's downloadable IPA is unsigned and ROM-free. It is not an App Store,
 TestFlight, or AltStore PAL package. You need a Mac or Windows PC running
 [AltServer](https://altstore.io/) so AltStore Classic can re-sign the app with
@@ -9,8 +13,8 @@ your own Apple ID.
 
 1. Install AltServer on your Mac or Windows PC and use it to install AltStore
    Classic on your iPhone or iPad.
-2. Download `AnnePad-0.1.0-preview.3-unsigned.ipa` from the [GitHub
-release](https://github.com/chrissotraidis/annepad/releases/tag/v0.1.0-preview.3).
+2. Download `AnnePad-0.1.0-preview.3-unsigned.ipa` from the GitHub
+release (retired).
 3. Open the IPA with AltStore Classic, or use **My Apps → +** and select it.
 4. Keep the device connected to the same computer/network while AltServer
    signs and installs the app.
