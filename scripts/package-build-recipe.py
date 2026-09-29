@@ -67,7 +67,8 @@ No third-party license is changed by this archive.
 ''', 0o644)
     manifest = ''.join(digest(data) + '  ' + name + '\n' for name, (data, _) in sorted(entries.items()))
     entries['MANIFEST.sha256'] = (manifest.encode(), 0o644)
-    output = ROOT / 'artifacts/AnnePad-0.1.0-build4-build-recipe.tar.gz'
+    version = json.loads((ROOT / 'version.json').read_text())
+    output = ROOT / f"artifacts/AnnePad-{version['version']}-build{version['build']}-build-recipe.tar.gz"
     output.parent.mkdir(exist_ok=True)
     import gzip
     with output.open('wb') as raw, gzip.GzipFile(fileobj=raw, mode='wb', filename='', mtime=0) as gz:

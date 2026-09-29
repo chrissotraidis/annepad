@@ -46,7 +46,7 @@ app="$staging/extracted/Payload/AnnePad.app"
 app_report="$staging/app-audit.txt"
 "$script_dir/audit-ios-app.sh" "$app" release > "$app_report"
 
-manifest_tmp="$staging/AnnePad-0.1.0-unsigned.manifest.sha256"
+manifest_tmp="$staging/AnnePad-${ANNEPAD_VERSION}-unsigned.manifest.sha256"
 canonical_tree_manifest "$staging/extracted" "$manifest_tmp"
 canonical_sha=$(sha256_file "$manifest_tmp")
 raw_sha=$(sha256_file "$ipa")
@@ -56,7 +56,7 @@ file_count=$(wc -l < "$manifest_tmp" | tr -d ' ')
 base=${ipa%.ipa}
 manifest_output="$base.manifest.sha256"
 report_output="$base.audit.txt"
-report_tmp="$staging/AnnePad-0.1.0-unsigned.audit.txt"
+report_tmp="$staging/AnnePad-${ANNEPAD_VERSION}-unsigned.audit.txt"
 {
     printf 'AnnePad unsigned IPA audit\n'
     printf '==========================\n\n'

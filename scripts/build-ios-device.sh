@@ -70,6 +70,8 @@ cmake -S "$game" -B "$build_dir" -G Xcode \
     -DSPIRV_CROSS_MSL_PATH="$spirv_cross_msl" \
     -DFILE_TO_C_PATH="$file_to_c" \
     -DANNEPAD_BUILD_PROFILE="$profile" \
+    -DANNEPAD_VERSION="$ANNEPAD_VERSION" \
+    -DANNEPAD_BUILD="$ANNEPAD_BUILD" \
     -DDEVELOPMENT_TEAM="${DEVELOPMENT_TEAM:-}"
 
 # Xcode's incremental build can preserve resources removed from the project.
