@@ -15,7 +15,7 @@ require_command zip
 
 default_app="$ANNEPAD_ROOT/build-ios-app-device-release/Release/AnnePad.app"
 app="$default_app"
-output="$ANNEPAD_ROOT/artifacts/AnnePad-0.1.0-unsigned.ipa"
+output="$ANNEPAD_ROOT/artifacts/AnnePad-${ANNEPAD_VERSION}-unsigned.ipa"
 allow_build=true
 custom_app=false
 

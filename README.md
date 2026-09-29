@@ -30,6 +30,7 @@ not a confirmed gameplay fix.
 
 | Option | Status | What to do |
 |---|---|---|
+| Make your own with PadForge | **Available** | See [Get started](#get-started). Releases hold the recipe only. |
 | Local iPhone or iPad build | **Available now** | Build and sign with your Apple development team using the instructions below. |
 | Simulator | **Available now** | Best for development and UI testing; it is not a substitute for physical-device testing. |
 | App Store / TestFlight | **Not announced** | No listing or public TestFlight currently exists. |
@@ -42,6 +43,19 @@ all been exercised on that hardware. Physical-controller, headphone/Bluetooth,
 interruption, thermal, and full iPhone acceptance remain separate test work.
 
 ## Get started
+
+**The easy way:** releases publish no app, because AnnePad contains code
+translated from the game; you make your own from your own ROM. On an Apple
+Silicon Mac with Xcode and `brew install cmake ninja`, download
+[PadForge](https://github.com/chrissotraidis/padforge/releases/latest), unzip it,
+double-click `PadForge.command`, choose AnnePad and pick your Pokémon Stadium
+(US) ROM. PadForge builds AnnePad from this repository's
+[latest release](https://github.com/chrissotraidis/annepad/releases/latest) and
+saves an unsigned IPA in the folder you choose. Install it with AltStore Classic,
+SideStore or Sideloadly. The IPA contains code translated from your ROM: it is
+yours alone; never share it.
+
+**By hand:**
 
 You need:
 
@@ -264,7 +278,9 @@ iPhone, and device matrix remains incomplete.
 <details>
 <summary><strong>Where is the IPA?</strong></summary>
 
-Previous builds have been retired; a new version is in progress.
+There is no public IPA: the app contains code translated from the game, so
+PadForge builds your own from your ROM on an Apple Silicon Mac. See
+[Get started](#get-started).
 </details>
 
 <details>

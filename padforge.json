@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "id": "annepad",
+  "name": "AnnePad",
+  "game": "Pok\u00e9mon Stadium (N64) via PokemonStadiumRecomp",
+  "kind": "disc-translation",
+  "status": "draft-untested",
+  "inputs": [
+    {
+      "type": "n64-rom",
+      "formats": [
+        "z64",
+        "n64",
+        "v64"
+      ],
+      "when": "build",
+      "description": "Your own supported Pok\u00e9mon Stadium ROM (absolute path). It is read during preparation and translation."
+    }
+  ],
+  "targets": {
+    "ios": {
+      "hosts": {
+        "macos-arm64": "experimental"
+      },
+      "output": "ipa",
+      "check": "ipa",
+      "steps": [
+        {
+          "stage": "preflight",
+          "command": [
+            "{repo}/scripts/check-prerequisites.sh"
+          ]
+        },
+        {
+          "stage": "dependencies",
+          "command": [
+            "{repo}/scripts/fetch-sources.sh"
+          ]
+        },
+        {
+          "stage": "prepare-rom",
+          "command": [
+            "{repo}/scripts/prepare-game.sh",
+            "--rom",
+            "{disc}"
+          ]
+        },
+        {
+          "stage": "tools",
+          "command": [
+            "{repo}/scripts/build-host-tools.sh"
+          ]
+        },
+        {
+          "stage": "translate",
+          "command": [
+            "{repo}/scripts/generate-game.sh",
+            "--rom",
+            "{disc}"
+          ]
+        },
+        {
+          "stage": "host-build",
+          "command": [
+            "{repo}/scripts/build-macos.sh"
+          ]
+        },
+        {
+          "stage": "package",
+          "command": [
+            "{repo}/scripts/package-ios.sh",
+            "--output",
+            "{repo}/artifacts/AnnePad-personal-unsigned.ipa"
+          ]
+        },
+        {
+          "stage": "export",
+          "command": [
+            "cp",
+            "{repo}/artifacts/AnnePad-personal-unsigned.ipa",
+            "{output}"
+          ]
+        }
+      ]
+    }
+  },
+  "requirements": {
+    "disk_gb": 20,
+    "tools": [
+      {
+        "name": "git",
+        "version_args": [
+          "--version"
+        ]
+      },
+      {
+        "name": "cmake",
+        "version_args": [
+          "--version"
+        ]
+      },
+      {
+        "name": "ninja",
+        "version_args": [
+          "--version"
+        ]
+      },
+      {
+        "name": "python3",
+        "version_args": [
+          "--version"
+        ]
+      },
+      {
+        "name": "xcodebuild",
+        "version_args": [
+          "-version"
+        ],
+        "note": "Install Xcode and its iOS platform"
+      }
+    ]
+  },
+  "publication": {
+    "public_binaries": false,
+    "reason": "Personal builds contain game code translated from the player's ROM; public releases are source only."
+  }
+}

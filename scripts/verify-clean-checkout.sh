@@ -74,16 +74,16 @@ git -C "$checkout" checkout --quiet --detach HEAD
     }
 )
 
-actual_manifest="$checkout/artifacts/AnnePad-0.1.0-unsigned.manifest.sha256"
+actual_manifest="$checkout/artifacts/AnnePad-${ANNEPAD_VERSION}-unsigned.manifest.sha256"
 if ! cmp -s "$expected_manifest" "$actual_manifest"; then
     diff -u "$expected_manifest" "$actual_manifest" || true
     die "clean-checkout canonical manifest does not match the expected candidate"
 fi
 
 mkdir -p "$ANNEPAD_ROOT/logs/clean-checkout-latest"
-cp "$checkout/artifacts/AnnePad-0.1.0-unsigned.audit.txt" \
+cp "$checkout/artifacts/AnnePad-${ANNEPAD_VERSION}-unsigned.audit.txt" \
     "$ANNEPAD_ROOT/logs/clean-checkout-latest/"
-cp "$checkout/artifacts/AnnePad-0.1.0-unsigned.manifest.sha256" \
+cp "$checkout/artifacts/AnnePad-${ANNEPAD_VERSION}-unsigned.manifest.sha256" \
     "$ANNEPAD_ROOT/logs/clean-checkout-latest/"
 
 head_sha=$(git -C "$checkout" rev-parse HEAD)

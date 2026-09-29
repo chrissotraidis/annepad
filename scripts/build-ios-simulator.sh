@@ -47,6 +47,8 @@ cmake -S "$game" -B "$build_dir" -G Xcode \
     -DANNEPAD_IOS_DIR="$ANNEPAD_ROOT/apple/app" \
     -DANNEPAD_RECOMPILED_ARCHIVE="$core_archive" \
     -DANNEPAD_BUILD_PROFILE="$profile" \
+    -DANNEPAD_VERSION="$ANNEPAD_VERSION" \
+    -DANNEPAD_BUILD="$ANNEPAD_BUILD" \
     -DDXC_PATH="$dxc" \
     -DSPIRV_CROSS_MSL_PATH="$spirv_cross_msl" \
     -DFILE_TO_C_PATH="$file_to_c" \
