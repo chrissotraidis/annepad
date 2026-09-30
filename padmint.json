@@ -119,6 +119,16 @@
         "note": "Install Xcode and its iOS platform"
       },
       {
+        "name": "xcrun",
+        "label": "Metal Toolchain",
+        "version_args": [
+          "metal",
+          "--version"
+        ],
+        "player": true,
+        "note": "Install Xcode's Metal Toolchain: xcodebuild -downloadComponent MetalToolchain"
+      },
+      {
         "name": "mips-linux-gnu-ld",
         "version_args": [
           "--version"
