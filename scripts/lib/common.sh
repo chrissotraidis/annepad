@@ -4,7 +4,7 @@ set -euo pipefail
 
 ANNEPAD_ROOT=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)
 ANNEPAD_LOCK="$ANNEPAD_ROOT/dependencies.lock.json"
-# One version for the app, its release and PadForge: version.json.
+# One version for the app, its release and PadMint: version.json.
 ANNEPAD_VERSION=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["version"])' "$ANNEPAD_ROOT/version.json")
 ANNEPAD_BUILD=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["build"])' "$ANNEPAD_ROOT/version.json")
 ANNEPAD_SOURCES="$ANNEPAD_ROOT/external/sources"
