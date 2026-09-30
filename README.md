@@ -51,7 +51,7 @@ Silicon Mac with Xcode and `brew install cmake ninja mips-linux-gnu-binutils`, d
 double-click `PadMint.command`, choose AnnePad and pick your Pokémon Stadium
 (US) ROM. PadMint builds AnnePad from this repository's
 [latest release](https://github.com/chrissotraidis/annepad/releases/latest) and
-saves an unsigned IPA in the folder you choose. Install it with AltStore Classic,
+saves an unsigned IPA in your Downloads folder. Install it with AltStore Classic,
 SideStore or Sideloadly. The IPA contains code translated from your ROM: it is
 yours alone; never share it.
 
