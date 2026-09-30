@@ -82,15 +82,32 @@ fetch_detached() {
     local source_name=$1
     local destination=$2
     local label=$3
-    local url revision
+    local url revision status earlier
     url=$(lock_value "$source_name" url)
     revision=$(lock_value "$source_name" commit)
 
-    if [[ ! -d "$destination/.git" ]]; then
-        [[ ! -e "$destination" ]] || die "refusing to replace non-git path: $destination"
+    # A rerun finds this source already at the pinned commit, with AnnePad's own patches
+    # applied to its files; apply-patches.sh recognizes those and verify-sources.sh checks the
+    # result. Staged changes mean a checkout that never finished (an empty index), not patches.
+    if [[ -d "$destination/.git" && "$(git -C "$destination" rev-parse -q --verify HEAD 2>/dev/null)" == "$revision" ]] \
+        && git -C "$destination" diff --cached --quiet --ignore-submodules=dirty 2>/dev/null; then
+        disable_push "$destination"
+        return 0
+    fi
+    # Anything else in the way (a download that stopped partway, or changes at another
+    # commit) is kept under a new name, never deleted, and the source is downloaded again.
+    if [[ -e "$destination" ]]; then
+        if [[ ! -d "$destination/.git" ]] \
+            || ! status=$(git -C "$destination" status --porcelain --untracked-files=no --ignore-submodules=dirty 2>/dev/null) \
+            || [[ -n "$status" ]]; then
+            earlier="$destination.earlier-$(date +%Y%m%d-%H%M%S)"
+            mv "$destination" "$earlier"
+            note "$label was incomplete or changed, maybe from a download that stopped partway."
+            note "Kept it as $earlier (nothing deleted) and downloading it again."
+        fi
+    fi
+    if [[ ! -e "$destination" ]]; then
         git clone --filter=blob:none --no-checkout "$url" "$destination"
-    else
-        verify_clean_checkout "$destination" "$label"
     fi
 
     git -C "$destination" fetch --depth=1 origin "$revision"
