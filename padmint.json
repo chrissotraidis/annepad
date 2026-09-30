@@ -117,6 +117,13 @@
           "-version"
         ],
         "note": "Install Xcode and its iOS platform"
+      },
+      {
+        "name": "mips-linux-gnu-ld",
+        "version_args": [
+          "--version"
+        ],
+        "note": "The pret disassembly build links MIPS code: brew install mips-linux-gnu-binutils (mips64-elf-ld also works)"
       }
     ]
   },
