@@ -46,7 +46,8 @@ interruption, thermal, and full iPhone acceptance remain separate test work.
 
 **The easy way:** releases publish no app, because AnnePad contains code
 translated from the game; you make your own from your own ROM. On an Apple
-Silicon Mac with Xcode and `brew install cmake ninja mips-linux-gnu-binutils`, download
+Silicon Mac with Xcode (plus its Metal Toolchain: `xcodebuild -downloadComponent MetalToolchain`) and
+`brew install cmake ninja mips-linux-gnu-binutils`, download
 [PadMint](https://github.com/chrissotraidis/padmint/releases/latest), unzip it,
 double-click `PadMint.command`, choose AnnePad and pick your Pokémon Stadium
 (US) ROM. PadMint builds AnnePad from this repository's
