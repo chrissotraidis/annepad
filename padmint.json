@@ -134,6 +134,22 @@
           "--version"
         ],
         "note": "The pret disassembly build links MIPS code: brew install mips-linux-gnu-binutils (mips64-elf-ld also works)"
+      },
+      {
+        "name": "jq",
+        "version_args": [
+          "--version"
+        ],
+        "player": true,
+        "note": "Install jq with Homebrew: brew install jq"
+      },
+      {
+        "name": "rg",
+        "version_args": [
+          "--version"
+        ],
+        "player": true,
+        "note": "Install ripgrep with Homebrew: brew install ripgrep"
       }
     ]
   },
