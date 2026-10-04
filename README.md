@@ -4,6 +4,15 @@ Pokémon Stadium via static recompilation, rebuilt for iPhone and iPad.
 Native Metal rendering, Files-based setup, touch controls, persistent saves,
 and pinned, ROM-free local builds.
 
+<p align="center">
+  <img alt="iPhone and iPad" src="https://img.shields.io/badge/platform-iPhone%20%2F%20iPad-0A84FF?logo=apple">
+  <img alt="Metal renderer" src="https://img.shields.io/badge/renderer-Metal-5E5CE6">
+  <img alt="N64 static recompilation" src="https://img.shields.io/badge/N64-static%20recompilation-FF9F0A">
+  <a href="https://github.com/chrissotraidis/padmint"><img alt="Build AnnePad with PadMint" src="https://img.shields.io/badge/PadMint-build%20your%20own-3EB489"></a>
+  <img alt="Game data not included" src="https://img.shields.io/badge/game%20data-not%20included-FF453A">
+  <a href="https://discord.gg/xwHfUD2bxW"><img alt="Join the AnnePad Discord" src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&amp;logoColor=white"></a>
+</p>
+
 ![AnnePad running Pokémon Stadium with its landscape touch controller](docs/evidence/readme/title-screen.png)
 
 AnnePad packages the [Pokémon Stadium recompilation
@@ -25,6 +34,13 @@ The [modernization record](docs/MODERNIZATION.md) separates the verified
 baseline, issue #2 investigation, and remaining source-delivery work. Preview 4
 adds [shareable diagnostics](docs/DIAGNOSTICS.md) for the Brock-gym crash; it is
 not a confirmed gameplay fix.
+
+> [!NOTE]
+> **AI disclosure:** AnnePad uses substantial AI assistance for code, tests,
+> documentation, debugging and maintenance. Some support replies and maintenance
+> tasks are automated. There is no audited percentage of AI-generated code.
+> Build, test and device records describe what was checked. This disclosure
+> concerns AnnePad's workflow, not the authorship of its upstream projects.
 
 ## Install status
 
@@ -324,6 +340,16 @@ asset boundaries](docs/LEGAL-AND-ASSET-BOUNDARIES.md).
 
 Generated sources, external checkouts, ROMs, saves, build directories, logs,
 IPAs, and signing material are intentionally ignored.
+
+## Community and support
+
+[Join the Discord](https://discord.gg/xwHfUD2bxW) for help and news. It is one
+community for AnnePad and its sibling projects, such as KartPad, BlueWake and
+MeleePad: ask about setup, building with PadMint, and installing, share how it
+runs on your device, and hear about new releases first.
+
+Found a bug? [Open an issue](https://github.com/chrissotraidis/annepad/issues)
+with your device, its OS version, and the steps that led to it.
 
 ## Legal and acknowledgements
 
