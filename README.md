@@ -67,10 +67,12 @@ Silicon Mac with Xcode (plus its Metal Toolchain: `xcodebuild -downloadComponent
 [PadMint](https://github.com/chrissotraidis/padmint/releases/latest), unzip it,
 double-click `PadMint.command`, choose AnnePad and pick your Pokémon Stadium
 (US) ROM. PadMint builds AnnePad from this repository's
-[latest release](https://github.com/chrissotraidis/annepad/releases/latest) and
-saves an unsigned IPA in your Downloads folder. Install it with AltStore Classic,
-SideStore or Sideloadly. The IPA contains code translated from your ROM: it is
-yours alone; never share it.
+[latest release](https://github.com/chrissotraidis/annepad/releases/latest). For
+**iPhone or iPad** it saves an unsigned IPA in your Downloads folder; install it
+with AltStore Classic, SideStore or Sideloadly. For **This Mac** (PadMint 0.5.5
+or newer, plus `brew install sdl2`) it saves `AnnePad.app`; open it and choose
+your ROM with **Change ROM**. Either copy contains code translated from your
+ROM: it is yours alone; never share it.
 
 **By hand:**
 
