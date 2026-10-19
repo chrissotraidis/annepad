@@ -13,8 +13,6 @@ and pinned, ROM-free local builds.
   <a href="https://discord.gg/xwHfUD2bxW"><img alt="Join the AnnePad Discord" src="https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&amp;logoColor=white"></a>
 </p>
 
-![AnnePad running Pokémon Stadium with its landscape touch controller](docs/evidence/readme/title-screen.png)
-
 AnnePad packages the [Pokémon Stadium recompilation
 project](https://github.com/mstan/PokemonStadiumRecomp) as a native Apple app.
 It runs ahead-of-time compiled arm64 code through Metal, imports a user-provided
@@ -161,38 +159,6 @@ mapping, and two-controller acceptance still require hands-on hardware tests.
 Pokémon Stadium uses held R to reveal battle move assignments, L for cancel in
 relevant battle paths, and edge-triggered Z actions. AnnePad therefore keeps Z
 as a normal press-and-hold touch.
-
-## Current screenshots
-
-<table>
-  <tr>
-    <td width="50%">
-      <img src="docs/evidence/readme/battle-closeup.png" alt="AnnePad showing a close-up Pokémon Stadium battle scene with landscape touch controls">
-    </td>
-    <td width="50%">
-      <img src="docs/evidence/readme/entry-pokemon.png" alt="AnnePad showing the Pokémon Stadium entry Pokémon screen with landscape touch controls">
-    </td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Battle at a glance</strong><br>Every core N64 control remains within reach in landscape.</td>
-    <td align="center"><strong>Explore Stadium</strong><br>Touch input stays present across the game’s menu-driven modes.</td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <img src="docs/evidence/readme/rental-selection.png" alt="AnnePad showing Pokémon Stadium rental selection with landscape touch controls">
-    </td>
-    <td width="50%">
-      <img src="docs/evidence/readme/team-versus.png" alt="AnnePad showing Pokémon Stadium team versus selection with landscape touch controls">
-    </td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Pick a team</strong><br>Choose rental Pokémon using the same touch layout.</td>
-    <td align="center"><strong>Ready for the match</strong><br>Move from team selection into a Stadium battle without a controller.</td>
-  </tr>
-</table>
-
-These project-provided iPad captures use privately supplied local game data. No
-game data is stored in this repository or distributed with the app.
 
 ## What works
 
