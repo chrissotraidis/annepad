@@ -2,7 +2,7 @@
   "schema_version": 1,
   "id": "annepad",
   "name": "AnnePad",
-  "game": "Pok\u00e9mon Stadium (N64) via PokemonStadiumRecomp",
+  "game": "Pokémon Stadium (N64) via PokemonStadiumRecomp",
   "kind": "disc-translation",
   "status": "draft-untested",
   "inputs": [
@@ -14,7 +14,7 @@
         "v64"
       ],
       "when": "build",
-      "description": "Your own supported Pok\u00e9mon Stadium ROM (absolute path). It is read during preparation and translation."
+      "description": "Your own supported Pokémon Stadium ROM (absolute path). It is read during preparation and translation."
     }
   ],
   "targets": {
@@ -78,6 +78,77 @@
           "command": [
             "cp",
             "{repo}/artifacts/AnnePad-personal-unsigned.ipa",
+            "{output}"
+          ]
+        }
+      ]
+    },
+    "macos": {
+      "hosts": {
+        "macos-arm64": "experimental"
+      },
+      "output": "zip",
+      "check": "none",
+      "steps": [
+        {
+          "stage": "preflight",
+          "command": [
+            "{repo}/scripts/check-prerequisites.sh"
+          ]
+        },
+        {
+          "stage": "dependencies",
+          "command": [
+            "{repo}/scripts/fetch-sources.sh"
+          ]
+        },
+        {
+          "stage": "prepare-rom",
+          "command": [
+            "{repo}/scripts/prepare-game.sh",
+            "--rom",
+            "{disc}"
+          ]
+        },
+        {
+          "stage": "tools",
+          "command": [
+            "{repo}/scripts/build-host-tools.sh"
+          ]
+        },
+        {
+          "stage": "translate",
+          "command": [
+            "{repo}/scripts/generate-game.sh",
+            "--rom",
+            "{disc}"
+          ]
+        },
+        {
+          "stage": "compile",
+          "command": [
+            "{repo}/scripts/build-macos.sh"
+          ]
+        },
+        {
+          "stage": "sign",
+          "command": [
+            "/usr/bin/codesign",
+            "--force",
+            "--deep",
+            "--sign",
+            "-",
+            "{repo}/build-macos/AnnePad.app"
+          ]
+        },
+        {
+          "stage": "package",
+          "command": [
+            "/usr/bin/ditto",
+            "-c",
+            "-k",
+            "--keepParent",
+            "{repo}/build-macos/AnnePad.app",
             "{output}"
           ]
         }
