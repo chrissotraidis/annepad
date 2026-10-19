@@ -329,3 +329,12 @@ reverse-engineered material and does not conceal its origin.
 Before sharing source, screenshots, or a binary, follow the
 [`legal and asset boundaries`](docs/LEGAL-AND-ASSET-BOUNDARIES.md) and the
 [`release checklist`](docs/RELEASE-CHECKLIST.md).
+
+## Legal
+
+AnnePad is an unofficial, fan-made project. It is not affiliated with, endorsed
+by, or sponsored by Nintendo. Pokémon and related names are trademarks of
+Nintendo, Creatures Inc. and GAME FREAK inc. This repository contains no game
+data, ROMs, or extracted assets. To use it, you need your own legally obtained
+copy of the game, and you build it yourself on your own machine. Please don't
+share game files or builds made from them.
