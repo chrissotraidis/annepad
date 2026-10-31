@@ -104,4 +104,66 @@ PadMint's audit against the same shell matched the Mac exactly: 102 app imports,
 13 runtime names, 2 standard C++ names, iOS 16, and only `AnnePadGame.dylib`
 added. Its input was the Mac's generated CPU source, copied privately. Windows
 generation was recorded separately above. A single Windows orchestrator from ROM
-to module is still open.
+to module is now `scripts/build-windows-module.py` (below).
+
+## One Windows script from ROM to module
+
+`scripts/build-windows-module.py` runs the whole route on Windows with
+PadMint's bundled Python 3.13 (x64, also on Windows 11 ARM64):
+
+```powershell
+python scripts\build-windows-module.py --rom ROM --toolchain PADMINT_IOS_TOOLCHAIN `
+  --build-dir NEW_WORK_FOLDER --jobs 6 --ido IDO_OUTPUT --binutils MIPS_BIN `
+  --rabbitizer-wheel RABBITIZER_WHEEL --uv UV_EXE
+```
+
+It checks the ROM (z64, v64 or n64 byte order) against the lock, exports the
+pinned sources with AnnePad's patches, and stages Make, Bash and coreutils
+from the 19 pinned MSYS2 packages in `scripts/windows-msys.json` inside the
+build folder. It then creates a uv environment from `scripts/windows-requirements.txt`
+with the fixed Rabbitizer wheel, runs pret's own `make extract` and `make rom`,
+and refuses to continue unless the rebuilt ROM has the supported MD5. Finally
+it builds the pinned N64Recomp with MSVC, generates the CPU code and compiles the
+module with `build-game-module.py`. ROM copies in the build folder are deleted
+after generation.
+
+Three Windows-only adjustments are made, none of which changes compiler flags:
+
+- splat 0.25.0 writes host paths into `.incbin` lines and linker scripts;
+  the script writes those two paths in POSIX form (`SPLAT_FIXES`).
+- Python runs in UTF-8 mode, as on a Mac, so splat can read the UTF-8 sources.
+- `TMPDIR` is a `/cygdrive/...` path both MSYS runtimes resolve, because IDO
+  runs in its own isolated runtime.
+
+`libyaz0` is left out of the Python environment: nothing in the build imports
+it and it has no Windows wheel. `cpp` is PadMint's Clang with `-E -xc++`, as on
+a Mac.
+
+Tools that PadMint must still supply before the recipe can offer Windows: IDO
+5.3/7.1 from PadMint's `scripts/ido-windows`, MIPS binutils with `ar` from
+`scripts/binutils-windows` (PadMint #225), and Rabbitizer
+`1.16.2+padmint.1` from `scripts/rabbitizer-windows` with
+`inputs-1.16.2.json`. uv is pinned in PadMint's tool lock (PadMint #226).
+The recipe keeps Windows unadvertised until those are published.
+
+Recorded on 1 November 2026 (Windows 11 ARM64, Parallels; PadMint 0.5.27's
+bundled Python; IDO built by PadMint's producer in 81 s; binutils from PadMint
+#225's CI; Rabbitizer from PadMint's producer with `inputs-1.16.2.json`):
+
+- One run of the script at `ddc7002` took the original `.v64` dump to the
+  module in 1,515 s with 6 jobs, staging MSYS and the Python environment
+  itself. The rebuilt ROM matched MD5 `ed1378bc12115f71209a77844965ba50`
+  (pret's own check also passed), and no ROM copy was left in the build folder.
+- All 1,006 generated files are identical to a separate earlier Windows run.
+  Against a Mac generation from the same patched game tree, 1,004 are identical;
+  `funcs.h` and `funcs_2.c` contain the same lines and functions in a
+  different order.
+- With a shell built on a Mac at `ddc7002`, PadMint accepted the module's
+  imports (103 from the app, 13 known runtime names, 2 standard C++ names; iOS
+  16), and insertion added only `AnnePadGame.dylib` to the 8 unchanged shell
+  entries with valid ZIP CRCs. The app count is one higher than the earlier audit
+  because the patched game code now calls the audio-list repair hook the shell
+  exports.
+
+Not yet tested: a device launch, gameplay, GB Tower and Transfer Pak; Windows x64
+hardware; build paths with spaces or non-English characters for this route.
