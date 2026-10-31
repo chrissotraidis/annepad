@@ -95,3 +95,13 @@ export. Run from scratch on 31 October, they reproduced the audit above: shell
 in 7 min 26 s, module in 10 min 27 s with 12 jobs, the same import counts, iOS 16,
 and insertion adding only the module to the 8-entry shell. Turning these into one
 PadMint recipe still needs the generation step for Windows.
+
+The same module also compiled on Windows 11 ARM64 (Parallels) on 31 October.
+It used the PadMint 0.5.27 release ZIP's bundled Python, the LLVM 21.1.8 ARM64 and
+iOS SDK that PadMint installs, a fresh clone at `6318c13`, and
+`scripts/build-game-module.py` with 6 jobs. All 1,011 units compiled in 56 minutes.
+PadMint's audit against the same shell matched the Mac exactly: 102 app imports,
+13 runtime names, 2 standard C++ names, iOS 16, and only `AnnePadGame.dylib`
+added. Its input was the Mac's generated CPU source, copied privately. Windows
+generation was recorded separately above. A single Windows orchestrator from ROM
+to module is still open.
