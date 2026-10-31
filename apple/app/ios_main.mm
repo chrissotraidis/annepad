@@ -12,6 +12,9 @@
 #import <UIKit/UIKit.h>
 
 #include "rom_setup.h"
+#if defined(ANNEPAD_MODULE_SHELL)
+#include "game_module.h"
+#endif
 #include "touch_tap_latch.h"
 #include "diagnostics_impl.h"
 
@@ -832,6 +835,14 @@ extern "C" void annepad_touch_snapshot(uint16_t* buttons, float* x, float* y) {
 
 extern "C" int SDL_main(int argc, char** argv) {
     @autoreleasepool {
+#if defined(ANNEPAD_MODULE_SHELL)
+        NSString* modulePath = [[NSBundle mainBundle].bundlePath stringByAppendingPathComponent:@"AnnePadGame.dylib"];
+        if (const char* error = annepad_load_game_module(modulePath.fileSystemRepresentation)) {
+            std::fprintf(stderr, "%s\n", error);
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Build AnnePad with PadMint", error, nullptr);
+            return EXIT_FAILURE;
+        }
+#endif
         SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
         SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 #if !defined(ANNEPAD_RELEASE_BUILD)
