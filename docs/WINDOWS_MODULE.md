@@ -84,3 +84,14 @@ matching the shell. Insertion added only `AnnePadGame.dylib` and left every
 shell entry unchanged. This used the Mac's generated CPU source, not a Windows
 generation, and no device launch was attempted. A repeatable full orchestrator,
 the final ledger and the Windows module compile remain open.
+
+The shell and module now have repeatable entry points:
+`scripts/build-module-shell.sh [output.ipa]` applies and verifies the maintained
+patches, builds only rt64's `file_to_c` host tool, applies the shell patch for
+that build only, rejects ROM files or `func_8…` code in the shell, and writes a
+deterministic unsigned IPA. `scripts/build-game-module.py` compiles the module
+with PadMint's toolchain and requires `_annepad_get_game_module` to be its only
+export. Run from scratch on 31 October, they reproduced the audit above: shell
+in 7 min 26 s, module in 10 min 27 s with 12 jobs, the same import counts, iOS 16,
+and insertion adding only the module to the 8-entry shell. Turning these into one
+PadMint recipe still needs the generation step for Windows.
