@@ -58,6 +58,14 @@ interruption, thermal, and full iPhone acceptance remain separate test work.
 
 ## Get started
 
+**No Mac?** Building AnnePad for iPhone or iPad needs an Apple Silicon Mac
+today. AnnePad reads your own ROM while it builds, so it can't use [GitHub's
+Mac](https://github.com/chrissotraidis/padmint#no-mac-build-on-githubs-mac) the
+way some other ports do: that would mean uploading your game file. A Windows
+build is in progress; [PadMint's Windows
+list](https://github.com/chrissotraidis/padmint/blob/main/docs/WINDOWS.md) shows
+where it stands.
+
 **The easy way:** releases publish no app, because AnnePad contains code
 translated from the game; you make your own from your own ROM. On an Apple
 Silicon Mac with Xcode (plus its Metal Toolchain: `xcodebuild -downloadComponent MetalToolchain`) and
