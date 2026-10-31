@@ -69,3 +69,18 @@ The complete module/app import audit, final source/input ledger, repeatable full
 orchestrator and packaged PadMint route remain acceptance gates. Device gameplay,
 GB Tower behavior and Transfer Pak operation have not been tested by these build
 checks. Neither Windows architecture is advertised by the recipe yet.
+
+
+On 31 October 2026 the module/app import audit passed on an Apple Silicon Mac.
+The private module was built with `cmake/game-module` from the existing
+supported-ROM CPU generation, PadMint's LLVM 22.1.8 and its open-source iOS SDK
+(1,011 compile units). The empty shell was built from the pinned game source
+with `private-module-shell.patch` applied only for that build. The shell
+contains no generated `func_8…` code. Its `recomp_entrypoint` is the loader's
+forwarding stub, and all 103 declared runtime exports are present. PadMint
+0.5.27 accepted the pair: 102 module imports resolve to the app, 13 are known
+runtime names and 2 are standard C++ names. The module's minimum is iOS 16,
+matching the shell. Insertion added only `AnnePadGame.dylib` and left every
+shell entry unchanged. This used the Mac's generated CPU source, not a Windows
+generation, and no device launch was attempted. A repeatable full orchestrator,
+the final ledger and the Windows module compile remain open.
