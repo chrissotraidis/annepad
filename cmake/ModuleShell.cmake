@@ -1,0 +1,22 @@
+function(annepad_module_shell target)
+    get_filename_component(root "${ANNEPAD_IOS_DIR}/../.." ABSOLUTE)
+    include("${root}/cmake/ModuleIdentity.cmake")
+    annepad_module_identity("${root}" identity)
+    target_sources(${target} PRIVATE "${root}/apple/module/game_module_loader.cpp")
+    target_include_directories(${target} PRIVATE "${root}/apple/module")
+    target_compile_definitions(${target} PRIVATE ANNEPAD_MODULE_SHELL=1)
+    set_source_files_properties("${root}/apple/module/game_module_loader.cpp" PROPERTIES
+        COMPILE_DEFINITIONS "ANNEPAD_MODULE_ID=\"${identity}\"")
+    # Retain the reviewed public API required by the private CPU/RSP module.
+    # Whole-archive loading would also retain disabled runtime compiler stubs.
+    set(exports "${root}/cmake/runtime-exports.txt")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${exports}")
+    file(STRINGS "${exports}" symbols REGEX "^_")
+    foreach(symbol IN LISTS symbols)
+        if(NOT symbol MATCHES "^_[A-Za-z0-9_$.]+$")
+            message(FATAL_ERROR "Invalid module runtime export: ${symbol}")
+        endif()
+        target_link_options(${target} PRIVATE "LINKER:-u,${symbol}")
+    endforeach()
+    target_link_options(${target} PRIVATE "LINKER:-exported_symbols_list,${exports}")
+endfunction()

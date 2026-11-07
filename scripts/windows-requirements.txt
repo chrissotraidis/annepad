@@ -1,0 +1,23 @@
+# pret pokestadium's requirements, pinned to the versions the Mac route uses.
+# libyaz0 is omitted: nothing in the build imports it and it has no Windows wheel.
+# rabbitizer comes from the fixed 1.16.2+padmint.1 wheel (see build-windows-module.py).
+certifi==2026.7.22
+charset-normalizer==3.4.9
+colorama==0.4.6
+crunch64==0.6.2
+decomp_settings==0.0.10
+idna==3.18
+intervaltree==3.2.1
+ipl3checksum==1.3.1
+mapfile_parser==2.13.0
+n64img==0.3.3
+pygfxd==1.0.5
+pylibyaml==0.1.0
+pypng==0.20220715.0
+PyYAML==6.0.3
+requests==2.34.2
+sortedcontainers==2.4.0
+spimdisasm @ git+https://github.com/Decompollaborate/spimdisasm.git@fe1338434c99240eb4adca0b7860edc12b847565
+splat64==0.25.0
+tqdm==4.70.0
+urllib3==2.7.0

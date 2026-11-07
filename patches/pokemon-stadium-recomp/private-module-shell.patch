@@ -1,0 +1,53 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -53,6 +53,11 @@
+ # for dev — stderr logs). Configure with -DPSR_NO_CONSOLE=ON for the release exe.
+ option(PSR_NO_CONSOLE "Build a windowed release with no console window" OFF)
+ 
++option(ANNEPAD_MODULE_SHELL "Build the iOS app without private generated game code" OFF)
++if(ANNEPAD_MODULE_SHELL AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
++    message(FATAL_ERROR "The module shell currently targets iOS only")
++endif()
++
+ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+     set(ANNEPAD_IOS_DIR "" CACHE PATH "Path to AnnePad's native iOS sources")
+     set(ANNEPAD_RECOMPILED_ARCHIVE "" CACHE FILEPATH "Prebuilt iOS AOT game archive")
+@@ -63,7 +68,7 @@
+     if(NOT EXISTS "${ANNEPAD_IOS_DIR}/ios_main.mm")
+         message(FATAL_ERROR "ANNEPAD_IOS_DIR must contain ios_main.mm")
+     endif()
+-    if(NOT EXISTS "${ANNEPAD_RECOMPILED_ARCHIVE}")
++    if(NOT ANNEPAD_MODULE_SHELL AND NOT EXISTS "${ANNEPAD_RECOMPILED_ARCHIVE}")
+         message(FATAL_ERROR "ANNEPAD_RECOMPILED_ARCHIVE must name the audited iOS AOT archive")
+     endif()
+ 
+@@ -120,7 +125,9 @@
+ # We just declare the include path + link dependency below.
+ 
+ # ---- RecompiledFuncs library (the recompiled game C) -----------------------
+-if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
++if(ANNEPAD_MODULE_SHELL)
++    add_library(RecompiledFuncs INTERFACE)
++elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+     add_library(RecompiledFuncs STATIC IMPORTED GLOBAL)
+     set_target_properties(RecompiledFuncs PROPERTIES
+         IMPORTED_LOCATION "${ANNEPAD_RECOMPILED_ARCHIVE}")
+@@ -224,6 +231,17 @@
+     # itself is added to this target by recomp_target_launcher_ui() below.
+     ${PSR_LAUNCHER_SOURCE}
+ )
++
++if(ANNEPAD_MODULE_SHELL)
++    get_target_property(app_sources PokemonStadiumRecomp SOURCES)
++    list(REMOVE_ITEM app_sources
++        "src/main/register_overlays.cpp" "generated/lookup.cpp"
++        "${CMAKE_SOURCE_DIR}/rsp/aspMain.cpp" "${CMAKE_SOURCE_DIR}/rsp/gbTowerMain.cpp"
++        "${CMAKE_SOURCE_DIR}/rsp/gbTowerColorMain.cpp" "${CMAKE_SOURCE_DIR}/rsp/njpgdspMain.cpp")
++    set_property(TARGET PokemonStadiumRecomp PROPERTY SOURCES "${app_sources}")
++    include("${ANNEPAD_IOS_DIR}/../../cmake/ModuleShell.cmake")
++    annepad_module_shell(PokemonStadiumRecomp)
++endif()
+ 
+ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+     target_sources(PokemonStadiumRecomp PRIVATE

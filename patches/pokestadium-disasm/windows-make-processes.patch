@@ -1,0 +1,129 @@
+--- a/Makefile
++++ b/Makefile
+@@ -11,7 +11,8 @@
+ 
+ # OS Detection
+ ifeq ($(OS),Windows_NT)
+-$(error Native Windows is currently unsupported for building this repository, use WSL instead c:)
++DETECTED_OS = windows
++VENV_BIN_DIR = Scripts
+ else
+   UNAME_S := $(shell uname -s)
+   ifeq ($(UNAME_S),Linux)
+--- a/tools/extract_presjpeg.py
++++ b/tools/extract_presjpeg.py
+@@ -31,6 +31,5 @@
+ file.seek(header_size, os.SEEK_SET)
+ jpeg_file = bytearray(file.read())
+ file.close()
+-file = open(filepath, 'wb')
+-file.write(jpeg_file)
++filepath.write_bytes(jpeg_file)
+ filepath.rename(filepath.with_suffix('.jpeg'))
+--- a/tools/asm-processor/build.py
++++ b/tools/asm-processor/build.py
+@@ -1,5 +1,6 @@
+ #!/usr/bin/env python3
+ import sys
++import os
+ from pathlib import Path
+ import shlex
+ import subprocess
+@@ -21,6 +22,10 @@
+ 
+ asmproc_flags = all_args[:sep0]
+ compiler = all_args[sep0:sep1]
++if os.name == "nt" and Path(compiler[0]).is_file():
++    with open(compiler[0], "rb") as executable:
++        if executable.read(2) == b"#!":
++            compiler.insert(0, "bash")
+ 
+ assembler_args = all_args[sep1 + 1 : sep2]
+ assembler_sh = " ".join(shlex.quote(x) for x in assembler_args)
+@@ -104,7 +109,7 @@
+     deps_file = out_file.with_suffix(".asmproc.d")
+     if deps:
+         with deps_file.open("w") as f:
+-            f.write(str(out_file) + ": " + " \\\n    ".join(deps) + "\n")
++            f.write(out_file.as_posix() + ": " + " \\\n    ".join(deps) + "\n")
+             for dep in deps:
+                 f.write("\n" + dep + ":\n")
+     else:
+--- a/tools/asm-processor/asm_processor.py
++++ b/tools/asm-processor/asm_processor.py
+@@ -1,6 +1,8 @@
+ #!/usr/bin/env python3
+ import argparse
+ import tempfile
++import shlex
++import subprocess
+ import struct
+ import copy
+ import sys
+@@ -1107,17 +1109,17 @@
+             asm.extend(conts)
+         asm.append('glabel {}'.format(late_rodata_source_name_end))
+ 
+-    o_file = tempfile.NamedTemporaryFile(prefix='asm-processor', suffix='.o', delete=False)
++    o_file = tempfile.NamedTemporaryFile(prefix='asm-processor', suffix='.o', delete=False, dir='.' if os.name == 'nt' else None)
+     o_name = o_file.name
+     o_file.close()
+-    s_file = tempfile.NamedTemporaryFile(prefix='asm-processor', suffix='.s', delete=False)
++    s_file = tempfile.NamedTemporaryFile(prefix='asm-processor', suffix='.s', delete=False, dir='.' if os.name == 'nt' else None)
+     s_name = s_file.name
+     try:
+         s_file.write(asm_prelude + b'\n')
+         for line in asm:
+             s_file.write(line.encode(output_enc) + b'\n')
+         s_file.close()
+-        ret = os.system(assembler + " " + s_name + " -o " + o_name)
++        ret = subprocess.call(shlex.split(assembler) + [os.path.basename(s_name) if os.name == "nt" else s_name, "-o", os.path.basename(o_name) if os.name == "nt" else o_name])
+         if ret != 0:
+             raise Failure("failed to assemble")
+         with open(o_name, 'rb') as f:
+@@ -1335,7 +1337,9 @@
+                 if not existing:
+                     name_to_sym[s.name] = s
+                     newer_syms.append(s)
+-                elif s.st_shndx != SHN_UNDEF:
++                elif s.st_shndx != SHN_UNDEF and not (
++                    existing.st_shndx == s.st_shndx and existing.st_value == s.st_value
++                ):
+                     raise Failure("symbol \"" + s.name + "\" defined twice")
+                 else:
+                     s.replace_by = existing
+--- a/lib/ultralib/Makefile
++++ b/lib/ultralib/Makefile
+@@ -189,8 +189,8 @@
+ endif
+ ifneq ($(FIXUPS),0)
+ 	$(V)tools/set_o32abi_bit.py $(WORKING_DIR)/$(@:.marker=.o)
+-	$(V)$(CROSS)strip $(WORKING_DIR)/$(@:.marker=.o) -N asdasdasdasd
+-	$(V)$(CROSS)objcopy --remove-section .mdebug $(WORKING_DIR)/$(@:.marker=.o)
++	$(V)$(CROSS)strip $(@:.marker=.o) -N asdasdasdasd
++	$(V)$(CROSS)objcopy --remove-section .mdebug $(@:.marker=.o)
+ endif
+ # create or update the marker file
+ 	@touch $@
+@@ -209,8 +209,8 @@
+ endif
+ ifneq ($(FIXUPS),0)
+ 	$(V)tools/set_o32abi_bit.py $(WORKING_DIR)/$(@:.marker=.o)
+-	$(V)$(CROSS)strip $(WORKING_DIR)/$(@:.marker=.o) -N asdasdasdasd
+-	$(V)$(CROSS)objcopy --remove-section .mdebug $(WORKING_DIR)/$(@:.marker=.o)
++	$(V)$(CROSS)strip $(@:.marker=.o) -N asdasdasdasd
++	$(V)$(CROSS)objcopy --remove-section .mdebug $(@:.marker=.o)
+ endif
+ # create or update the marker file
+ 	@touch $@
+@@ -232,8 +232,8 @@
+ endif
+ ifneq ($(FIXUPS),0)
+ 	tools/set_o32abi_bit.py $(WORKING_DIR)/$(@:.marker=.o)
+-	$(CROSS)strip $(WORKING_DIR)/$(@:.marker=.o) -N asdasdasdasd
+-	$(CROSS)objcopy --remove-section .mdebug $(WORKING_DIR)/$(@:.marker=.o)
++	$(CROSS)strip $(@:.marker=.o) -N asdasdasdasd
++	$(CROSS)objcopy --remove-section .mdebug $(@:.marker=.o)
+ endif
+ # create or update the marker file
+ 	@touch $@
