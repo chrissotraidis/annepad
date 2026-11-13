@@ -65,7 +65,9 @@ fetch_archive \
     "$sdl_sha256" "$sdl_archive"
 sdl_source="$source_root/SDL2-$sdl_version"
 sdl_prefix="$prefix_root/sdl2"
-extract_archive "$sdl_archive" "$sdl_source" "SDL2-$sdl_version"
+# The source marker and sdl_config name the scene patch revision, so a source or
+# library built with an earlier revision is replaced.
+extract_archive "$sdl_archive" "$sdl_source" "SDL2-$sdl_version-scenes-v3"
 # UIKit scene startup for SDL 2.32.10: apps built with the iOS 27 SDK need it to open.
 # Applied once; an already patched source is left as it is.
 sdl_scene_patch="$ANNEPAD_ROOT/patches/sdl2/uikit-scenes.patch"
@@ -73,7 +75,7 @@ if ! patch -d "$sdl_source" -p1 -R -s -f --dry-run < "$sdl_scene_patch" >/dev/nu
     patch -d "$sdl_source" -p1 -N -s < "$sdl_scene_patch"
 fi
 
-sdl_config=static-metal-no-loadso-scenes-v2
+sdl_config=static-metal-no-loadso-scenes-v3
 if [[ ! -f "$sdl_prefix/lib/libSDL2.a" ]] || \
    [[ ! -f "$sdl_prefix/.annepad-config" ]] || \
    [[ "$(<"$sdl_prefix/.annepad-config")" != "$sdl_config" ]]; then
