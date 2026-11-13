@@ -303,6 +303,12 @@ not use keyboard/controller assistance after team selection begins.
   phone/tablet profile persistence and migration.
 - No stuck input after cancellation, backgrounding, setup overlay, or controller
   connection change.
+- Auto-hide with a physical controller: controller paired before launch,
+  connect/disconnect during play, a second controller added or removed, a
+  controller owning only Player 2, the Auto-hide setting turned off and on while
+  connected, and Show Touch Controls restoring working touch with the controller
+  still connected. `scripts/test-touch-visibility.sh` covers the decision on the
+  host; the hardware scenarios remain a physical-controller gate.
 
 ## Saves/files/lifecycle scenarios
 

@@ -55,7 +55,7 @@
          if (ev.type == SDL_KEYDOWN && ev.key.repeat == 0 &&
              ev.key.keysym.scancode < SDL_NUM_SCANCODES) {
              std::lock_guard<std::mutex> lock(g_keyboard_tap_mutex);
-@@ -1607,17 +1634,142 @@
+@@ -1607,17 +1634,161 @@
  // real behavior, not a fake. Real input takes effect when a controller is
  // plugged in and SDL_GameControllerOpen succeeds.
  
@@ -139,6 +139,21 @@
 +    return current;
 +}
 +
++#if defined(__APPLE__) && TARGET_OS_IPHONE
++extern "C" void annepad_touch_set_player_controller(int ready);
++
++// Touch input drives Player 1. Only a controller that owns Player 1 and has
++// the stick and buttons gameplay needs lets the touch overlay auto-hide.
++static bool controller_can_play(SDL_GameController* pad) {
++    return pad != nullptr &&
++        SDL_GameControllerHasAxis(pad, SDL_CONTROLLER_AXIS_LEFTX) &&
++        SDL_GameControllerHasAxis(pad, SDL_CONTROLLER_AXIS_LEFTY) &&
++        SDL_GameControllerHasButton(pad, SDL_CONTROLLER_BUTTON_A) &&
++        SDL_GameControllerHasButton(pad, SDL_CONTROLLER_BUTTON_B) &&
++        SDL_GameControllerHasButton(pad, SDL_CONTROLLER_BUTTON_START);
++}
++#endif
++
 +static void reconcile_controllers(ControllerReconcileReason reason) {
 +#ifndef __APPLE__
 +    SDL_PumpEvents();
@@ -196,13 +211,17 @@
 +            found->name.c_str());
 +    }
 +    std::fflush(stderr);
++#if defined(__APPLE__) && TARGET_OS_IPHONE
++    annepad_touch_set_player_controller(
++        controller_handle_valid(0) && controller_can_play(g_controller_pads[0]) ? 1 : 0);
++#endif
 +    g_controller_reconciled = true;
 +    g_next_controller_check = std::chrono::steady_clock::now() + std::chrono::seconds(1);
 +}
  
  // Snapshot the launcher's assignment into the per-port routing tables. Called
  // once from the boot thread when PLAY is clicked. SDL handles are opened lazily
-@@ -1627,9 +1779,10 @@
+@@ -1627,9 +1798,10 @@
          const auto pa = pkmnstadium::recompui::port_assignment(port);
          g_port_enabled[port] = pa.enabled;
          g_port_kind[port] = pa.enabled ? pa.kind : pkmnstadium::recompui::DeviceKind::None;
@@ -214,7 +233,7 @@
      std::fprintf(stderr, "[input] launcher config applied: "
                   "P1=%d P2=%d P3=%d P4=%d (0=None 1=Kbd 2=Pad)\n",
                   (int)g_port_kind[0], (int)g_port_kind[1],
-@@ -1637,51 +1790,18 @@
+@@ -1637,51 +1809,18 @@
      std::fflush(stderr);
  }
  
@@ -275,7 +294,7 @@
      }
  }
  
-@@ -1689,17 +1804,15 @@
+@@ -1689,17 +1828,15 @@
  #ifndef __APPLE__
      SDL_GameControllerUpdate();
  #endif
@@ -301,7 +320,7 @@
  }
  
  static float normalized_stick_axis(int32_t value, int32_t deadzone) {
-@@ -1734,7 +1847,9 @@
+@@ -1734,7 +1871,9 @@
          }
          switch (g_port_kind[controller_num]) {
              case pkmnstadium::recompui::DeviceKind::Gamepad:
@@ -312,7 +331,7 @@
                  break;
              case pkmnstadium::recompui::DeviceKind::Keyboard:
                  use_kb = true;
-@@ -1746,12 +1861,16 @@
+@@ -1746,12 +1885,16 @@
          }
          primary_port = (controller_num == 0);
      } else {
@@ -333,7 +352,7 @@
      }
  
      // TCP override (debug harness) layers only onto the primary port.
-@@ -1887,12 +2006,10 @@
+@@ -1887,12 +2030,10 @@
  }
  
  static void set_rumble(int controller_num, bool on) {
@@ -350,7 +369,7 @@
      if (!pad) return;
      SDL_GameControllerRumble(pad, on ? 0xFFFF : 0, on ? 0xFFFF : 0, 1000);
  }
-@@ -1906,8 +2023,12 @@
+@@ -1906,8 +2047,12 @@
      // which is how the launcher suppresses unconfigured players.
      if (g_launcher_input_active.load()) {
 +        ensure_controllers_open();
@@ -365,7 +384,7 @@
          info.connected_device = has_dev
              ? ultramodern::input::Device::Controller
              : ultramodern::input::Device::None;
-@@ -1920,11 +2040,13 @@
+@@ -1920,11 +2065,13 @@
      // Legacy: libultra's osContInit() queries before the first poll, so
      // lazy-detect the pad here too (else "Controller 1 not connected").
      if (controller_num == 0) {
