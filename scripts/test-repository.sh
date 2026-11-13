@@ -21,6 +21,7 @@ if (ANNEPAD_BUILD_JOBS=two configured_build_jobs >/dev/null 2>&1); then
     die "non-numeric ANNEPAD_BUILD_JOBS value was accepted"
 fi
 "$ANNEPAD_ROOT/scripts/test-touch-tap-latch.sh"
+"$ANNEPAD_ROOT/scripts/test-touch-visibility.sh"
 "$ANNEPAD_ROOT/scripts/test-controller-slots.sh"
 python3 "$ANNEPAD_ROOT/tests/patch_stack_test.py"
 

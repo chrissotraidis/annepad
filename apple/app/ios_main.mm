@@ -13,6 +13,7 @@
 
 #include "rom_setup.h"
 #include "touch_tap_latch.h"
+#include "touch_visibility.h"
 #include "diagnostics_impl.h"
 
 int annepad_recomp_main(int argc, char** argv);
@@ -24,6 +25,7 @@ std::atomic<uint16_t> g_touch_buttons{0};
 AnnePadTouchTapLatch g_touch_taps;
 std::atomic<int32_t> g_touch_x{0};
 std::atomic<int32_t> g_touch_y{0};
+std::atomic_bool g_player_controller_ready{false};
 
 constexpr uint8_t kTapHoldPolls = 6;
 constexpr uint8_t kShoulderTapHoldPolls = 45;
@@ -110,6 +112,10 @@ NSString* touchControlsEnabledDefaultsKey() {
     return @"annepad.touch.enabled.v1";
 }
 
+NSString* touchAutoHideDefaultsKey() {
+    return @"annepad.touch.auto-hide-controller.v1";
+}
+
 CGFloat savedTouchOpacity() {
     NSNumber* saved = [NSUserDefaults.standardUserDefaults
         objectForKey:touchOpacityDefaultsKey()];
@@ -123,6 +129,13 @@ BOOL savedTouchControlsEnabled() {
     return ![saved isKindOfClass:NSNumber.class] || saved.boolValue;
 }
 
+BOOL savedTouchAutoHide() {
+    NSNumber* saved = [NSUserDefaults.standardUserDefaults
+        objectForKey:touchAutoHideDefaultsKey()];
+    const bool hasSaved = [saved isKindOfClass:NSNumber.class];
+    return AnnePadSavedAutoHide(hasSaved, hasSaved && saved.boolValue);
+}
+
 int savedResolutionMultiplier() {
     NSInteger value = [NSUserDefaults.standardUserDefaults
         integerForKey:resolutionDefaultsKey()];
@@ -133,7 +146,10 @@ int savedResolutionMultiplier() {
 
 @interface AnnePadTouchOverlayView : UIView
 - (void)presentResolutionMenu;
+- (void)setPlayerControllerReady:(BOOL)ready;
 @end
+
+AnnePadTouchOverlayView* g_touch_overlay = nil;
 
 @implementation AnnePadTouchOverlayView {
     std::array<TouchControl, kControlCount> _controls;
@@ -144,7 +160,7 @@ int savedResolutionMultiplier() {
     BOOL _editing;
     BOOL _hasUndo;
     NSInteger _selected;
-    BOOL _touchControlsEnabled;
+    AnnePadTouchVisibility _visibility;
     CGFloat _globalOpacity;
     CGFloat _undoOpacity;
     UISlider* _opacitySlider;
@@ -159,7 +175,9 @@ int savedResolutionMultiplier() {
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _controls = defaultControls();
         _selected = 9;
-        _touchControlsEnabled = savedTouchControlsEnabled();
+        _visibility.enabled = savedTouchControlsEnabled();
+        _visibility.autoHide = savedTouchAutoHide();
+        _visibility.controllerReady = g_player_controller_ready.load(std::memory_order_relaxed);
         _globalOpacity = savedTouchOpacity();
         [self loadLayout];
         _opacitySlider = [[UISlider alloc] initWithFrame:CGRectZero];
@@ -298,8 +316,29 @@ int savedResolutionMultiplier() {
     [NSUserDefaults.standardUserDefaults setObject:saved forKey:layoutDefaultsKey()];
     [NSUserDefaults.standardUserDefaults setDouble:_globalOpacity
                                              forKey:touchOpacityDefaultsKey()];
-    [NSUserDefaults.standardUserDefaults setBool:_touchControlsEnabled
+    [NSUserDefaults.standardUserDefaults setBool:_visibility.enabled
                                            forKey:touchControlsEnabledDefaultsKey()];
+    [NSUserDefaults.standardUserDefaults setBool:_visibility.autoHide
+                                           forKey:touchAutoHideDefaultsKey()];
+}
+
+- (BOOL)gameplayControlsVisible {
+    return _visibility.gameplayVisible();
+}
+
+- (void)setVisibility:(AnnePadTouchVisibility)visibility save:(BOOL)save {
+    const BOOL wasVisible = [self gameplayControlsVisible];
+    _visibility = visibility;
+    // Hidden controls must not keep a held button, stick or latched tap alive.
+    if (wasVisible && ![self gameplayControlsVisible] && !_editing) [self clearInput];
+    if (save) [self saveLayout];
+    [self setNeedsDisplay];
+}
+
+- (void)setPlayerControllerReady:(BOOL)ready {
+    AnnePadTouchVisibility next = _visibility;
+    next.controllerReady = ready;
+    [self setVisibility:next save:NO];
 }
 
 - (NSArray<NSString*>*)toolbarLabels {
@@ -369,7 +408,7 @@ int savedResolutionMultiplier() {
 
     for (NSInteger index = 0; index < (NSInteger)kControlCount; ++index) {
         const TouchControl& control = _controls[index];
-        if (!_touchControlsEnabled && !_editing) continue;
+        if (![self gameplayControlsVisible] && !_editing) continue;
         if (!control.visible && !_editing) continue;
         CGPoint center = [self centerForControl:control];
         CGFloat radius = [self radiusForControl:control];
@@ -513,16 +552,29 @@ int savedResolutionMultiplier() {
                                             message:nil
                                      preferredStyle:UIAlertControllerStyleActionSheet];
     AnnePadTouchOverlayView* overlay = self;
-    NSString* touchToggleTitle = _touchControlsEnabled
-        ? @"Turn Off Touch Controls"
-        : @"Turn On Touch Controls";
-    [menu addAction:[UIAlertAction actionWithTitle:touchToggleTitle
+    const BOOL controlsVisible = [self gameplayControlsVisible];
+    [menu addAction:[UIAlertAction actionWithTitle:controlsVisible
+                                                       ? @"Hide Touch Controls"
+                                                       : @"Show Touch Controls"
                                              style:UIAlertActionStyleDefault
                                            handler:^(__unused UIAlertAction* action) {
-        overlay->_touchControlsEnabled = !overlay->_touchControlsEnabled;
-        [overlay clearInput];
-        [overlay saveLayout];
-        [overlay setNeedsDisplay];
+        AnnePadTouchVisibility next = overlay->_visibility;
+        if (controlsVisible) {
+            next.enabled = false;
+        } else {
+            next.show();
+        }
+        [overlay setVisibility:next save:YES];
+    }]];
+    NSString* autoHideTitle = _visibility.autoHide
+        ? @"Auto-hide Touch Controls with Controller: On"
+        : @"Auto-hide Touch Controls with Controller: Off";
+    [menu addAction:[UIAlertAction actionWithTitle:autoHideTitle
+                                             style:UIAlertActionStyleDefault
+                                           handler:^(__unused UIAlertAction* action) {
+        AnnePadTouchVisibility next = overlay->_visibility;
+        next.autoHide = !next.autoHide;
+        [overlay setVisibility:next save:YES];
     }]];
     [menu addAction:[UIAlertAction actionWithTitle:@"Manage Game ROM"
                                              style:UIAlertActionStyleDefault
@@ -731,7 +783,7 @@ int savedResolutionMultiplier() {
     for (UITouch* touch in touches) {
         CGPoint point = [touch locationInView:self];
         if ([self handleToolbarPoint:point]) continue;
-        if (!_editing && !_touchControlsEnabled) continue;
+        if (!_editing && ![self gameplayControlsVisible]) continue;
         NSInteger control = [self controlAtPoint:point includeHidden:_editing];
         if (control == NSNotFound) continue;
         _selected = control;
@@ -812,12 +864,35 @@ extern "C" void annepad_touch_attach(void* window_pointer) {
             [[AnnePadTouchOverlayView alloc] initWithFrame:host.bounds];
         overlay.translatesAutoresizingMaskIntoConstraints = NO;
         [host addSubview:overlay];
+        g_touch_overlay = overlay;
         [NSLayoutConstraint activateConstraints:@[
             [overlay.leadingAnchor constraintEqualToAnchor:host.leadingAnchor],
             [overlay.trailingAnchor constraintEqualToAnchor:host.trailingAnchor],
             [overlay.topAnchor constraintEqualToAnchor:host.topAnchor],
             [overlay.bottomAnchor constraintEqualToAnchor:host.bottomAnchor],
         ]];
+        // A controller reported between creation and attachment still applies.
+        [overlay setPlayerControllerReady:
+            g_player_controller_ready.load(std::memory_order_relaxed)];
+    });
+}
+
+// The runtime's controller reconciliation reports whether a usable physical
+// controller owns Player 1, the player touch input drives. Controllers that
+// belong to other players never hide Player 1's touch controls.
+extern "C" void annepad_touch_set_player_controller(int ready) {
+    bool isReady = ready != 0;
+#if TARGET_OS_SIMULATOR
+    // CoreSimulator exposes its synthetic MFi "Gamepad" even when no external
+    // controller is paired. Keep touch controls available in Simulator tests.
+    isReady = false;
+#endif
+    if (g_player_controller_ready.exchange(isReady, std::memory_order_relaxed) == isReady) {
+        return;
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [g_touch_overlay setPlayerControllerReady:
+            g_player_controller_ready.load(std::memory_order_relaxed)];
     });
 }
 
